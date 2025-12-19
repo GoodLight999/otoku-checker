@@ -12,16 +12,16 @@ from google.genai.errors import ClientError
 API_KEY = os.environ.get("GEMINI_API_KEY")
 MODEL_ID = os.environ.get("GEMINI_MODEL_ID", "gemini-flash-latest")
 
-print(f"--- INITIALIZING DEBUG SCRAPER (MODEL: {MODEL_ID}) ---")
+print(f"--- INITIALIZING DEBUG SCRAPER (MODEL: {MODEL_ID}) ---", flush=True)
 if not API_KEY:
-    print("FATAL ERROR: 'GEMINI_API_KEY' environment variable is missing.")
+    print("FATAL ERROR: 'GEMINI_API_KEY' environment variable is missing.", flush=True)
     sys.exit(1)
 
-# 【修正】タイムアウトはミリ秒指定。300秒 = 300,000ms
-# これで「短すぎる」エラーは消え、かつ5分で損切りできるようになります
+# 【修正】タイムアウトを90秒(90000ms)に短縮
+# 5分も待つ必要はありません。動くときは1分で動きます。ダメな時はすぐ切って次へ行きます。
 client = genai.Client(
     api_key=API_KEY, 
-    http_options=types.HttpOptions(timeout=300000) 
+    http_options=types.HttpOptions(timeout=90000) 
 )
 
 URLS = {
@@ -44,13 +44,14 @@ def clean_json_text(text):
 
 def clean_html_aggressive(html_text):
     if not html_text: return ""
-
-    # formタグは消さない
+    
+    # 巨大ブロック削除 (formは維持)
     blocks_to_kill = r'<(header|footer|nav|noscript|script|style|iframe|svg|aside)[^>]*>.*?</\1>'
     html_text = re.sub(blocks_to_kill, '', html_text, flags=re.DOTALL | re.IGNORECASE)
 
     html_text = re.sub(r'<!--.*?-->', '', html_text, flags=re.DOTALL)
 
+    # リンク以外削除
     html_text = re.sub(r'<((?!a\s)[a-z0-9]+)\s+[^>]*>', r'<\1>', html_text, flags=re.IGNORECASE)
     
     attrs_to_remove = ['class', 'id', 'style', 'target', 'rel', 'onclick', 'data-[a-z0-9-]+', 'aria-[a-z-]+', 'role']
@@ -69,7 +70,7 @@ def clean_html_aggressive(html_text):
     return html_text[:95000].strip()
 
 def fetch_and_extract(card_name, target_url):
-    print(f"\n>>> Processing: {card_name}")
+    print(f"\n>>> Processing: {card_name}", flush=True)
     
     try:
         headers = {
@@ -84,17 +85,17 @@ def fetch_and_extract(card_name, target_url):
         # デバッグ保存
         with open(f"debug_input_{card_name}.html", "w", encoding="utf-8") as f:
             f.write(content)
-        print(f"DEBUG: Saved input HTML ({len(content)} chars)")
+        print(f"DEBUG: Saved input HTML ({len(content)} chars)", flush=True)
         
         if len(content) < 100:
-            print("FATAL: Cleaned HTML is empty!")
+            print("FATAL: Cleaned HTML is empty!", flush=True)
             return []
         
     except Exception as e:
-        print(f"ERROR: Failed to fetch web content: {e}")
+        print(f"ERROR: Failed to fetch web content: {e}", flush=True)
         return []
 
-    # プロンプト（完全版）
+    # 完全版プロンプト
     prompt = f"""
         You are an expert data analyst for Japanese credit card rewards (Poi-katsu).
         Analyze the text and extract store data properly.
@@ -148,7 +149,7 @@ def fetch_and_extract(card_name, target_url):
 
     for attempt in range(max_retries):
         try:
-            print(f"DEBUG: Requesting Gemini... (Attempt {attempt+1})")
+            print(f"DEBUG: Requesting Gemini... (Attempt {attempt+1})", flush=True)
             
             response = client.models.generate_content(
                 model=MODEL_ID, 
@@ -169,15 +170,17 @@ def fetch_and_extract(card_name, target_url):
 
         except ClientError as e:
             if "429" in str(e) or "RESOURCE_EXHAUSTED" in str(e):
-                print(f"WARNING: Rate Limit (429). Sleeping 5s...")
+                print(f"WARNING: Rate Limit (429). Sleeping 5s...", flush=True)
                 time.sleep(5)
                 continue
             else:
-                print(f"CRITICAL API ERROR: {e}")
+                print(f"CRITICAL API ERROR: {e}", flush=True)
                 return []
         except Exception as e:
-            print(f"WARNING: Network/Server Error ({e}).")
+            # タイムアウト等
+            print(f"WARNING: Network/Timeout Error ({e}).", flush=True)
             if attempt < max_retries - 1:
+                print("Retrying in 5s...", flush=True)
                 time.sleep(5)
                 continue
             else:
@@ -193,10 +196,10 @@ def fetch_and_extract(card_name, target_url):
     try:
         cleaned_json = clean_json_text(response_text)
         data = json.loads(cleaned_json)
-        print(f"SUCCESS: Extracted {len(data)} items for {card_name}")
+        print(f"SUCCESS: Extracted {len(data)} items for {card_name}", flush=True)
         return data
     except Exception as e:
-        print(f"JSON PARSE ERROR: {e}")
+        print(f"JSON PARSE ERROR: {e}", flush=True)
         with open(f"debug_error_{card_name}.txt", "w", encoding="utf-8") as f:
             f.write(str(e) + "\n\n" + response_text)
         return []
@@ -215,11 +218,11 @@ for i, (card, url) in enumerate(URLS.items()):
     if i < len(URLS) - 1:
         time.sleep(2)
 
-print(f"\n>>> Total items collected: {len(final_list)}")
+print(f"\n>>> Total items collected: {len(final_list)}", flush=True)
 
 try:
     with open("data.json", "w", encoding="utf-8") as f:
         json.dump(final_list, f, ensure_ascii=False, indent=2)
-    print(f"SUCCESS: 'data.json' created.")
+    print(f"SUCCESS: 'data.json' created.", flush=True)
 except Exception as e:
-    print(f"FATAL ERROR: Could not write data.json: {e}")
+    print(f"FATAL ERROR: Could not write data.json: {e}", flush=True)
