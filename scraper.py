@@ -18,7 +18,7 @@ if not API_KEY:
     print("FATAL ERROR: 'GEMINI_API_KEY' environment variable is missing.", flush=True)
     sys.exit(1)
 
-# タイムアウト90秒 (先輩のオリジナル設定を厳守)
+# タイムアウト90秒 (オリジナル設定を厳守)
 client = genai.Client(
     api_key=API_KEY, 
     http_options=types.HttpOptions(timeout=90000) 
@@ -40,7 +40,7 @@ BASE_DOMAINS = {
     "MUFG": "https://www.cr.mufg.jp"
 }
 
-# 【追加】環境変数からリファラルURLを取得
+# 【マージ】環境変数からリファラルURLを取得
 REFERRAL_URLS = {
     "SMBC": os.environ.get("SMBC_REFERRAL_URL"),
     "MUFG": os.environ.get("MUFG_REFERRAL_URL")
@@ -81,12 +81,11 @@ def clean_html_aggressive(html_text):
     
     return html_text[:95000].strip()
 
-# 【追加】リファラルリンクの内容のみを根拠にする生成ロジック
+# 【マージ】リファラルサイトのテキストのみを根拠にする生成関数
 def generate_catchphrase(card_name, referral_text):
     if not referral_text or len(referral_text) < 50:
         return None
     print(f">>> Analyzing Referral Content for {card_name}...", flush=True)
-    # f-string内でのJSON構造の波括弧エスケープ（二重化）
     prompt = f"""
         あなたは合理的な金融アナリストです。提供された「リファラルサイトのテキスト」のみを解析してください。
         【タスク】
@@ -101,7 +100,6 @@ def generate_catchphrase(card_name, referral_text):
         {referral_text[:20000]}
     """
     try:
-        # 修正済: configは通常の辞書リテラル
         response = client.models.generate_content(
             model=MODEL_ID, 
             contents=prompt,
@@ -112,7 +110,7 @@ def generate_catchphrase(card_name, referral_text):
         return None
 
 def fetch_and_extract(card_name, target_url):
-    print(f"\n>>> Processing Official: {card_name}", flush=True)
+    print(f"\n>>> Processing: {card_name}", flush=True)
     
     try:
         headers = {
@@ -136,7 +134,7 @@ def fetch_and_extract(card_name, target_url):
         print(f"ERROR: Failed to fetch web content: {e}", flush=True)
         return []
 
-    # 先輩の「完全版プロンプト」（一文字も変えず完全維持）
+    # 「完全版プロンプト」（一文字も変えず完全維持）
     prompt = f"""
         You are an expert data analyst for Japanese credit card rewards (Poi-katsu).
         Analyze the text and extract store data properly.
@@ -192,7 +190,6 @@ def fetch_and_extract(card_name, target_url):
         try:
             print(f"DEBUG: Requesting Gemini... (Attempt {attempt+1})", flush=True)
             
-            # 修正済: configは通常の辞書
             response = client.models.generate_content(
                 model=MODEL_ID, 
                 contents=prompt,
@@ -263,7 +260,6 @@ for i, (card, url) in enumerate(URLS.items()):
         final_stores_list.extend(items)
 
     # 2. 【マージ】リファラルリンクのテキストのみからキャッチコピーを生成
-    # これにより「15,000P」等の実利がmetaに流し込まれます
     ref_url = REFERRAL_URLS.get(card)
     if ref_url and ref_url != "#":
         try:
@@ -278,13 +274,13 @@ for i, (card, url) in enumerate(URLS.items()):
     if i < len(URLS) - 1:
         time.sleep(2)
 
-# 【最重要】出力構造を辞書形式に変更し、UI側の meta 参照を有効化
+# 【最重要】出力構造を辞書形式に変更して保存
 final_output = {
     "meta": meta_data,
     "stores": final_stores_list
 }
 
-print(f"\n>>> Total items: {len(final_stores_list)}, meta generated: {len(meta_data)}", flush=True)
+print(f"\n>>> Total stores: {len(final_stores_list)}, meta generated: {len(meta_data)}", flush=True)
 
 try:
     with open("data.json", "w", encoding="utf-8") as f:
