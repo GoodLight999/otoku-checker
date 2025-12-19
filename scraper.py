@@ -4,7 +4,7 @@ import json
 import time
 import re
 import sys
-from urllib.parse import urljoin  # URL結合用
+from urllib.parse import urljoin
 from google import genai
 from google.genai import types
 from google.genai.errors import ClientError
@@ -40,7 +40,7 @@ BASE_DOMAINS = {
     "MUFG": "https://www.cr.mufg.jp"
 }
 
-# 【マージ】環境変数からリファラルURLを取得
+# 環境変数からリファラルURLを取得 (GitHub ActionsのVariablesから)
 REFERRAL_URLS = {
     "SMBC": os.environ.get("SMBC_REFERRAL_URL"),
     "MUFG": os.environ.get("MUFG_REFERRAL_URL")
@@ -81,7 +81,7 @@ def clean_html_aggressive(html_text):
     
     return html_text[:95000].strip()
 
-# 【マージ】リファラルサイトのテキストのみを根拠にする生成関数
+# リファラルリンクのテキストのみを根拠にする生成関数
 def generate_catchphrase(card_name, referral_text):
     if not referral_text or len(referral_text) < 50:
         return None
@@ -110,7 +110,7 @@ def generate_catchphrase(card_name, referral_text):
         return None
 
 def fetch_and_extract(card_name, target_url):
-    print(f"\n>>> Processing: {card_name}", flush=True)
+    print(f"\n>>> Processing Official: {card_name}", flush=True)
     
     try:
         headers = {
@@ -134,7 +134,7 @@ def fetch_and_extract(card_name, target_url):
         print(f"ERROR: Failed to fetch web content: {e}", flush=True)
         return []
 
-    # 「完全版プロンプト」（一文字も変えず完全維持）
+    # 完全版プロンプト (オリジナルを1文字も変えずに完全維持)
     prompt = f"""
         You are an expert data analyst for Japanese credit card rewards (Poi-katsu).
         Analyze the text and extract store data properly.
@@ -246,7 +246,7 @@ final_stores_list = []
 meta_data = {}
 
 for i, (card, url) in enumerate(URLS.items()):
-    # 1. 公式サイトから店舗抽出
+    # 1. 公式サイトから店舗情報を抽出
     items = fetch_and_extract(card, url)
     if items:
         base_domain = BASE_DOMAINS.get(card, "") 
@@ -259,7 +259,7 @@ for i, (card, url) in enumerate(URLS.items()):
                 print(f"DEBUG: Fixed URL -> {item['official_list_url']}", flush=True)
         final_stores_list.extend(items)
 
-    # 2. 【マージ】リファラルリンクのテキストのみからキャッチコピーを生成
+    # 2. リファラルサイトのテキストのみからキャッチコピーを生成
     ref_url = REFERRAL_URLS.get(card)
     if ref_url and ref_url != "#":
         try:
@@ -274,13 +274,13 @@ for i, (card, url) in enumerate(URLS.items()):
     if i < len(URLS) - 1:
         time.sleep(2)
 
-# 【最重要】出力構造を辞書形式に変更して保存
+# 出力構造を辞書形式に変更し、HTML側の参照を成立させる
 final_output = {
     "meta": meta_data,
     "stores": final_stores_list
 }
 
-print(f"\n>>> Total stores: {len(final_stores_list)}, meta generated: {len(meta_data)}", flush=True)
+print(f"\n>>> Total items collected: {len(final_stores_list)}", flush=True)
 
 try:
     with open("data.json", "w", encoding="utf-8") as f:
