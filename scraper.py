@@ -134,7 +134,7 @@ def fetch_and_extract(card_name, target_url):
         print(f"ERROR: Failed to fetch web content: {e}", flush=True)
         return []
 
-    # 完全版プロンプト (ひらがな対応のルールを追加)
+    # 完全版プロンプト (商業施設内の対象外警告を強化)
     prompt = f"""
         You are an expert data analyst for Japanese credit card rewards (Poi-katsu).
         Analyze the text and extract store data properly.
@@ -163,6 +163,11 @@ def fetch_and_extract(card_name, target_url):
            - **Saizeriya (SMBC)**: Must link to the specific store list URL if found.
            - **KFC (SMBC)**: Must link to the specific store list URL if found.
            - If no specific list URL is found, set `official_list_url` to null.
+           
+        6. **COMMERCIAL FACILITIES (商業施設)**:
+           - Check for footnotes or warnings about "commercial facilities" (商業施設).
+           - If the text mentions that stores inside commercial facilities/stations are excluded, you MUST explicitly include "商業施設内の店舗は対象外の場合あり" in the `note`.
+           - This is highly critical for SMBC related stores.
 
         【Output JSON Schema】
         Return a JSON ARRAY.
@@ -174,7 +179,7 @@ def fetch_and_extract(card_name, target_url):
                 "payment_method": "String (e.g., 'スマホタッチ決済のみ', '物理カードOK')",
                 "mobile_order": "String (e.g., '対象外', '公式アプリのみ対象')",
                 "delivery": "String (e.g., '対象外', '自社デリバリーは対象')",
-                "note": "String (e.g., 'Amexは要確認')"
+                "note": "String (e.g., '商業施設内は対象外など')"
             }},
             "official_list_url": "Specific Store List URL or null"
         }}
