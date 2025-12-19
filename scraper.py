@@ -5,7 +5,7 @@ import time
 import re
 from google import genai
 
-# --- 設定 ---
+# --- Configuration ---
 API_KEY = os.environ.get("GEMINI_API_KEY")
 client = genai.Client(api_key=API_KEY)
 
@@ -25,28 +25,32 @@ URLS = {
 }
 
 def fetch_and_extract(card_name, target_url):
-    print(f"🔍 {card_name}を解析中（介護モード実行中）...")
+    print(f"DEBUG: Processing {card_name} with {MODEL_ID}...")
     try:
         content = requests.get(target_url, timeout=30).text
-        # プロンプトを強化：読み仮名と例示を大量に
+        # 例示を大幅に増やし、AIへの指示を徹底強化
         prompt = f"""
-        Extract real-world store rewards for {card_name} from the text. 
+        Extract real-world store rewards for {card_name} from the provided text.
         Return ONLY a JSON array of objects.
-        
+
         【JSON Structure】
-        - name: Official store name (e.g., "東急ストア")
-        - aliases: ALL possible search terms including:
-            1. Hiragana reading (e.g., "とうきゅうすとあ")
-            2. Katakana reading (e.g., "トウキュウストア")
-            3. Common nicknames (e.g., "マック", "マクド")
-            4. English names if applicable (e.g., "McDonald's")
-        - caution: Polite usage note in Japanese.
-        
-        【Rules】
-        - Ignore online-only shops.
-        - Be exhaustive with aliases to help users find stores easily.
-        
-        Text: {content[:15000]}
+        - name: Official store name (e.g., "セブン-イレブン", "ガスト")
+        - group: Group name if applicable (e.g., "セブン&アイ", "すかいらーくグループ"). null if none.
+        - aliases: LIST of all possible search keywords. 
+          MUST include:
+          1. Hiragana reading (e.g., "せぶんいれぶん", "がすと", "とうきゅうすとあ")
+          2. Katakana reading (e.g., "セブンイレブン", "ガスト", "トウキュウストア")
+          3. Common nicknames/abbreviations (e.g., "セブン", "マック", "マクド")
+          4. Related sub-brands if they share the same reward (e.g., for "セイコーマート", add "ハセガワストア", "タイエー")
+        - caution: Short polite note in Japanese regarding payment methods.
+
+        【Extraction Examples for AI Guidance】
+        - Store "マクドナルド" -> aliases: ["まくどなるど", "マクド", "マック", "mcdonalds"]
+        - Store "すき家" -> aliases: ["すきや", "スキヤ", "ゼンショー"]
+        - Store "東急ストア" -> aliases: ["とうきゅうすとあ", "トウキュウストア", "tokyu"]
+
+        Text Content:
+        {content[:15000]}
         """
         
         time.sleep(2)
@@ -58,31 +62,19 @@ def fetch_and_extract(card_name, target_url):
             return json.loads(json_match.group())
         return []
     except Exception as e:
-        print(f"❌ {card_name}でエラー: {e}")
+        print(f"ERROR: {card_name} - {e}")
         return []
 
-# 店舗統合ロジック
-merged_stores = {}
+# Execution Logic
+final_list = []
 for card, url in URLS.items():
     raw_data = fetch_and_extract(card, url)
     for item in raw_data:
-        name = item["name"]
-        if name not in merged_stores:
-            merged_stores[name] = {
-                "name": name,
-                "aliases": item.get("aliases", []),
-                "supports": []
-            }
-        if card not in merged_stores[name]["supports"]:
-            merged_stores[name]["supports"].append(card)
-        
-        # 読み仮名・別称をマージして重複削除
-        existing_aliases = set(merged_stores[name]["aliases"])
-        existing_aliases.update(item.get("aliases", []))
-        merged_stores[name]["aliases"] = list(existing_aliases)
+        item["card_type"] = card
+        final_list.append(item)
 
-final_list = list(merged_stores.values())
+# Save to file
 with open("data.json", "w", encoding="utf-8") as f:
     json.dump(final_list, f, ensure_ascii=False, indent=2)
 
-print(f"✅ 介護用データの生成が完了しました: {len(final_list)} 店舗")
+print(f"SUCCESS: Generated {len(final_list)} entries in data.json")
