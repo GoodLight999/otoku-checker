@@ -2,9 +2,13 @@
   {
     "name": "セイコーマート",
     "aliases": [
-      "タイエー",
       "ハマナスクラブ",
-      "ハセガワストア"
+      "せいこーまーと",
+      "タイエー",
+      "セイコマ",
+      "Seicomart",
+      "ハセガワストア",
+      "セコマ"
     ],
     "supports": [
       "SMBC"
@@ -14,7 +18,10 @@
     "name": "セブン-イレブン",
     "aliases": [
       "セブンイレブン",
-      "セブン"
+      "7-Eleven",
+      "せぶんいれぶん",
+      "セブン",
+      "711"
     ],
     "supports": [
       "SMBC"
@@ -23,7 +30,10 @@
   {
     "name": "ポプラ",
     "aliases": [
-      "生活彩家"
+      "ぽぷら",
+      "生活彩家",
+      "せいかつさいか",
+      "Poplar"
     ],
     "supports": [
       "SMBC"
@@ -31,7 +41,11 @@
   },
   {
     "name": "ミニストップ",
-    "aliases": [],
+    "aliases": [
+      "みにすとっぷ",
+      "Ministop",
+      "ミニスト"
+    ],
     "supports": [
       "SMBC"
     ]
@@ -39,9 +53,15 @@
   {
     "name": "ローソン",
     "aliases": [
-      "ローソンスリーエフ",
+      "ローソン",
+      "ローソンストア100",
+      "100円ローソン",
       "ナチュラルローソン",
-      "ローソンストア100"
+      "ろーそん",
+      "Lawson",
+      "ローソンスリーエフ",
+      "ローパナ",
+      "LAWSON"
     ],
     "supports": [
       "SMBC",
@@ -51,8 +71,10 @@
   {
     "name": "マクドナルド",
     "aliases": [
+      "マック",
       "マクド",
-      "マック"
+      "McDonald's",
+      "まくどなるど"
     ],
     "supports": [
       "SMBC"
@@ -61,6 +83,8 @@
   {
     "name": "モスバーガー",
     "aliases": [
+      "Mos Burger",
+      "もすばーがー",
       "モス",
       "モスバーガー＆カフェ"
     ],
@@ -71,9 +95,12 @@
   {
     "name": "ケンタッキーフライドチキン",
     "aliases": [
-      "KFC",
       "ケンタ",
-      "ケンタッキー"
+      "Kentucky Fried Chicken",
+      "ケンタッキー",
+      "けんたっきーふらいどちきん",
+      "KFC",
+      "ケンチキ"
     ],
     "supports": [
       "SMBC"
@@ -82,7 +109,29 @@
   {
     "name": "吉野家",
     "aliases": [
+      "Yoshinoya",
       "よしのや"
+    ],
+    "supports": [
+      "SMBC"
+    ]
+  },
+  {
+    "name": "すき家",
+    "aliases": [
+      "Sukiya",
+      "すきや"
+    ],
+    "supports": [
+      "SMBC"
+    ]
+  },
+  {
+    "name": "スターバックス",
+    "aliases": [
+      "スタバ",
+      "すたーばっくす",
+      "Starbucks"
     ],
     "supports": [
       "SMBC"
@@ -91,7 +140,9 @@
   {
     "name": "サイゼリヤ",
     "aliases": [
-      "サイゼ"
+      "サイゼ",
+      "さいぜりや",
+      "Saizeriya"
     ],
     "supports": [
       "SMBC"
@@ -99,77 +150,198 @@
   },
   {
     "name": "ガスト",
-    "aliases": [],
-    "supports": [
-      "SMBC"
-    ]
-  },
-  {
-    "name": "バーミヤン",
-    "aliases": [],
-    "supports": [
-      "SMBC"
-    ]
-  },
-  {
-    "name": "しゃぶ葉",
-    "aliases": [],
-    "supports": [
-      "SMBC"
-    ]
-  },
-  {
-    "name": "ジョナサン",
-    "aliases": [],
-    "supports": [
-      "SMBC"
-    ]
-  },
-  {
-    "name": "夢庵",
-    "aliases": [],
-    "supports": [
-      "SMBC"
-    ]
-  },
-  {
-    "name": "すかいらーくグループ飲食店",
     "aliases": [
-      "chawan",
-      "La Ohana",
-      "ステーキガスト",
-      "桃菜",
-      "三〇三",
-      "から好し",
-      "グラッチェガーデンズ",
-      "八郎そば",
-      "とんから亭",
-      "藍屋",
-      "ゆめあん食堂",
-      "魚屋路",
-      "むさしの森珈琲"
+      "がすと",
+      "Gusto"
     ],
     "supports": [
       "SMBC"
     ]
   },
   {
-    "name": "すき家",
-    "aliases": [],
+    "name": "バーミヤン",
+    "aliases": [
+      "Bamiyan",
+      "ばーみやん"
+    ],
+    "supports": [
+      "SMBC"
+    ]
+  },
+  {
+    "name": "しゃぶ葉",
+    "aliases": [
+      "Syabuyo",
+      "しゃぶよう"
+    ],
+    "supports": [
+      "SMBC"
+    ]
+  },
+  {
+    "name": "ジョナサン",
+    "aliases": [
+      "Jonathan's",
+      "じょなさん"
+    ],
+    "supports": [
+      "SMBC"
+    ]
+  },
+  {
+    "name": "夢庵",
+    "aliases": [
+      "Yumean",
+      "ゆめあん"
+    ],
+    "supports": [
+      "SMBC"
+    ]
+  },
+  {
+    "name": "ステーキガスト",
+    "aliases": [
+      "Steak Gusto",
+      "すてーきがすと"
+    ],
+    "supports": [
+      "SMBC"
+    ]
+  },
+  {
+    "name": "から好し",
+    "aliases": [
+      "からよし",
+      "Karayoshi"
+    ],
+    "supports": [
+      "SMBC"
+    ]
+  },
+  {
+    "name": "むさしの森珈琲",
+    "aliases": [
+      "Musashino Mori Coffee",
+      "むさしのもりこーひー"
+    ],
+    "supports": [
+      "SMBC"
+    ]
+  },
+  {
+    "name": "藍屋",
+    "aliases": [
+      "Aiya",
+      "あいや"
+    ],
+    "supports": [
+      "SMBC"
+    ]
+  },
+  {
+    "name": "グラッチェガーデンズ",
+    "aliases": [
+      "Grazie Gardens",
+      "ぐらっちぇがーでんず"
+    ],
+    "supports": [
+      "SMBC"
+    ]
+  },
+  {
+    "name": "魚屋路",
+    "aliases": [
+      "ととやみち",
+      "Totoyamichi"
+    ],
+    "supports": [
+      "SMBC"
+    ]
+  },
+  {
+    "name": "chawan",
+    "aliases": [
+      "ちゃわん",
+      "チャワン"
+    ],
+    "supports": [
+      "SMBC"
+    ]
+  },
+  {
+    "name": "La Ohana",
+    "aliases": [
+      "らおはな",
+      "ラオハナ"
+    ],
+    "supports": [
+      "SMBC"
+    ]
+  },
+  {
+    "name": "とんから亭",
+    "aliases": [
+      "とんからてい",
+      "Tonkaratei"
+    ],
+    "supports": [
+      "SMBC"
+    ]
+  },
+  {
+    "name": "ゆめあん食堂",
+    "aliases": [
+      "ゆめあんしょくどう"
+    ],
+    "supports": [
+      "SMBC"
+    ]
+  },
+  {
+    "name": "桃菜",
+    "aliases": [
+      "とうさい",
+      "トウサイ"
+    ],
+    "supports": [
+      "SMBC"
+    ]
+  },
+  {
+    "name": "八郎そば",
+    "aliases": [
+      "はちろうそば"
+    ],
+    "supports": [
+      "SMBC"
+    ]
+  },
+  {
+    "name": "三〇三",
+    "aliases": [
+      "みわみ",
+      "ミワミ"
+    ],
     "supports": [
       "SMBC"
     ]
   },
   {
     "name": "はま寿司",
-    "aliases": [],
+    "aliases": [
+      "Hama-sushi",
+      "はまずし"
+    ],
     "supports": [
       "SMBC"
     ]
   },
   {
     "name": "ココス",
-    "aliases": [],
+    "aliases": [
+      "COCO'S",
+      "ここす"
+    ],
     "supports": [
       "SMBC"
     ]
@@ -177,7 +349,9 @@
   {
     "name": "ドトールコーヒーショップ",
     "aliases": [
-      "ドトール"
+      "どとーるこーひーしょっぷ",
+      "ドトール",
+      "Doutor"
     ],
     "supports": [
       "SMBC"
@@ -186,7 +360,10 @@
   {
     "name": "エクセルシオール カフェ",
     "aliases": [
-      "エクセルシオール"
+      "エクセルシオール",
+      "えくせるしおーるかふぇ",
+      "Excelsior Cafe",
+      "エクセル"
     ],
     "supports": [
       "SMBC"
@@ -194,15 +371,9 @@
   },
   {
     "name": "かっぱ寿司",
-    "aliases": [],
-    "supports": [
-      "SMBC"
-    ]
-  },
-  {
-    "name": "スターバックス",
     "aliases": [
-      "スタバ"
+      "かっぱずし",
+      "Kappa Sushi"
     ],
     "supports": [
       "SMBC"
@@ -211,6 +382,10 @@
   {
     "name": "セブン‐イレブン",
     "aliases": [
+      "セブンイレブン",
+      "7-Eleven",
+      "Seven-Eleven",
+      "せぶんいれぶん",
       "セブン"
     ],
     "supports": [
@@ -220,7 +395,13 @@
   {
     "name": "コカ・コーラ自販機",
     "aliases": [
-      "コカコーラ自販機"
+      "こかこーらじはんき",
+      "コカコーラジハンキ",
+      "Coca-Cola",
+      "Coke ON Pay",
+      "Coke ON",
+      "コカコーラ",
+      "コカ・コーラ"
     ],
     "supports": [
       "MUFG"
@@ -228,14 +409,36 @@
   },
   {
     "name": "くら寿司",
-    "aliases": [],
+    "aliases": [
+      "クラズシ",
+      "くらずし",
+      "無添くら寿司",
+      "Kura Sushi"
+    ],
     "supports": [
       "MUFG"
     ]
   },
   {
     "name": "スシロー",
-    "aliases": [],
+    "aliases": [
+      "スシロー",
+      "あきんどスシロー",
+      "すしろー",
+      "Sushiro"
+    ],
+    "supports": [
+      "MUFG"
+    ]
+  },
+  {
+    "name": "ピザハット",
+    "aliases": [
+      "Pizza Hut",
+      "ピザハットオンライン",
+      "ピザハット",
+      "ぴざはっと"
+    ],
     "supports": [
       "MUFG"
     ]
@@ -243,7 +446,10 @@
   {
     "name": "松屋",
     "aliases": [
-      "松屋フーズ"
+      "Matsuya",
+      "まつや",
+      "松屋フーズ",
+      "マツヤ"
     ],
     "supports": [
       "MUFG"
@@ -251,35 +457,98 @@
   },
   {
     "name": "松のや",
-    "aliases": [],
+    "aliases": [
+      "まつのや",
+      "マツノヤ",
+      "松乃家",
+      "まつの屋"
+    ],
     "supports": [
       "MUFG"
     ]
   },
   {
     "name": "マイカリー食堂",
-    "aliases": [],
+    "aliases": [
+      "マイカリーショクドウ",
+      "マイカリー",
+      "まいかりーしょくどう"
+    ],
+    "supports": [
+      "MUFG"
+    ]
+  },
+  {
+    "name": "ステーキ屋松",
+    "aliases": [
+      "ステーキ松",
+      "すてーきやまつ",
+      "ステーキヤマツ"
+    ],
+    "supports": [
+      "MUFG"
+    ]
+  },
+  {
+    "name": "松軒中華食堂",
+    "aliases": [
+      "まつけんちゅうかしょくどう",
+      "マツケンチュウカショクドウ",
+      "松軒"
+    ],
+    "supports": [
+      "MUFG"
+    ]
+  },
+  {
+    "name": "すし松",
+    "aliases": [
+      "スシマツ",
+      "すしまつ"
+    ],
+    "supports": [
+      "MUFG"
+    ]
+  },
+  {
+    "name": "トゥックントゥックン",
+    "aliases": [
+      "とぅっくんとぅっくん",
+      "トゥックントゥックン"
+    ],
     "supports": [
       "MUFG"
     ]
   },
   {
     "name": "ロッテリア",
-    "aliases": [],
+    "aliases": [
+      "ロッテリア",
+      "ろってりあ",
+      "Lotteria"
+    ],
     "supports": [
       "MUFG"
     ]
   },
   {
     "name": "ゼッテリア",
-    "aliases": [],
+    "aliases": [
+      "ぜってりあ",
+      "ZETTERIA",
+      "ゼッテリア"
+    ],
     "supports": [
       "MUFG"
     ]
   },
   {
     "name": "アオキスーパー",
-    "aliases": [],
+    "aliases": [
+      "アオキスーパー",
+      "アオキ",
+      "あおきすーぱー"
+    ],
     "supports": [
       "MUFG"
     ]
@@ -287,7 +556,11 @@
   {
     "name": "オーケー",
     "aliases": [
-      "OKストア"
+      "おーけー",
+      "OK Store",
+      "オーケーストア",
+      "OKストア",
+      "オーケー"
     ],
     "supports": [
       "MUFG"
@@ -295,7 +568,11 @@
   },
   {
     "name": "オオゼキ",
-    "aliases": [],
+    "aliases": [
+      "オオゼキ",
+      "おおぜき",
+      "Ozeki"
+    ],
     "supports": [
       "MUFG"
     ]
@@ -303,10 +580,12 @@
   {
     "name": "サンリブ",
     "aliases": [
-      "マルショク",
-      "サンリブBUONO",
+      "サンク",
+      "サンリブ",
       "リブホール",
-      "サンク"
+      "サンリブBUONO",
+      "マルショク",
+      "さんりぶ"
     ],
     "supports": [
       "MUFG"
@@ -315,7 +594,10 @@
   {
     "name": "三和",
     "aliases": [
-      "スーパー三和"
+      "さんわ",
+      "サンワ",
+      "スーパー三和",
+      "SANWA"
     ],
     "supports": [
       "MUFG"
@@ -323,7 +605,11 @@
   },
   {
     "name": "フードワン",
-    "aliases": [],
+    "aliases": [
+      "ふーどわん",
+      "FOOD ONE",
+      "フードワン"
+    ],
     "supports": [
       "MUFG"
     ]
@@ -331,7 +617,9 @@
   {
     "name": "スーパー魚長",
     "aliases": [
+      "スーパーウオチョウ",
       "生鮮乃木市場",
+      "すーぱーうおちょう",
       "生鮮げんき市場"
     ],
     "supports": [
@@ -341,8 +629,12 @@
   {
     "name": "近商ストア",
     "aliases": [
-      "ハーベス",
-      "Pochette"
+      "Harves",
+      "キンショウストア",
+      "ポシェット",
+      "きんしょうすとあ",
+      "Pochette",
+      "ハーベス"
     ],
     "supports": [
       "MUFG"
@@ -351,8 +643,12 @@
   {
     "name": "東急ストア",
     "aliases": [
+      "プレッセ",
+      "Precce",
+      "とうきゅうすとあ",
+      "Tokyu Store",
       "フードステーション",
-      "プレッセ"
+      "トウキュウストア"
     ],
     "supports": [
       "MUFG"
@@ -360,21 +656,33 @@
   },
   {
     "name": "東武ストア",
-    "aliases": [],
+    "aliases": [
+      "Tobu Store",
+      "とうぶすとあ",
+      "トウブストア"
+    ],
     "supports": [
       "MUFG"
     ]
   },
   {
     "name": "ドミー",
-    "aliases": [],
+    "aliases": [
+      "どみー",
+      "ドミー",
+      "Domy"
+    ],
     "supports": [
       "MUFG"
     ]
   },
   {
     "name": "肉のハナマサ",
-    "aliases": [],
+    "aliases": [
+      "にくのはなまさ",
+      "ニクノハナマサ",
+      "ハナマサ"
+    ],
     "supports": [
       "MUFG"
     ]
@@ -382,8 +690,11 @@
   {
     "name": "ジャパンミート",
     "aliases": [
+      "じゃぱんみーと",
       "パワーマート",
-      "MEATMeet"
+      "ジャパンミート",
+      "MEATMeet",
+      "JAPAN MEAT"
     ],
     "supports": [
       "MUFG"
@@ -393,7 +704,10 @@
     "name": "ヤマナカ",
     "aliases": [
       "フランテ",
-      "フランテロゼ"
+      "やまなか",
+      "フランテロゼ",
+      "Frante",
+      "ヤマナカ"
     ],
     "supports": [
       "MUFG"
