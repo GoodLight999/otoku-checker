@@ -25,32 +25,30 @@ URLS = {
 }
 
 def fetch_and_extract(card_name, target_url):
-    print(f"DEBUG: Processing {card_name} with {MODEL_ID}...")
+    print(f"DEBUG: Extracting {card_name} stores from {target_url}")
     try:
-        content = requests.get(target_url, timeout=30).text
-        # 例示を大幅に増やし、AIへの指示を徹底強化
+        # 読み込み範囲を5万文字に拡大（欠損防止）
+        content = requests.get(target_url, timeout=45).text
+        
+        # 網羅性を最優先し、AIに「全店舗の出力」を強制
         prompt = f"""
-        Extract real-world store rewards for {card_name} from the provided text.
+        Extract EVERY SINGLE store reward for {card_name} listed in the text below. 
+        DO NOT omit, summarize, or truncate. I need an exhaustive list.
+        
         Return ONLY a JSON array of objects.
-
+        
         【JSON Structure】
-        - name: Official store name (e.g., "セブン-イレブン", "ガスト")
-        - group: Group name if applicable (e.g., "セブン&アイ", "すかいらーくグループ"). null if none.
-        - aliases: LIST of all possible search keywords. 
-          MUST include:
-          1. Hiragana reading (e.g., "せぶんいれぶん", "がすと", "とうきゅうすとあ")
-          2. Katakana reading (e.g., "セブンイレブン", "ガスト", "トウキュウストア")
-          3. Common nicknames/abbreviations (e.g., "セブン", "マック", "マクド")
-          4. Related sub-brands if they share the same reward (e.g., for "セイコーマート", add "ハセガワストア", "タイエー")
-        - caution: Short polite note in Japanese regarding payment methods.
-
-        【Extraction Examples for AI Guidance】
-        - Store "マクドナルド" -> aliases: ["まくどなるど", "マクド", "マック", "mcdonalds"]
-        - Store "すき家" -> aliases: ["すきや", "スキヤ", "ゼンショー"]
-        - Store "東急ストア" -> aliases: ["とうきゅうすとあ", "トウキュウストア", "tokyu"]
+        - name: Official store name.
+        - group: Parent group name (e.g., "すかいらーく", "セブン&アイ") if mentioned.
+        - aliases: Exhaustive search terms. Include:
+            1. Hiragana reading (MUST include for every store)
+            2. Katakana reading
+            3. Common nicknames
+            4. Sub-brands sharing the same reward (e.g., for "セイコーマート", include "ハセガワストア", "タイエー")
+        - caution: Short payment condition note.
 
         Text Content:
-        {content[:15000]}
+        {content[:50000]}
         """
         
         time.sleep(2)
@@ -59,13 +57,15 @@ def fetch_and_extract(card_name, target_url):
         
         json_match = re.search(r'\[.*\]', raw_text, re.DOTALL)
         if json_match:
-            return json.loads(json_match.group())
+            data = json.loads(json_match.group())
+            print(f"SUCCESS: Extracted {len(data)} items for {card_name}")
+            return data
         return []
     except Exception as e:
-        print(f"ERROR: {card_name} - {e}")
+        print(f"ERROR: Failed to process {card_name}: {e}")
         return []
 
-# Execution Logic
+# 各カードのデータを独立して保持（セブンが2回出る仕様を確定）
 final_list = []
 for card, url in URLS.items():
     raw_data = fetch_and_extract(card, url)
@@ -73,8 +73,6 @@ for card, url in URLS.items():
         item["card_type"] = card
         final_list.append(item)
 
-# Save to file
+# Save results
 with open("data.json", "w", encoding="utf-8") as f:
     json.dump(final_list, f, ensure_ascii=False, indent=2)
-
-print(f"SUCCESS: Generated {len(final_list)} entries in data.json")
