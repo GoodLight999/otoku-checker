@@ -22,7 +22,7 @@
             <div class="grid grid-cols-2 gap-4">
                 <div>
                     <div class="flex justify-between items-center mb-1">
-                        <label class="text-[10px] font-bold text-slate-500 uppercase">三井住友カード (最大7%)</label>
+                        <label class="text-[10px] font-bold text-slate-500 uppercase tracking-tighter">三井住友カード (最大7%)</label>
                         <a href="https://www.smbc-card.com/mem/wp/vpoint_up_program/index.jsp" target="_blank" class="text-[10px] text-green-600 underline">公式詳細</a>
                     </div>
                     <div class="flex items-center bg-slate-50 rounded-xl px-3 py-2 border border-slate-200 focus-within:border-green-600 focus-within:ring-2 focus-within:ring-green-100 transition-all">
@@ -32,7 +32,7 @@
                 </div>
                 <div>
                     <div class="flex justify-between items-center mb-1">
-                        <label class="text-[10px] font-bold text-slate-500 uppercase">三菱UFJカード (最大19%)</label>
+                        <label class="text-[10px] font-bold text-slate-500 uppercase tracking-tighter">三菱UFJカード (最大19%)</label>
                         <a href="https://www.cr.mufg.jp/mufgcard/point/global/save/convenience_store/index.html" target="_blank" class="text-[10px] text-red-600 underline">公式詳細</a>
                     </div>
                     <div class="flex items-center bg-slate-50 rounded-xl px-3 py-2 border border-slate-200 focus-within:border-red-600 focus-within:ring-2 focus-within:ring-red-100 transition-all">
@@ -58,6 +58,8 @@
         <div id="results" class="space-y-4"></div>
 
         <footer class="mt-12 text-center pb-8">
+            <div id="affiliate-footer" class="mb-8 border-t border-slate-200 pt-8"></div>
+            
             <div class="text-[10px] text-slate-400 leading-relaxed max-w-xs mx-auto">
                 <p class="mb-2">
                     本データはAI解析による推定値です。<br>
@@ -72,11 +74,19 @@
     </div>
 
     <script>
-        let storeData = [];
+        // 【改良】メタデータ対応。旧来の配列形式でも動作するように初期化
+        let storeData = { meta: {}, stores: [] };
+        
+        const MOPPY_LINKS = {
+            'SMBC': 'https://pc.moppy.jp/entry/invite.php?invite=Gupre100&s_id=149052',
+            'MUFG': 'https://pc.moppy.jp/entry/invite.php?invite=Gupre100&s_id=157374'
+        };
+
         const searchInput = document.getElementById('search');
         const smbcInput = document.getElementById('smbc-rate');
         const mufgInput = document.getElementById('mufg-rate');
         const resultsDiv = document.getElementById('results');
+        const footerDiv = document.getElementById('affiliate-footer');
 
         smbcInput.value = localStorage.getItem('otoku-rate-smbc') || "7.0";
         mufgInput.value = localStorage.getItem('otoku-rate-mufg') || "5.5";
@@ -112,11 +122,15 @@
             resultsDiv.innerHTML = '';
 
             if (!rawQuery) {
-                resultsDiv.innerHTML = '<p class="text-center text-slate-300 font-bold mt-10 text-sm">検索ワードを入力</p>';
+                resultsDiv.innerHTML = '<p class="text-center text-slate-300 font-bold mt-10 text-sm italic tracking-widest uppercase opacity-50 tracking-tighter">Search for store rewards</p>';
+                updateFooter(); // 未入力時もフッター更新
                 return;
             }
 
-            let filtered = storeData.filter(s => {
+            // 【改良】新旧データ構造の両方に対応
+            const storesArray = Array.isArray(storeData) ? storeData : (storeData.stores || []);
+            
+            let filtered = storesArray.filter(s => {
                 const conditionValues = s.conditions ? Object.values(s.conditions) : [];
                 const searchTargets = [
                     s.name, 
@@ -135,13 +149,12 @@
 
             if (filtered.length === 0) {
                 resultsDiv.innerHTML = '<p class="text-center text-slate-300 font-bold mt-10">該当なし</p>';
+                updateFooter();
                 return;
             }
 
             filtered.forEach(s => {
                 const isSmbc = s.card_type === 'SMBC';
-                
-                // 配色定義: SMBC=緑(Green), MUFG=赤(Red)
                 const badgeColor = isSmbc ? 'bg-green-600' : 'bg-red-600';
                 const rateColor = isSmbc ? 'text-green-700' : 'text-red-600';
                 
@@ -153,13 +166,10 @@
                 if(c.delivery) conditionsHtml += `<div class="text-[10px] leading-tight text-slate-500 mb-1"><span class="font-bold text-slate-700">配達:</span> ${c.delivery}</div>`;
                 if(c.note) conditionsHtml += `<div class="text-[10px] leading-tight text-orange-600 font-bold mt-1 bg-orange-50 p-1 rounded border border-orange-100">⚠️ ${c.note}</div>`;
 
-                // リンク出し分けロジック
                 let linkHtml = '';
                 if (s.official_list_url) {
-                    // 特定の店舗リストURLがある場合
                     linkHtml = `<a href="${s.official_list_url}" target="_blank" class="block mt-2 text-[10px] text-blue-500 underline text-right font-bold">📍 対象店舗リストを見る &rarr;</a>`;
                 } else {
-                    // 汎用公式サイトリンク
                     linkHtml = `<a href="${s.source_url}" target="_blank" class="block mt-2 text-[10px] text-slate-400 underline text-right">公式サイトで条件を確認 &rarr;</a>`;
                 }
 
@@ -186,9 +196,30 @@
                     </div>
                 </div>
                 `;
-                
                 resultsDiv.insertAdjacentHTML('beforeend', html);
             });
+            updateFooter();
+        }
+
+        function updateFooter() {
+            if (!footerDiv) return;
+            const meta = storeData.meta || {};
+            footerDiv.innerHTML = `
+                <div class="px-4">
+                    <p class="text-[9px] text-slate-400 leading-relaxed max-w-xs mx-auto mb-6 font-medium italic">
+                        ユーザーに利益のないアフィリエイトリンクよりも、ユーザー還元が大きい選択肢を提示することが、本ツールの持続的な信頼に繋がると判断しています。
+                    </p>
+                    <div class="flex flex-col gap-2 max-w-xs mx-auto">
+                        <a href="${MOPPY_LINKS.SMBC}" target="_blank" class="flex justify-between items-center px-4 py-2 bg-white border border-slate-200 rounded-lg text-[10px] text-slate-600 active:bg-slate-50 transition-colors shadow-sm shadow-slate-200/50">
+                            <span class="font-black tracking-tight">${meta.smbc_catch || '三井住友カード発行'}</span>
+                            <span class="text-slate-300 text-[8px] font-black uppercase">Moppy ↗</span>
+                        </a>
+                        <a href="${MOPPY_LINKS.MUFG}" target="_blank" class="flex justify-between items-center px-4 py-2 bg-white border border-slate-200 rounded-lg text-[10px] text-slate-600 active:bg-slate-50 transition-colors shadow-sm shadow-slate-200/50">
+                            <span class="font-black tracking-tight">${meta.mufg_catch || '三菱UFJカード発行'}</span>
+                            <span class="text-slate-300 text-[8px] font-black uppercase">Moppy ↗</span>
+                        </a>
+                    </div>
+                </div>`;
         }
     </script>
 </body>
