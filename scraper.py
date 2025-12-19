@@ -7,8 +7,9 @@ from google import genai
 
 # --- Configuration ---
 API_KEY = os.environ.get("GEMINI_API_KEY")
-# デフォルト値を正しいID "gemini-3-flash-preview" に修正
-MODEL_ID = os.environ.get("GEMINI_MODEL_ID", "gemini-3-flash-preview")
+# デフォルトは "gemini-flash-latest" に戻しました。
+# GitHub Actionsの変数(GEMINI_MODEL_ID)があればそれを優先します。
+MODEL_ID = os.environ.get("GEMINI_MODEL_ID", "gemini-flash-latest")
 
 client = genai.Client(api_key=API_KEY)
 
