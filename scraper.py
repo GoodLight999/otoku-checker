@@ -40,6 +40,12 @@ BASE_DOMAINS = {
     "MUFG": "https://www.cr.mufg.jp"
 }
 
+# 環境変数からリファラルURLを取得（モッピー以外のURLに変更されても対応可能）
+REFERRAL_URLS = {
+    "SMBC": os.environ.get("SMBC_REFERRAL_URL"),
+    "MUFG": os.environ.get("MUFG_REFERRAL_URL")
+}
+
 def clean_json_text(text):
     if not text: return "[]"
     text = re.sub(r'```json\s*', '', text)
@@ -75,41 +81,40 @@ def clean_html_aggressive(html_text):
     
     return html_text[:95000].strip()
 
-# --- 【新規】合理的なアナリストとしてのメタ生成関数 (構文エラー修正済) ---
-def generate_marketing_meta(all_text):
-    print("\n>>> Analyzing for Marketing Meta...", flush=True)
-    # f-string内なのでJSON構造の波括弧は二重にする必要があります
+# 【新規】リファラルリンク（モッピー等）の内容のみを根拠にする生成ロジック
+def generate_catchphrase(card_name, referral_text):
+    if not referral_text or len(referral_text) < 100:
+        return f"{card_name}の最新情報をチェック"
+    
+    print(f">>> Analyzing Referral Content for {card_name}...", flush=True)
+    # f-string内のJSON構造定義のため、波括弧を二重化(エスケープ)しています
     prompt = f"""
-        あなたは合理的な金融アナリストです。公式サイトから抽出されたテキストを解析してください。
-
+        あなたは合理的な金融アナリストです。提供された「リファラルサイトのテキスト」のみを解析してください。
         【タスク】
-        解析したテキストに含まれる最新の還元条件に基づき、ユーザーの利得を最大化する具体的な数値を1つ含めた短いキャッチコピー（smbc_catch, mufg_catch）を生成せよ。
-
+        提供されたテキストから、このリンク経由でカードを新規発行した際の「最大還元額(P)」や「特典」を1つ特定し、短いキャッチコピーを生成せよ。
+        【絶対ルール】
+        1. 提供されたテキストに記載のない数値（20%など）を捏造することは厳禁。
+        2. テキストに「15,000P」とあればそれを使い、数値がなければ特典内容を簡潔に示せ。
+        3. あなた自身の知識（学習データ）は一切使わず、目の前のテキストのみを根拠とせよ。
         【出力形式】
-        JSON形式。
-        {{
-            "smbc_catch": "解析結果に基づく事実のみを用いたコピー",
-            "mufg_catch": "解析結果に基づく事実のみを用いたコピー"
-        }}
-
-        解析対象テキスト:
-        {all_text[:30000]}
+        JSON: {{ "catch": "事実に基づくコピー" }}
+        
+        解析対象:
+        {referral_text[:20000]}
     """
     try:
-        # ここはPythonの辞書なので、二重括弧にしてはいけませんでした(修正済)
+        # 修正ポイント: configは通常の辞書リテラル{}を使用。TypeErrorを回避。
         response = client.models.generate_content(
             model=MODEL_ID, 
             contents=prompt,
             config={"response_mime_type": "application/json", "temperature": 0.0}
         )
-        return json.loads(response.text)
-    except Exception as e:
-        print(f"DEBUG: Meta Generation failed ({e})", flush=True)
-        # 修正: returnの辞書も二重括弧から通常の辞書へ
-        return {"smbc_catch": "最新還元率をチェック", "mufg_catch": "最新還元率をチェック"}
+        return json.loads(response.text).get("catch")
+    except:
+        return f"{card_name}の最新情報をチェック"
 
 def fetch_and_extract(card_name, target_url):
-    print(f"\n>>> Processing: {card_name}", flush=True)
+    print(f"\n>>> Processing Official Site: {card_name}", flush=True)
     
     try:
         headers = {
@@ -133,7 +138,7 @@ def fetch_and_extract(card_name, target_url):
         print(f"ERROR: Failed to fetch web content: {e}", flush=True)
         return []
 
-    # 先輩のオリジナルプロンプトをそのまま使用
+    # 完全版プロンプト (先輩のオリジナルを1文字も変えずに維持)
     prompt = f"""
         You are an expert data analyst for Japanese credit card rewards (Poi-katsu).
         Analyze the text and extract store data properly.
@@ -189,7 +194,7 @@ def fetch_and_extract(card_name, target_url):
         try:
             print(f"DEBUG: Requesting Gemini... (Attempt {attempt+1})", flush=True)
             
-            # 修正: configも二重括弧から通常の辞書へ
+            # 修正ポイント: configは通常の辞書リテラルを使用
             response = client.models.generate_content(
                 model=MODEL_ID, 
                 contents=prompt,
@@ -243,33 +248,34 @@ def fetch_and_extract(card_name, target_url):
 
 # --- Main Logic ---
 final_stores_list = []
-full_text_for_meta = ""
+meta_data = {}
 
 for i, (card, url) in enumerate(URLS.items()):
+    # 1. 公式サイトから店舗抽出
     items = fetch_and_extract(card, url)
     if items:
-        # 先輩のロジック: デバッグ用のHTMLを読み込んでメタ解析用テキストに蓄積
-        with open(f"debug_input_{card}.html", "r", encoding="utf-8") as f:
-            full_text_for_meta += f.read() + "\n"
-
         base_domain = BASE_DOMAINS.get(card, "") 
         for item in items:
             item["card_type"] = card
             item["source_url"] = OFFICIAL_LINKS[card]
-            
             raw_url = item.get("official_list_url")
             if raw_url and not raw_url.startswith("http"):
                 item["official_list_url"] = urljoin(base_domain, raw_url)
                 print(f"DEBUG: Fixed URL -> {item['official_list_url']}", flush=True)
-
         final_stores_list.extend(items)
-    
+
+    # 2. リファラルサイトから宣伝文を生成（捏造禁止・実利根拠）
+    ref_url = REFERRAL_URLS.get(card)
+    if ref_url and ref_url != "#":
+        try:
+            ref_resp = requests.get(ref_url, headers={"User-Agent": "Mozilla/5.0"}, timeout=30)
+            ref_text = clean_html_aggressive(ref_resp.text)
+            meta_data[f"{card.lower()}_catch"] = generate_catchphrase(card, ref_text)
+        except Exception as e:
+            print(f"REF SCRAPE ERROR ({card}): {e}")
+
     if i < len(URLS) - 1:
         time.sleep(2)
-
-# メタデータの生成
-print("\n>>> Finalizing marketing metadata...", flush=True)
-meta_data = generate_marketing_meta(full_text_for_meta)
 
 # 構造化された最終出力
 final_output = {
