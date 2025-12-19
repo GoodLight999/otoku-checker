@@ -3,63 +3,65 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>おトク還元チェッカー PRO (Deep Context)</title>
+    <title>おトク還元チェッカー PRO v2</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&family=Noto+Sans+JP:wght@400;500;700;900&display=swap" rel="stylesheet">
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700;900&display=swap');
-        body { font-family: 'Noto Sans JP', sans-serif; background-color: #f1f5f9; }
-        .card-smbc { background: linear-gradient(135deg, #e0f2fe 0%, #ffffff 100%); border-left: 5px solid #0284c7; }
-        .card-mufg { background: linear-gradient(135deg, #dcfce7 0%, #ffffff 100%); border-left: 5px solid #16a34a; }
-        details > summary { list-style: none; }
-        details > summary::-webkit-details-marker { display: none; }
+        body { font-family: 'Inter', 'Noto Sans JP', sans-serif; background-color: #f1f5f9; }
+        .card-shadow { box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06); }
     </style>
 </head>
-<body class="min-h-screen pb-32 text-slate-700">
-    <div class="max-w-xl mx-auto px-4 pt-6">
-        
+<body class="min-h-screen pb-20 text-slate-800">
+    <div class="max-w-xl mx-auto px-4 pt-8">
         <header class="mb-6">
-            <h1 class="text-3xl font-black text-slate-800 tracking-tighter">還元チェッカー <span class="text-blue-600 text-lg align-top">PRO</span></h1>
-            <p class="text-xs text-slate-500 font-bold mt-1">AI-Powered Reward Logic Analysis</p>
+            <h1 class="text-3xl font-black text-slate-900 tracking-tighter italic">還元チェッカー <span class="text-blue-600">PRO</span></h1>
+            <p class="text-xs font-bold text-slate-400 mt-1 uppercase tracking-widest">Powered by Gemini 3.0 Series</p>
         </header>
 
-        <section class="bg-white rounded-2xl shadow-sm border border-slate-200 p-4 mb-4">
+        <section class="bg-white rounded-2xl p-5 mb-6 border border-slate-200 card-shadow">
             <div class="grid grid-cols-2 gap-4">
                 <div>
                     <div class="flex justify-between items-center mb-1">
-                        <label class="text-[10px] font-bold text-blue-600 uppercase">SMBC (V-Point)</label>
-                        <a href="https://www.smbc-card.com/mem/wp/vpoint_up_program/index.jsp" target="_blank" class="text-[10px] text-blue-400 underline decoration-dotted">公式サイト</a>
+                        <label class="text-[10px] font-bold text-slate-500 uppercase">SMBC (Max 7%)</label>
+                        <a href="https://www.smbc-card.com/mem/wp/vpoint_up_program/index.jsp" target="_blank" class="text-[10px] text-blue-500 underline">公式詳細</a>
                     </div>
-                    <div class="flex items-center bg-slate-50 rounded-lg px-3 py-2 border border-slate-200 focus-within:border-blue-500">
-                        <input type="number" id="smbc-rate" step="0.5" class="bg-transparent w-full font-bold outline-none text-blue-700 text-xl font-mono">
-                        <span class="text-xs font-bold text-slate-400">%</span>
+                    <div class="flex items-center bg-slate-50 rounded-xl px-3 py-2 border border-slate-200 focus-within:border-blue-500 focus-within:ring-2 focus-within:ring-blue-100 transition-all">
+                        <input type="number" id="smbc-rate" step="0.5" class="bg-transparent w-full font-black outline-none text-blue-600 text-xl" placeholder="7.0">
+                        <span class="text-slate-400 font-bold text-xs">%</span>
                     </div>
                 </div>
                 <div>
                     <div class="flex justify-between items-center mb-1">
-                        <label class="text-[10px] font-bold text-green-600 uppercase">MUFG (Global)</label>
-                        <a href="https://www.cr.mufg.jp/mufgcard/point/global/save/convenience_store/index.html" target="_blank" class="text-[10px] text-green-400 underline decoration-dotted">公式サイト</a>
+                        <label class="text-[10px] font-bold text-slate-500 uppercase">MUFG (Max 19%)</label>
+                        <a href="https://www.cr.mufg.jp/mufgcard/point/global/save/convenience_store/index.html" target="_blank" class="text-[10px] text-green-600 underline">公式詳細</a>
                     </div>
-                    <div class="flex items-center bg-slate-50 rounded-lg px-3 py-2 border border-slate-200 focus-within:border-green-500">
-                        <input type="number" id="mufg-rate" step="0.5" class="bg-transparent w-full font-bold outline-none text-green-700 text-xl font-mono">
-                        <span class="text-xs font-bold text-slate-400">%</span>
+                    <div class="flex items-center bg-slate-50 rounded-xl px-3 py-2 border border-slate-200 focus-within:border-green-500 focus-within:ring-2 focus-within:ring-green-100 transition-all">
+                        <input type="number" id="mufg-rate" step="0.5" class="bg-transparent w-full font-black outline-none text-green-600 text-xl" placeholder="5.5">
+                        <span class="text-slate-400 font-bold text-xs">%</span>
                     </div>
                 </div>
             </div>
         </section>
 
-        <div class="sticky top-2 z-20 mb-6">
-            <div class="relative shadow-xl shadow-slate-200/50 rounded-2xl">
-                <input type="text" id="search" placeholder="店名検索 (例: マック, セブン, ガスト)..." 
-                       class="w-full p-4 pl-5 rounded-2xl border border-slate-100 outline-none text-lg font-bold placeholder-slate-300 focus:ring-4 focus:ring-blue-100 transition-all">
-                <div class="absolute right-4 top-1/2 -translate-y-1/2 text-slate-300">🔍</div>
+        <div class="sticky top-4 z-20 mb-6">
+            <div class="relative group">
+                <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                    <svg class="h-5 w-5 text-slate-400 group-focus-within:text-blue-500 transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                    </svg>
+                </div>
+                <input type="text" id="search" placeholder="店名、ブランド、読み仮名..." 
+                    class="w-full pl-11 pr-4 py-4 rounded-2xl border-none shadow-xl shadow-slate-200/50 focus:ring-4 focus:ring-blue-500/20 outline-none text-lg font-bold placeholder-slate-300 bg-white transition-all">
             </div>
         </div>
 
-        <div id="results" class="space-y-3"></div>
+        <div id="results" class="space-y-4"></div>
 
-        <footer class="mt-12 text-center text-[10px] text-slate-400 pb-10">
-            <p>Generated by Gemini 3.0 Series based on official documentation.</p>
-            <p class="mt-1">※最終的な適用条件は必ず公式サイトをご確認ください。</p>
+        <footer class="mt-12 text-center pb-8">
+            <p class="text-[10px] text-slate-400">
+                本データはAIによる解析結果です。最新の正確な情報は必ず各公式サイトをご確認ください。<br>
+                特にMUFGカードはブランド(Amex/Visa/JCB)により対象店舗が異なる場合があります。
+            </p>
         </footer>
     </div>
 
@@ -68,28 +70,11 @@
         const searchInput = document.getElementById('search');
         const smbcInput = document.getElementById('smbc-rate');
         const mufgInput = document.getElementById('mufg-rate');
+        const resultsDiv = document.getElementById('results');
 
-        // カタカナ・ひらがな正規化
-        function normalizeKana(str) {
-            if (!str) return "";
-            let val = str.normalize('NFKC');
-            return val.replace(/[\u30a1-\u30f6]/g, m => String.fromCharCode(m.charCodeAt(0) - 0x60)).toLowerCase();
-        }
-
-        // 初期設定
+        // デフォルト値と保存
         smbcInput.value = localStorage.getItem('otoku-rate-smbc') || "7.0";
-        mufgInput.value = localStorage.getItem('otoku-rate-mufg') || "5.5"; // MUFGは基本5.5だがキャンペーンで変動あり
-
-        // データ取得
-        fetch('./data.json')
-            .then(res => res.json())
-            .then(data => { 
-                storeData = data; 
-                render(); 
-            })
-            .catch(e => {
-                document.getElementById('results').innerHTML = `<p class="text-center text-red-400 font-bold">データ読み込みエラー: ${e}</p>`;
-            });
+        mufgInput.value = localStorage.getItem('otoku-rate-mufg') || "5.5";
 
         [searchInput, smbcInput, mufgInput].forEach(el => el.addEventListener('input', () => {
             localStorage.setItem('otoku-rate-smbc', smbcInput.value);
@@ -97,97 +82,100 @@
             render();
         }));
 
+        // データ取得
+        fetch('./data.json')
+            .then(res => res.json())
+            .then(data => {
+                storeData = data;
+                render();
+            })
+            .catch(err => resultsDiv.innerHTML = '<p class="text-center text-red-400 font-bold mt-10">データ読み込みエラー</p>');
+
+        function normalizeKana(str) {
+            if (!str) return "";
+            return str.normalize('NFKC')
+                      .replace(/[\u30a1-\u30f6]/g, m => String.fromCharCode(m.charCodeAt(0) - 0x60))
+                      .toLowerCase();
+        }
+
         function render() {
             const query = normalizeKana(searchInput.value);
             const smbcRate = parseFloat(smbcInput.value) || 0;
             const mufgRate = parseFloat(mufgInput.value) || 0;
-            const container = document.getElementById('results');
-            container.innerHTML = '';
 
-            // 検索フィルター
+            resultsDiv.innerHTML = '';
+
+            if (!query) {
+                resultsDiv.innerHTML = '<p class="text-center text-slate-300 font-bold mt-10 text-sm">店名を入力して検索</p>';
+                return;
+            }
+
+            // 検索フィルタリング
             let filtered = storeData.filter(s => {
                 const searchTargets = [
                     s.name, 
                     s.group, 
-                    ...(s.aliases || []),
-                    s.caution // 注釈内の単語（例：ハセガワストア）も検索対象にする
+                    ...(s.aliases || [])
                 ].map(normalizeKana);
-                return searchTargets.some(n => n && n.includes(query));
+                return searchTargets.some(t => t.includes(query));
             });
 
-            // ソート（還元率が高い順 -> 名前順）
+            // ソート（還元率が高い順）
             filtered = filtered.map(s => ({
                 ...s,
                 currentRate: (s.card_type === 'SMBC') ? smbcRate : mufgRate
-            })).sort((a, b) => b.currentRate - a.currentRate || a.name.localeCompare(b.name));
+            })).sort((a, b) => b.currentRate - a.currentRate);
 
             if (filtered.length === 0) {
-                container.innerHTML = '<p class="text-center text-slate-400 font-bold py-10">該当なし</p>';
+                resultsDiv.innerHTML = '<p class="text-center text-slate-300 font-bold mt-10">見つかりませんでした</p>';
                 return;
             }
 
             filtered.forEach(s => {
                 const isSmbc = s.card_type === 'SMBC';
-                const themeClass = isSmbc ? 'card-smbc' : 'card-mufg';
-                const badgeColor = isSmbc ? 'text-blue-600 bg-blue-100' : 'text-green-600 bg-green-100';
-                const cardName = isSmbc ? '三井住友 (SMBC)' : '三菱UFJ (MUFG)';
-
-                // 注釈のハイライト処理（重要なキーワードを赤字にする）
-                let cautionHtml = s.caution || "";
-                cautionHtml = cautionHtml
-                    .replace(/(不可|対象外|のみ|限定)/g, '<span class="text-red-600 font-bold underline">$1</span>')
-                    .replace(/(物理カード|QUICPay|Mobile Order)/gi, '<span class="font-bold text-slate-700">$1</span>');
-
-                // 詳細リストURLがある場合のボタン
-                const detailLinkBtn = s.url_list 
-                    ? `<a href="${s.url_list}" target="_blank" class="ml-2 text-[10px] bg-white border border-slate-200 px-2 py-1 rounded shadow-sm text-slate-500 hover:text-blue-500">店舗一覧 ↗</a>` 
-                    : '';
-
-                const div = document.createElement('div');
-                div.className = `p-5 rounded-2xl shadow-sm border border-slate-100 ${themeClass}`;
+                const colorClass = isSmbc ? 'text-blue-600 bg-blue-50 border-blue-100' : 'text-green-600 bg-green-50 border-green-100';
+                const badgeColor = isSmbc ? 'bg-blue-600' : 'bg-green-600';
                 
-                div.innerHTML = `
-                    <div class="flex justify-between items-start">
-                        <div class="flex-1">
-                            <div class="flex items-center gap-2 mb-1">
-                                <span class="text-[9px] font-black uppercase tracking-wider px-1.5 py-0.5 rounded ${badgeColor}">${cardName}</span>
-                                ${s.group ? `<span class="text-[9px] text-slate-400 font-bold">${s.group}</span>` : ''}
-                            </div>
-                            <h3 class="text-xl font-black text-slate-800 leading-tight flex items-center">
-                                ${s.name}
-                                ${detailLinkBtn}
-                            </h3>
+                // 条件表示の生成
+                let conditionsHtml = '';
+                const c = s.conditions || {};
+                
+                if(c.payment_method) conditionsHtml += `<div class="text-[10px] leading-tight text-slate-500 mb-1"><span class="font-bold text-slate-700">決済:</span> ${c.payment_method}</div>`;
+                if(c.mobile_order) conditionsHtml += `<div class="text-[10px] leading-tight text-slate-500 mb-1"><span class="font-bold text-slate-700">スマホ注文:</span> ${c.mobile_order}</div>`;
+                if(c.delivery) conditionsHtml += `<div class="text-[10px] leading-tight text-slate-500 mb-1"><span class="font-bold text-slate-700">配達:</span> ${c.delivery}</div>`;
+                if(c.note) conditionsHtml += `<div class="text-[10px] leading-tight text-orange-600 font-bold mt-1 bg-orange-50 p-1 rounded border border-orange-100">⚠️ ${c.note}</div>`;
+
+                // URLがある場合
+                let linkHtml = '';
+                if (s.official_list_url) {
+                    linkHtml = `<a href="${s.official_list_url}" target="_blank" class="block mt-2 text-[10px] text-blue-500 underline text-right">店舗リストを確認する &rarr;</a>`;
+                }
+
+                const html = `
+                <div class="bg-white rounded-2xl p-5 border border-slate-100 shadow-sm relative overflow-hidden">
+                    <div class="flex justify-between items-start mb-2">
+                        <div>
+                            <span class="inline-block px-2 py-0.5 rounded text-[9px] font-black text-white uppercase tracking-wider mb-1 ${badgeColor}">
+                                ${isSmbc ? 'SMBC' : 'MUFG'}
+                            </span>
+                            ${s.group ? `<span class="ml-1 text-[9px] text-slate-400 font-bold uppercase">${s.group}</span>` : ''}
+                            <h3 class="text-lg font-black text-slate-800 leading-tight">${s.name}</h3>
                         </div>
-                        <div class="text-right pl-2">
-                            <div class="text-3xl font-black text-slate-900 tracking-tighter">${s.currentRate.toFixed(1)}<span class="text-xs text-slate-400 ml-0.5">%</span></div>
+                        <div class="text-right">
+                            <div class="text-3xl font-black ${isSmbc ? 'text-blue-600' : 'text-green-600'} tracking-tighter">
+                                ${s.currentRate}<span class="text-sm ml-0.5">%</span>
+                            </div>
                         </div>
                     </div>
-
-                    <div class="mt-3 space-y-2">
-                        <div class="bg-white/60 rounded-lg p-2 border border-slate-100/50">
-                            <p class="text-[10px] font-bold text-slate-400 uppercase mb-0.5">Payment Rule</p>
-                            <p class="text-sm font-bold text-slate-700">${s.payment_rule || '要確認'}</p>
-                        </div>
-
-                        ${s.mobile_order_app ? `
-                        <div class="inline-block bg-orange-50 text-orange-600 text-[10px] font-bold px-2 py-0.5 rounded border border-orange-100">
-                            📱 モバイルオーダー対象あり
-                        </div>` : ''}
-
-                        ${cautionHtml ? `
-                        <details class="group mt-1">
-                            <summary class="cursor-pointer text-[11px] font-bold text-slate-500 hover:text-slate-800 flex items-center select-none">
-                                <span class="mr-1">⚠️</span> 注意点・詳細を表示
-                                <span class="ml-auto transform group-open:rotate-180 transition-transform text-slate-300">▼</span>
-                            </summary>
-                            <div class="mt-2 text-xs leading-relaxed text-slate-600 bg-white p-3 rounded-xl border border-slate-100">
-                                ${cautionHtml}
-                            </div>
-                        </details>
-                        ` : ''}
+                    
+                    <div class="bg-slate-50 rounded-xl p-3 border border-slate-100">
+                        ${conditionsHtml}
+                        ${linkHtml}
                     </div>
+                </div>
                 `;
-                container.appendChild(div);
+                
+                resultsDiv.insertAdjacentHTML('beforeend', html);
             });
         }
     </script>
