@@ -11,7 +11,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          fetch-depth: 0 # 履歴を全て取得して衝突を防ぐ
+          fetch-depth: 0
       
       - name: Set up Python
         uses: actions/setup-python@v5
@@ -25,6 +25,8 @@ jobs:
       - name: Run Scraper
         env:
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          # 変数が設定されていなければ gemini-flash-latest を使用
+          GEMINI_MODEL_ID: ${{ vars.GEMINI_MODEL_ID || 'gemini-flash-latest' }}
         run: python scraper.py
         
       - name: Commit and Push
@@ -32,7 +34,6 @@ jobs:
           git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
           git add data.json
-          git commit -m "Update store data (merged)" || exit 0
-          # 衝突を避けるために最新状態をpullしてくる
+          git commit -m "Update store data" || exit 0
           git pull --rebase origin main
           git push
