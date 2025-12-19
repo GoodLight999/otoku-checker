@@ -7,18 +7,10 @@ from google import genai
 
 # --- Configuration ---
 API_KEY = os.environ.get("GEMINI_API_KEY")
+# GitHub Actionsの変数からモデルIDを取得（デフォルトはlatest）
+MODEL_ID = os.environ.get("GEMINI_MODEL_ID", "gemini-flash-latest")
+
 client = genai.Client(api_key=API_KEY)
-
-# 【厳守】先輩の指定した最強のモデル判定ロジック
-def get_best_flash_model():
-    latest_alias = "gemini-flash-latest"
-    try:
-        info = client.models.get(model=latest_alias)
-        return latest_alias if "gemini-3" in info.name.lower() else "gemini-3-flash-preview"
-    except:
-        return "gemini-3-flash-preview"
-
-MODEL_ID = get_best_flash_model()
 
 URLS = {
     "SMBC": "https://r.jina.ai/https://www.smbc-card.com/mem/wp/vpoint_up_program/index.jsp",
@@ -35,24 +27,27 @@ def fetch_and_extract(card_name, target_url):
     try:
         content = requests.get(target_url, timeout=60).text
         
-        # プロンプト：MUFGのブランド構造と日本語出力を徹底
+        # プロンプト：Amex警告とURL抽出を強化
         prompt = f"""
-        You are an expert data analyst for Japanese credit card rewards (Poi-katsu).
+        You are an expert data analyst for Japanese credit card rewards.
         Analyze the text and extract store data properly.
 
         【CRITICAL RULES】
         1. **OUTPUT LANGUAGE**: All string values MUST be in **JAPANESE**.
         2. **ALIASES (略称)**: Generate rich search keywords.
            - "McDonald's" -> ["マクド", "マック", "Mac", "マクドナルド"]
-           - "Seicomart" -> ["セコマ", "セイコーマート"]
            - "Seven-Eleven" -> ["セブン", "セブイレ", "セブンイレブン"]
-        
-        3. **MUFG SPECIAL ATTENTION**: 
-           - MUFG Card Global Point rules are strictly divided into two groups:
-             Group A: **[Visa / Mastercard / JCB]**
-             Group B: **[American Express]**
-           - If a store is eligible for Group A but NOT Group B (or vice versa), you MUST state this in the `note` field.
-           - Example Note: "Amexは対象外" or "Visa/Master/JCBのみ対象"
+
+        3. **MUFG SPECIAL CAUTION (Amex)**: 
+           - **CRITICAL**: MUFG American Express rules are often NOT in the text (provided only via images). 
+           - For ALL MUFG stores, you MUST append this warning to the `note`: "Amexは条件が異なる可能性があるため公式サイトを確認推奨".
+           - Do not assume Amex eligibility unless explicitly stated in text.
+
+        4. **SPECIFIC STORE URLS**:
+           - If the text provides a specific URL for a store list (e.g., "サイゼリヤの対象店舗一覧はこちら", "ケンタッキー...はこちら"), EXTRACT that specific URL into `official_list_url`.
+           - **Saizeriya (SMBC)**: Must link to the specific store list URL if found.
+           - **KFC (SMBC)**: Must link to the specific store list URL if found.
+           - If no specific list URL is found, set `official_list_url` to null (do NOT use the general campaign URL).
 
         【Output JSON Schema】
         Return a JSON ARRAY.
@@ -64,9 +59,9 @@ def fetch_and_extract(card_name, target_url):
                 "payment_method": "String (e.g., 'スマホタッチ決済のみ', '物理カードOK')",
                 "mobile_order": "String (e.g., '対象外', '公式アプリのみ対象')",
                 "delivery": "String (e.g., '対象外', '自社デリバリーは対象')",
-                "note": "String (e.g., 'Amexブランドは対象外', '商業施設内は対象外')"
+                "note": "String (e.g., '商業施設内は対象外。Amexは要確認')"
             }},
-            "official_list_url": "URL or null"
+            "official_list_url": "Specific Store List URL or null"
         }}
 
         Target Text:
