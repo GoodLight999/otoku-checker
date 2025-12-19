@@ -16,7 +16,7 @@ if not API_KEY:
     print("FATAL ERROR: 'GEMINI_API_KEY' environment variable is missing.")
     sys.exit(1)
 
-# タイムアウト設定
+# タイムアウト設定(300秒)
 client = genai.Client(api_key=API_KEY, http_options={'timeout': 300})
 
 URLS = {
@@ -40,26 +40,30 @@ def clean_json_text(text):
 def clean_html_aggressive(html_text):
     if not html_text: return ""
 
-    # 【修正】formタグを削除対象から外しました。ページ全体がformで囲まれているケースで全滅するのを防ぐため。
-    # 削除対象: header, footer, nav, script, style, iframe, svg, aside (formは除外)
+    # 1. 巨大な不要ブロック削除 (formは除外)
+    # formタグの中身を消すとページが白紙になるサイトがあるため除外
     blocks_to_kill = r'<(header|footer|nav|noscript|script|style|iframe|svg|aside)[^>]*>.*?</\1>'
     html_text = re.sub(blocks_to_kill, '', html_text, flags=re.DOTALL | re.IGNORECASE)
 
+    # 2. コメント削除
     html_text = re.sub(r'<!--.*?-->', '', html_text, flags=re.DOTALL)
 
-    # タグ属性削除
+    # 3. リンク(a href)以外のタグ属性を全削除
     html_text = re.sub(r'<((?!a\s)[a-z0-9]+)\s+[^>]*>', r'<\1>', html_text, flags=re.IGNORECASE)
     
+    # aタグのゴミ属性削除
     attrs_to_remove = ['class', 'id', 'style', 'target', 'rel', 'onclick', 'data-[a-z0-9-]+', 'aria-[a-z-]+', 'role']
     for attr in attrs_to_remove:
         html_text = re.sub(r'\s+' + attr + r'="[^"]*"', '', html_text, flags=re.IGNORECASE)
         html_text = re.sub(r'\s+' + attr + r"='[^']*'", '', html_text, flags=re.IGNORECASE)
 
+    # 4. 不要な「箱」タグ削除
     tags_to_strip = ['div', 'span', 'section', 'article', 'main', 'body', 'html', 'head']
     for tag in tags_to_strip:
         html_text = re.sub(r'<' + tag + r'[^>]*>', '', html_text, flags=re.IGNORECASE)
         html_text = re.sub(r'</' + tag + r'>', '\n', html_text, flags=re.IGNORECASE)
 
+    # 5. 空白・改行の圧縮
     html_text = re.sub(r'\n+', '\n', html_text)
     html_text = re.sub(r' +', ' ', html_text)
     
@@ -79,7 +83,7 @@ def fetch_and_extract(card_name, target_url):
         raw_html = resp.text
         content = clean_html_aggressive(raw_html)
         
-        # 【デバッグ】AIに投げる直前のデータを保存（中身が空ならここで判明する）
+        # 【デバッグ】入力HTMLの保存
         debug_filename = f"debug_input_{card_name}.html"
         with open(debug_filename, "w", encoding="utf-8") as f:
             f.write(content)
@@ -93,32 +97,50 @@ def fetch_and_extract(card_name, target_url):
         print(f"ERROR: Failed to fetch web content: {e}")
         return []
 
+    # 【重要】指定された完全版プロンプト（一文字も削っていません）
     prompt = f"""
         You are an expert data analyst for Japanese credit card rewards (Poi-katsu).
         Analyze the text and extract store data properly.
 
         【CRITICAL RULES】
         1. **OUTPUT LANGUAGE**: All string values MUST be in **JAPANESE**.
+        
         2. **GROUP NAME**: You MUST extract the formal group name if applicable.
-        3. **ALIASES (略称)**: You MUST generate a rich list of search keywords.
-        4. **MUFG SPECIAL**: For MUFG, append "Amexは条件が異なる可能性があるため公式サイトを確認推奨" to `note`.
-        5. **URLS**: Extract specific store list URLs if found.
+           - Example: "ガスト" -> group: "すかいらーくグループ"
+           - Example: "セブン-イレブン" -> group: null
+
+        3. **ALIASES (略称)**: You MUST generate a rich list of search keywords, including slang.
+           - "McDonald's" -> ["マクド", "マック", "Mac", "マクドナルド"]
+           - "Seicomart" -> ["セコマ", "セイコーマート"]
+           - "Seven-Eleven" -> ["セブン", "セブイレ", "セブンイレブン"]
+           - "Starbucks" -> ["スタバ", "スターバックス"]
+           - "KFC" -> ["ケンタ", "ケンタッキー"]
+        
+        4. **MUFG SPECIAL CAUTION (Amex)**: 
+           - **CRITICAL**: MUFG American Express rules are often NOT in the text (provided only via images). 
+           - For ALL MUFG stores, you MUST append this warning to the `note`: "Amexは条件が異なる可能性があるため公式サイトを確認推奨".
+           - Separate rules for Visa/Master/JCB vs Amex if text explicitly mentions it.
+
+        5. **SPECIFIC STORE URLS**:
+           - If the text provides a specific URL for a store list (e.g., "サイゼリヤの対象店舗一覧はこちら", "ケンタッキー...はこちら"), EXTRACT that specific URL into `official_list_url`.
+           - **Saizeriya (SMBC)**: Must link to the specific store list URL if found.
+           - **KFC (SMBC)**: Must link to the specific store list URL if found.
+           - If no specific list URL is found, set `official_list_url` to null.
 
         【Output JSON Schema】
-        [
-          {{
-            "name": "Store Name",
-            "group": "Group Name or null",
-            "aliases": ["keyword1", "keyword2"],
+        Return a JSON ARRAY.
+        {{
+            "name": "Store Name (JAPANESE)",
+            "group": "Group Name or null (JAPANESE)",
+            "aliases": ["Array", "of", "search", "keywords"],
             "conditions": {{
-                "payment_method": "String",
-                "mobile_order": "String",
-                "delivery": "String",
-                "note": "String"
+                "payment_method": "String (e.g., 'スマホタッチ決済のみ', '物理カードOK')",
+                "mobile_order": "String (e.g., '対象外', '公式アプリのみ対象')",
+                "delivery": "String (e.g., '対象外', '自社デリバリーは対象')",
+                "note": "String (e.g., 'Amexは要確認')"
             }},
-            "official_list_url": "URL or null"
-          }}
-        ]
+            "official_list_url": "Specific Store List URL or null"
+        }}
 
         Target Text (Cleaned HTML):
         {content}
@@ -165,7 +187,7 @@ def fetch_and_extract(card_name, target_url):
             else:
                 return []
     
-    # 【デバッグ】AIからの返答を保存
+    # 【デバッグ】AIレスポンス保存
     debug_res_filename = f"debug_response_{card_name}.txt"
     try:
         with open(debug_res_filename, "w", encoding="utf-8") as f:
@@ -181,7 +203,6 @@ def fetch_and_extract(card_name, target_url):
         return data
     except Exception as e:
         print(f"JSON PARSE ERROR: {e}")
-        # パース失敗時のデータを保存
         with open(f"debug_error_{card_name}.txt", "w", encoding="utf-8") as f:
             f.write(str(e) + "\n\n" + response_text)
         return []
@@ -192,6 +213,7 @@ final_list = []
 for i, (card, url) in enumerate(URLS.items()):
     items = fetch_and_extract(card, url)
     if items:
+        # Copilot指摘の修正：辞書更新とリスト拡張
         for item in items:
             item["card_type"] = card
             item["source_url"] = OFFICIAL_LINKS[card]
