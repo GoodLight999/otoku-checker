@@ -1,0 +1,295 @@
+[
+  {
+    "name": "セブン-イレブン",
+    "rate": "7.0%",
+    "aliases": [
+      "7-Eleven",
+      "セブン"
+    ],
+    "caution": "スマートフォンでのタッチ決済（Apple Pay / Google Pay）を利用した場合の還元率です。商業施設内の店舗など、一部対象外の店舗があります。",
+    "url": "https://www.smbc-card.com/mem/wp/vpoint_up_program/index.jsp",
+    "card_type": "SMBC"
+  },
+  {
+    "name": "ローソン",
+    "rate": "7.0%",
+    "aliases": [
+      "ナチュラルローソン",
+      "ローソンストア100",
+      "LAWSON"
+    ],
+    "caution": "スマートフォンでのタッチ決済が対象です。iDでの支払いは還元率が異なりますのでご注意ください。",
+    "url": "https://www.smbc-card.com/mem/wp/vpoint_up_program/index.jsp",
+    "card_type": "SMBC"
+  },
+  {
+    "name": "マクドナルド",
+    "rate": "7.0%",
+    "aliases": [
+      "マック",
+      "マクド",
+      "McDonald's"
+    ],
+    "caution": "店頭での支払いのみ対象です。モバイルオーダーやデリバリーサービスは対象外となる場合があります。",
+    "url": "https://www.smbc-card.com/mem/wp/vpoint_up_program/index.jsp",
+    "card_type": "SMBC"
+  },
+  {
+    "name": "サイゼリヤ",
+    "rate": "7.0%",
+    "aliases": [
+      "サイゼ"
+    ],
+    "caution": "一部、キャッシュレス決済に対応していない店舗は対象外です。",
+    "url": "https://www.smbc-card.com/mem/wp/vpoint_up_program/index.jsp",
+    "card_type": "SMBC"
+  },
+  {
+    "name": "ガスト",
+    "rate": "7.0%",
+    "aliases": [
+      "すかいらーく"
+    ],
+    "caution": "スマートフォンでのタッチ決済を利用してください。宅配やテイクアウト事前決済は対象外となる場合があります。",
+    "url": "https://www.smbc-card.com/mem/wp/vpoint_up_program/index.jsp",
+    "card_type": "SMBC"
+  },
+  {
+    "name": "すき家",
+    "rate": "7.0%",
+    "aliases": [],
+    "caution": "ショッピングセンター内の店舗など、一部ポイント加算対象外の店舗があります。",
+    "url": "https://www.smbc-card.com/mem/wp/vpoint_up_program/index.jsp",
+    "card_type": "SMBC"
+  },
+  {
+    "name": "はま寿司",
+    "rate": "7.0%",
+    "aliases": [],
+    "caution": "スマートフォンを用いた非接触決済が条件です。",
+    "url": "https://www.smbc-card.com/mem/wp/vpoint_up_program/index.jsp",
+    "card_type": "SMBC"
+  },
+  {
+    "name": "ドトールコーヒーショップ",
+    "rate": "7.0%",
+    "aliases": [
+      "ドトール"
+    ],
+    "caution": "エクセルシオールカフェも対象に含まれます。ドトールバリューカードへのチャージは対象外です。",
+    "url": "https://www.smbc-card.com/mem/wp/vpoint_up_program/index.jsp",
+    "card_type": "SMBC"
+  },
+  {
+    "name": "セブン‐イレブン",
+    "rate": "7.0%",
+    "aliases": [
+      "セブンイレブン",
+      "セブン"
+    ],
+    "caution": "商業施設内店舗、オンラインショッピング、デリバリー、セブン自販機、スマホレジでの利用は対象外です。最大20％還元には条件達成が必要です。",
+    "url": "https://www.cr.mufg.jp/mufgcard/point/global/save/convenience_store/index.html",
+    "card_type": "MUFG"
+  },
+  {
+    "name": "ローソン",
+    "rate": "7.0%",
+    "aliases": [
+      "ナチュラルローソン",
+      "ローソンストア100"
+    ],
+    "caution": "商業施設・駅・ビル内店舗、ガソリンスタンド併設店舗、オンライン、スマホレジでの利用は対象外です。最大20％還元には条件達成が必要です。",
+    "url": "https://www.cr.mufg.jp/mufgcard/point/global/save/convenience_store/index.html",
+    "card_type": "MUFG"
+  },
+  {
+    "name": "コカ・コーラ自販機",
+    "rate": "7.0%",
+    "aliases": [
+      "Coke ON",
+      "コカコーラ"
+    ],
+    "caution": "タッチ決済、QUICPay、Coke ON Pay/Passが対象です。Coke ONアプリ経由のApple Pay利用は対象外となります。",
+    "url": "https://www.cr.mufg.jp/mufgcard/point/global/save/convenience_store/index.html",
+    "card_type": "MUFG"
+  },
+  {
+    "name": "くら寿司",
+    "rate": "7.0%",
+    "aliases": [],
+    "caution": "商業施設内の一部店舗、オンライン事前決済（スマホでお持ち帰り等）は対象外です。",
+    "url": "https://www.cr.mufg.jp/mufgcard/point/global/save/convenience_store/index.html",
+    "card_type": "MUFG"
+  },
+  {
+    "name": "スシロー",
+    "rate": "7.0%",
+    "aliases": [],
+    "caution": "商業施設内の一部店舗、オンライン決済、「京樽スシロー」「スシローToGo」は対象外です。",
+    "url": "https://www.cr.mufg.jp/mufgcard/point/global/save/convenience_store/index.html",
+    "card_type": "MUFG"
+  },
+  {
+    "name": "ピザハットオンライン",
+    "rate": "7.0%",
+    "aliases": [
+      "ピザハット"
+    ],
+    "caution": "公式サイトおよび公式アプリでのオンライン注文時のクレジットカード決済が対象となります。",
+    "url": "https://www.cr.mufg.jp/mufgcard/point/global/save/convenience_store/index.html",
+    "card_type": "MUFG"
+  },
+  {
+    "name": "松屋フーズ",
+    "rate": "7.0%",
+    "aliases": [
+      "松屋",
+      "松のや",
+      "マイカリー食堂",
+      "松弁ネット",
+      "松屋モバイルオーダー",
+      "松弁デリバリー"
+    ],
+    "caution": "券売機・セルフレジでの決済、または指定のネット注文サービスが対象です。SA・PA内店舗や公式オンラインショップは対象外です。",
+    "url": "https://www.cr.mufg.jp/mufgcard/point/global/save/convenience_store/index.html",
+    "card_type": "MUFG"
+  },
+  {
+    "name": "ロッテリア",
+    "rate": "7.0%",
+    "aliases": [
+      "ゼッテリア"
+    ],
+    "caution": "店頭決済およびモバイルオーダーが対象。アメリカン・エキスプレスでの店頭決済、および商業施設内店舗は対象外となる場合があります。",
+    "url": "https://www.cr.mufg.jp/mufgcard/point/global/save/convenience_store/index.html",
+    "card_type": "MUFG"
+  },
+  {
+    "name": "アオキスーパー",
+    "rate": "7.0%",
+    "aliases": [],
+    "caution": "ショッピングセンターアズパーク内専門店、クイックコマース、インターネット利用などは対象外です。",
+    "url": "https://www.cr.mufg.jp/mufgcard/point/global/save/convenience_store/index.html",
+    "card_type": "MUFG"
+  },
+  {
+    "name": "オーケー",
+    "rate": "7.0%",
+    "aliases": [
+      "OKストア"
+    ],
+    "caution": "ネットスーパーでの利用は対象外です。",
+    "url": "https://www.cr.mufg.jp/mufgcard/point/global/save/convenience_store/index.html",
+    "card_type": "MUFG"
+  },
+  {
+    "name": "オオゼキ",
+    "rate": "7.0%",
+    "aliases": [],
+    "caution": "オンラインストア、ネットスーパーは対象外です。",
+    "url": "https://www.cr.mufg.jp/mufgcard/point/global/save/convenience_store/index.html",
+    "card_type": "MUFG"
+  },
+  {
+    "name": "サンリブ",
+    "rate": "7.0%",
+    "aliases": [
+      "マルショク",
+      "リブホール",
+      "サンク",
+      "サンリブBUONO"
+    ],
+    "caution": "ネットスーパーでの利用は対象外です。",
+    "url": "https://www.cr.mufg.jp/mufgcard/point/global/save/convenience_store/index.html",
+    "card_type": "MUFG"
+  },
+  {
+    "name": "三和・フードワン",
+    "rate": "7.0%",
+    "aliases": [
+      "スーパー三和"
+    ],
+    "caution": "対象店舗での通常決済が対象です。",
+    "url": "https://www.cr.mufg.jp/mufgcard/point/global/save/convenience_store/index.html",
+    "card_type": "MUFG"
+  },
+  {
+    "name": "スーパー魚長",
+    "rate": "7.0%",
+    "aliases": [
+      "生鮮乃木市場",
+      "生鮮げんき市場"
+    ],
+    "caution": "対象店舗での通常決済が対象です。",
+    "url": "https://www.cr.mufg.jp/mufgcard/point/global/save/convenience_store/index.html",
+    "card_type": "MUFG"
+  },
+  {
+    "name": "近商ストア",
+    "rate": "7.0%",
+    "aliases": [
+      "ハーベス",
+      "Pochette"
+    ],
+    "caution": "ネットスーパー、および食品スーパー以外での利用は対象外です。",
+    "url": "https://www.cr.mufg.jp/mufgcard/point/global/save/convenience_store/index.html",
+    "card_type": "MUFG"
+  },
+  {
+    "name": "東急ストア",
+    "rate": "7.0%",
+    "aliases": [
+      "プレッセ",
+      "フードステーション"
+    ],
+    "caution": "テナントおよびネットスーパーでの利用は対象外です。",
+    "url": "https://www.cr.mufg.jp/mufgcard/point/global/save/convenience_store/index.html",
+    "card_type": "MUFG"
+  },
+  {
+    "name": "東武ストア",
+    "rate": "7.0%",
+    "aliases": [],
+    "caution": "ネットショップ、手ぶら決済、専門店売り場などは対象外です。",
+    "url": "https://www.cr.mufg.jp/mufgcard/point/global/save/convenience_store/index.html",
+    "card_type": "MUFG"
+  },
+  {
+    "name": "ドミー",
+    "rate": "7.0%",
+    "aliases": [],
+    "caution": "対象店舗での通常決済が対象です。",
+    "url": "https://www.cr.mufg.jp/mufgcard/point/global/save/convenience_store/index.html",
+    "card_type": "MUFG"
+  },
+  {
+    "name": "肉のハナマサ",
+    "rate": "7.0%",
+    "aliases": [],
+    "caution": "フランチャイズ店舗での利用は対象外です。",
+    "url": "https://www.cr.mufg.jp/mufgcard/point/global/save/convenience_store/index.html",
+    "card_type": "MUFG"
+  },
+  {
+    "name": "ジャパンミート",
+    "rate": "7.0%",
+    "aliases": [
+      "MEATMeet",
+      "パワーマート"
+    ],
+    "caution": "対象店舗での通常決済が対象です。",
+    "url": "https://www.cr.mufg.jp/mufgcard/point/global/save/convenience_store/index.html",
+    "card_type": "MUFG"
+  },
+  {
+    "name": "ヤマナカ",
+    "rate": "7.0%",
+    "aliases": [
+      "フランテ",
+      "フランテロゼ"
+    ],
+    "caution": "ネットスーパーでの利用は対象外です。",
+    "url": "https://www.cr.mufg.jp/mufgcard/point/global/save/convenience_store/index.html",
+    "card_type": "MUFG"
+  }
+]
