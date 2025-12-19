@@ -10,6 +10,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # 履歴を全て取得して衝突を防ぐ
       
       - name: Set up Python
         uses: actions/setup-python@v5
@@ -23,14 +25,14 @@ jobs:
       - name: Run Scraper
         env:
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
-        run: |
-          python scraper.py
-          ls -la # ファイルが生成されたか確認用
+        run: python scraper.py
         
       - name: Commit and Push
         run: |
           git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
           git add data.json
-          git commit -m "Update store data" || exit 0
+          git commit -m "Update store data (merged)" || exit 0
+          # 衝突を避けるために最新状態をpullしてくる
+          git pull --rebase origin main
           git push
