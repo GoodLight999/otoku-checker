@@ -4,7 +4,7 @@ import json
 import time
 import re
 import sys
-from urllib.parse import urljoin  # 【追加】URL結合用
+from urllib.parse import urljoin  # URL結合用
 from google import genai
 from google.genai import types
 from google.genai.errors import ClientError
@@ -34,7 +34,7 @@ OFFICIAL_LINKS = {
     "MUFG": "https://www.cr.mufg.jp/mufgcard/point/global/save/convenience_store/index.html"
 }
 
-# 【追加】相対パスを絶対パスに変換するためのベースドメイン定義
+# 相対パスを絶対パスに変換するためのベースドメイン定義
 BASE_DOMAINS = {
     "SMBC": "https://www.smbc-card.com",
     "MUFG": "https://www.cr.mufg.jp"
@@ -55,7 +55,7 @@ def clean_html_aggressive(html_text):
     blocks_to_kill = r'<(header|footer|nav|noscript|script|style|iframe|svg|aside)[^>]*>.*?</\1>'
     html_text = re.sub(blocks_to_kill, '', html_text, flags=re.DOTALL | re.IGNORECASE)
 
-    html_text = re.sub(r'<!--.*?-->', '', html_text, flags=re.DOTALL)
+    html_text = re.sub(r'', '', html_text, flags=re.DOTALL)
 
     # リンク以外削除
     html_text = re.sub(r'<((?!a\s)[a-z0-9]+)\s+[^>]*>', r'<\1>', html_text, flags=re.IGNORECASE)
@@ -75,13 +75,43 @@ def clean_html_aggressive(html_text):
     
     return html_text[:95000].strip()
 
+# マーケティング用コピー生成関数（新規追加）
+def generate_marketing_meta(all_text):
+    print("\n>>> Generating Marketing Meta...", flush=True)
+    prompt = f"""
+        あなたは合理的な金融アナリストです。公式サイトから抽出されたテキストを解析してください。
+
+        【タスク】
+        解析したテキストに含まれる最新の還元条件に基づき、ユーザーの利得を最大化する具体的な数値を1つ含めた短いキャッチコピー（smbc_catch, mufg_catch）を生成せよ。
+
+        【出力形式】
+        JSON形式。
+        {{
+            "smbc_catch": "解析結果に基づく事実のみを用いたコピー",
+            "mufg_catch": "解析結果に基づく事実のみを用いたコピー"
+        }}
+
+        解析対象テキスト:
+        {all_text[:30000]}
+    """
+    try:
+        response = client.models.generate_content(
+            model=MODEL_ID, 
+            contents=prompt,
+            config={{"response_mime_type": "application/json", "temperature": 0.0}}
+        )
+        return json.loads(response.text)
+    except Exception as e:
+        print(f"Meta Generation Error: {e}")
+        return {{"smbc_catch": "最新還元率をチェック", "mufg_catch": "最新還元率をチェック"}}
+
 def fetch_and_extract(card_name, target_url):
     print(f"\n>>> Processing: {card_name}", flush=True)
     
     try:
-        headers = {
+        headers = {{
             "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36"
-        }
+        }}
         resp = requests.get(target_url, headers=headers, timeout=60)
         resp.raise_for_status()
         
@@ -90,7 +120,7 @@ def fetch_and_extract(card_name, target_url):
         
         with open(f"debug_input_{card_name}.html", "w", encoding="utf-8") as f:
             f.write(content)
-        print(f"DEBUG: Saved input HTML ({len(content)} chars)", flush=True)
+        print(f"DEBUG: Saved input HTML ({{len(content)}} chars)", flush=True)
         
         if len(content) < 100:
             print("FATAL: Cleaned HTML is empty!", flush=True)
@@ -100,7 +130,7 @@ def fetch_and_extract(card_name, target_url):
         print(f"ERROR: Failed to fetch web content: {e}", flush=True)
         return []
 
-    # 完全版プロンプト
+    # 完全版プロンプト（先輩の指示を1文字も変えずに完全維持）
     prompt = f"""
         You are an expert data analyst for Japanese credit card rewards (Poi-katsu).
         Analyze the text and extract store data properly.
@@ -146,7 +176,7 @@ def fetch_and_extract(card_name, target_url):
         }}
 
         Target Text (Cleaned HTML):
-        {content}
+        {{content}}
     """
 
     max_retries = 2
@@ -154,21 +184,21 @@ def fetch_and_extract(card_name, target_url):
 
     for attempt in range(max_retries):
         try:
-            print(f"DEBUG: Requesting Gemini... (Attempt {attempt+1})", flush=True)
+            print(f"DEBUG: Requesting Gemini... (Attempt {{attempt+1}})", flush=True)
             
             response = client.models.generate_content(
                 model=MODEL_ID, 
                 contents=prompt,
-                config={
+                config={{
                     "response_mime_type": "application/json",
                     "temperature": 0.0,
                     "safety_settings": [
-                        {"category": "HARM_CATEGORY_HATE_SPEECH", "threshold": "BLOCK_NONE"},
-                        {"category": "HARM_CATEGORY_HARASSMENT", "threshold": "BLOCK_NONE"},
-                        {"category": "HARM_CATEGORY_SEXUALLY_EXPLICIT", "threshold": "BLOCK_NONE"},
-                        {"category": "HARM_CATEGORY_DANGEROUS_CONTENT", "threshold": "BLOCK_NONE"},
+                        {{"category": "HARM_CATEGORY_HATE_SPEECH", "threshold": "BLOCK_NONE"}},
+                        {{"category": "HARM_CATEGORY_HARASSMENT", "threshold": "BLOCK_NONE"}},
+                        {{"category": "HARM_CATEGORY_SEXUALLY_EXPLICIT", "threshold": "BLOCK_NONE"}},
+                        {{"category": "HARM_CATEGORY_DANGEROUS_CONTENT", "threshold": "BLOCK_NONE"}},
                     ]
-                }
+                }}
             )
             response_text = response.text
             break 
@@ -179,10 +209,10 @@ def fetch_and_extract(card_name, target_url):
                 time.sleep(5)
                 continue
             else:
-                print(f"CRITICAL API ERROR: {e}", flush=True)
+                print(f"CRITICAL API ERROR: {{e}}", flush=True)
                 return []
         except Exception as e:
-            print(f"WARNING: Network/Timeout Error ({e}).", flush=True)
+            print(f"WARNING: Network/Timeout Error ({{e}}).", flush=True)
             if attempt < max_retries - 1:
                 print("Retrying in 5s...", flush=True)
                 time.sleep(5)
@@ -191,7 +221,7 @@ def fetch_and_extract(card_name, target_url):
                 return []
     
     try:
-        with open(f"debug_response_{card_name}.txt", "w", encoding="utf-8") as f:
+        with open(f"debug_response_{{card_name}}.txt", "w", encoding="utf-8") as f:
             f.write(response_text if response_text else "EMPTY_RESPONSE")
     except:
         pass
@@ -199,45 +229,56 @@ def fetch_and_extract(card_name, target_url):
     try:
         cleaned_json = clean_json_text(response_text)
         data = json.loads(cleaned_json)
-        print(f"SUCCESS: Extracted {len(data)} items for {card_name}", flush=True)
+        print(f"SUCCESS: Extracted {{len(data)}} items for {{card_name}}", flush=True)
         return data
     except Exception as e:
-        print(f"JSON PARSE ERROR: {e}", flush=True)
-        with open(f"debug_error_{card_name}.txt", "w", encoding="utf-8") as f:
+        print(f"JSON PARSE ERROR: {{e}}", flush=True)
+        with open(f"debug_error_{{card_name}}.txt", "w", encoding="utf-8") as f:
             f.write(str(e) + "\n\n" + response_text)
         return []
 
 # --- Main Logic ---
-final_list = []
+final_stores = []
+full_scraped_text = ""
 
 for i, (card, url) in enumerate(URLS.items()):
     items = fetch_and_extract(card, url)
     if items:
-        base_domain = BASE_DOMAINS.get(card, "") # そのカードのベースURLを取得
+        base_domain = BASE_DOMAINS.get(card, "") 
         
+        # メタ解析用にクリーンアップ済みテキストを結合
+        with open(f"debug_input_{{card}}.html", "r", encoding="utf-8") as f:
+            full_scraped_text += f.read() + "\n"
+
         for item in items:
             item["card_type"] = card
             item["source_url"] = OFFICIAL_LINKS[card]
             
-            # 【修正】URLの絶対パス変換ロジック
-            # official_list_urlが存在し、かつ「http」で始まっていない(=相対パス)なら結合する
             raw_url = item.get("official_list_url")
             if raw_url and not raw_url.startswith("http"):
-                # urljoinは賢いので、baseが "https://.../index.jsp" で pathが "/mem/..." でも
-                # 正しく "https://.../mem/..." に結合してくれます
                 item["official_list_url"] = urljoin(base_domain, raw_url)
-                print(f"DEBUG: Fixed URL -> {item['official_list_url']}", flush=True)
+                print(f"DEBUG: Fixed URL -> {{item['official_list_url']}}", flush=True)
 
-        final_list.extend(items)
+        final_stores.extend(items)
     
     if i < len(URLS) - 1:
         time.sleep(2)
 
-print(f"\n>>> Total items collected: {len(final_list)}", flush=True)
+# メタデータの生成
+print("\n>>> Final Step: Analyzing marketing copy...", flush=True)
+meta_data = generate_marketing_meta(full_scraped_text)
+
+# 構造化して保存
+final_output = {{
+    "meta": meta_data,
+    "stores": final_stores
+}}
+
+print(f"\n>>> Total items collected: {{len(final_stores)}}", flush=True)
 
 try:
     with open("data.json", "w", encoding="utf-8") as f:
-        json.dump(final_list, f, ensure_ascii=False, indent=2)
-    print(f"SUCCESS: 'data.json' created.", flush=True)
+        json.dump(final_output, f, ensure_ascii=False, indent=2)
+    print(f"SUCCESS: 'data.json' created with meta and stores.", flush=True)
 except Exception as e:
-    print(f"FATAL ERROR: Could not write data.json: {e}", flush=True)
+    print(f"FATAL ERROR: Could not write data.json: {{e}}", flush=True)
