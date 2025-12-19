@@ -12,7 +12,7 @@ API_KEY = os.environ.get("GEMINI_API_KEY")
 MODEL_ID = os.environ.get("GEMINI_MODEL_ID", "gemini-flash-latest")
 
 # --- Debug Initialization ---
-print("--- INITIALIZING SCRAPER (AGGRESSIVE CLEANING + FULL PROMPT) ---")
+print("--- INITIALIZING SCRAPER (RETRY ENHANCED) ---")
 if not API_KEY:
     print("FATAL ERROR: 'GEMINI_API_KEY' environment variable is missing.")
     sys.exit(1)
@@ -41,7 +41,6 @@ def clean_json_text(text):
 def clean_html_aggressive(html_text):
     """
     【HTML徹底ダイエット】
-    プロンプトを長く維持するために、入力データ側の無駄を極限まで削る。
     """
     if not html_text: return ""
 
@@ -52,18 +51,16 @@ def clean_html_aggressive(html_text):
     # 2. コメント削除
     html_text = re.sub(r'<!--.*?-->', '', html_text, flags=re.DOTALL)
 
-    # 3. リンク(a href)以外のタグ属性を全削除してトークン節約
-    # <li class="mod-list" ...> -> <li>
+    # 3. リンク(a href)以外のタグ属性を全削除
     html_text = re.sub(r'<((?!a\s)[a-z0-9]+)\s+[^>]*>', r'<\1>', html_text, flags=re.IGNORECASE)
     
-    # aタグの中身も、href以外は削除したいが、正規表現が複雑になるため
-    # class, id, style, target, onclick などの主要なゴミ属性を個別に消す
+    # aタグのゴミ属性削除
     attrs_to_remove = ['class', 'id', 'style', 'target', 'rel', 'onclick', 'data-[a-z0-9-]+', 'aria-[a-z-]+', 'role']
     for attr in attrs_to_remove:
         html_text = re.sub(r'\s+' + attr + r'="[^"]*"', '', html_text, flags=re.IGNORECASE)
         html_text = re.sub(r'\s+' + attr + r"='[^']*'", '', html_text, flags=re.IGNORECASE)
 
-    # 4. 構造的に不要な「箱」タグ(div, span, section等)を削除
+    # 4. 不要な「箱」タグ削除
     tags_to_strip = ['div', 'span', 'section', 'article', 'main', 'body', 'html', 'head']
     for tag in tags_to_strip:
         html_text = re.sub(r'<' + tag + r'[^>]*>', '', html_text, flags=re.IGNORECASE)
@@ -87,7 +84,6 @@ def fetch_and_extract(card_name, target_url):
         resp.raise_for_status()
         
         raw_html = resp.text
-        # ここで強力に削減する
         content = clean_html_aggressive(raw_html)
         
         orig_len = len(raw_html)
@@ -99,7 +95,6 @@ def fetch_and_extract(card_name, target_url):
         print(f"ERROR: Failed to fetch web content: {e}")
         return []
 
-    # 【重要】以前の指定通りの完全版プロンプト
     prompt = f"""
         You are an expert data analyst for Japanese credit card rewards (Poi-katsu).
         Analyze the text and extract store data properly.
@@ -167,6 +162,7 @@ def fetch_and_extract(card_name, target_url):
                     ]
                 }
             )
+            # 成功したらループを抜ける
             break 
 
         except ClientError as e:
@@ -176,10 +172,14 @@ def fetch_and_extract(card_name, target_url):
                 continue
             else:
                 print(f"CRITICAL API ERROR: {e}")
+                # 429以外のAPIエラー(権限エラー等)はリトライしても無駄なので諦める
                 return []
+                
         except Exception as e:
-            print(f"UNKNOWN ERROR: {e}")
-            return []
+            # 【変更点】Server disconnected などの謎エラーもここで拾ってリトライさせる
+            print(f"WARNING: Network/Server Error ({e}). Retrying in 5s...")
+            time.sleep(5)
+            continue
     else:
         print("ERROR: Failed after max retries.")
         return []
