@@ -7,8 +7,8 @@ from google import genai
 
 # --- Configuration ---
 API_KEY = os.environ.get("GEMINI_API_KEY")
-# GitHub Actions変数でモデルを指定。なければlatest
-MODEL_ID = os.environ.get("GEMINI_MODEL_ID", "gemini-flash-latest")
+# デフォルト値を正しいID "gemini-3-flash-preview" に修正
+MODEL_ID = os.environ.get("GEMINI_MODEL_ID", "gemini-3-flash-preview")
 
 client = genai.Client(api_key=API_KEY)
 
@@ -24,34 +24,39 @@ OFFICIAL_LINKS = {
 
 def clean_json_text(text):
     """
-    AIが良かれと思って付けたMarkdown記法(```json ... ```)を剥ぎ取る。
-    これが無いとjson.loadsで死ぬ。
+    AIの出力からJSON配列部分だけを外科手術のように正確に切り出す。
+    以前の r'\[.*\]' は、前置きに [Note] とかあると死ぬため、
+    「[{」で始まり「}]」で終わるパターンを優先的に探す。
     """
-    # ```json などの除去
+    # 1. まずMarkdown記法を除去
     text = re.sub(r'```json\s*', '', text)
     text = re.sub(r'```\s*', '', text)
     
-    # 最初の [ から 最後の ] までを強引に抽出
-    match = re.search(r'\[.*\]', text, re.DOTALL)
+    # 2. 「配列の中にオブジェクトが入っている」構造 ( [{ ... }] ) を探す
+    #    re.DOTALL で改行も無視してマッチさせる
+    match = re.search(r'\[\s*\{.*\}\s*\]', text, re.DOTALL)
     if match:
         return match.group()
+    
+    # 3. それで見つからなければ、単純な [] を探す（フォールバック）
+    match_simple = re.search(r'\[.*\]', text, re.DOTALL)
+    if match_simple:
+        return match_simple.group()
+        
     return text.strip()
 
 def fetch_and_extract(card_name, target_url):
     print(f"DEBUG: Analyzing {card_name} data using {MODEL_ID}...")
     try:
-        # Jinaや公式サイトに弾かれないようUser-Agentを偽装
         headers = {
             "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
         }
         content = requests.get(target_url, headers=headers, timeout=60).text
         
-        # コンテンツが空なら即死
         if not content or len(content) < 100:
             print(f"FATAL: Empty content for {card_name}")
             return []
 
-        # プロンプト：グループ定義を復活させ、例示と条件をMAXまで盛った厳格仕様
         prompt = f"""
         You are an expert data analyst for Japanese credit card rewards (Poi-katsu).
         Analyze the text and extract store data properly.
@@ -106,7 +111,6 @@ def fetch_and_extract(card_name, target_url):
             config={"response_mime_type": "application/json"}
         )
         
-        # Markdownを除去してからロード
         cleaned_json = clean_json_text(response.text)
         data = json.loads(cleaned_json)
         
@@ -115,7 +119,6 @@ def fetch_and_extract(card_name, target_url):
 
     except Exception as e:
         print(f"ERROR: {card_name} extraction failed: {e}")
-        # エラー時、レスポンスがあれば中身をログに出す（デバッグ用）
         if 'response' in locals() and hasattr(response, 'text'):
             print(f"Raw Response Dump: {response.text[:200]}...") 
         return []
