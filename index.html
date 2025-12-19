@@ -22,21 +22,21 @@
             <div class="grid grid-cols-2 gap-4">
                 <div>
                     <div class="flex justify-between items-center mb-1">
-                        <label class="text-[10px] font-bold text-slate-500 uppercase">SMBC (最大7%)</label>
-                        <a href="https://www.smbc-card.com/mem/wp/vpoint_up_program/index.jsp" target="_blank" class="text-[10px] text-blue-500 underline">公式詳細</a>
+                        <label class="text-[10px] font-bold text-slate-500 uppercase">三井住友カード (最大7%)</label>
+                        <a href="https://www.smbc-card.com/mem/wp/vpoint_up_program/index.jsp" target="_blank" class="text-[10px] text-green-600 underline">公式詳細</a>
                     </div>
-                    <div class="flex items-center bg-slate-50 rounded-xl px-3 py-2 border border-slate-200 focus-within:border-blue-500 focus-within:ring-2 focus-within:ring-blue-100 transition-all">
-                        <input type="number" id="smbc-rate" step="0.5" class="bg-transparent w-full font-black outline-none text-blue-600 text-xl" placeholder="7.0">
+                    <div class="flex items-center bg-slate-50 rounded-xl px-3 py-2 border border-slate-200 focus-within:border-green-600 focus-within:ring-2 focus-within:ring-green-100 transition-all">
+                        <input type="number" id="smbc-rate" step="0.5" class="bg-transparent w-full font-black outline-none text-green-700 text-xl" placeholder="7.0">
                         <span class="text-slate-400 font-bold text-xs">%</span>
                     </div>
                 </div>
                 <div>
                     <div class="flex justify-between items-center mb-1">
-                        <label class="text-[10px] font-bold text-slate-500 uppercase">MUFG (最大19%)</label>
-                        <a href="https://www.cr.mufg.jp/mufgcard/point/global/save/convenience_store/index.html" target="_blank" class="text-[10px] text-green-600 underline">公式詳細</a>
+                        <label class="text-[10px] font-bold text-slate-500 uppercase">三菱UFJカード (最大19%)</label>
+                        <a href="https://www.cr.mufg.jp/mufgcard/point/global/save/convenience_store/index.html" target="_blank" class="text-[10px] text-red-600 underline">公式詳細</a>
                     </div>
-                    <div class="flex items-center bg-slate-50 rounded-xl px-3 py-2 border border-slate-200 focus-within:border-green-500 focus-within:ring-2 focus-within:ring-green-100 transition-all">
-                        <input type="number" id="mufg-rate" step="0.5" class="bg-transparent w-full font-black outline-none text-green-600 text-xl" placeholder="5.5">
+                    <div class="flex items-center bg-slate-50 rounded-xl px-3 py-2 border border-slate-200 focus-within:border-red-600 focus-within:ring-2 focus-within:ring-red-100 transition-all">
+                        <input type="number" id="mufg-rate" step="0.5" class="bg-transparent w-full font-black outline-none text-red-600 text-xl" placeholder="5.5">
                         <span class="text-slate-400 font-bold text-xs">%</span>
                     </div>
                 </div>
@@ -46,12 +46,12 @@
         <div class="sticky top-4 z-20 mb-6">
             <div class="relative group">
                 <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                    <svg class="h-5 w-5 text-slate-400 group-focus-within:text-blue-500 transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <svg class="h-5 w-5 text-slate-400 group-focus-within:text-indigo-500 transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                     </svg>
                 </div>
                 <input type="text" id="search" placeholder="店名・条件 (例: モス デリバリー)" 
-                    class="w-full pl-11 pr-4 py-4 rounded-2xl border-none shadow-xl shadow-slate-200/50 focus:ring-4 focus:ring-blue-500/20 outline-none text-lg font-bold placeholder-slate-300 bg-white transition-all">
+                    class="w-full pl-11 pr-4 py-4 rounded-2xl border-none shadow-xl shadow-slate-200/50 focus:ring-4 focus:ring-indigo-500/20 outline-none text-lg font-bold placeholder-slate-300 bg-white transition-all">
             </div>
         </div>
 
@@ -60,12 +60,12 @@
         <footer class="mt-12 text-center pb-8">
             <div class="text-[10px] text-slate-400 leading-relaxed max-w-xs mx-auto">
                 <p class="mb-2">
-                    本データはAI解析による推定値です。必ず公式サイトで最新条件をご確認ください。
+                    本データはAI解析による推定値です。<br>
+                    正確な条件は必ず各公式サイトをご確認ください。
                 </p>
-                <p class="font-bold text-slate-500">
-                    ※三菱UFJカード(MUFG)は、国際ブランドが<br>
-                    「Visa/Mastercard/JCB」か「American Express」かで<br>
-                    対象店舗が異なる場合がありますのでご注意ください。
+                <p class="font-bold text-red-400">
+                    ※三菱UFJカードのAmexブランドは、<br>
+                    対象店舗や条件が大きく異なる場合があります。
                 </p>
             </div>
         </footer>
@@ -103,7 +103,6 @@
         }
 
         function render() {
-            // スペース区切りで検索語を分割（AND検索用）
             const rawQuery = searchInput.value;
             const queries = rawQuery.trim().split(/\s+/).map(normalizeKana);
             
@@ -118,10 +117,7 @@
             }
 
             let filtered = storeData.filter(s => {
-                // 条件文（conditions）の中身もすべて検索対象の文字列として結合
                 const conditionValues = s.conditions ? Object.values(s.conditions) : [];
-                
-                // 検索対象：店名、グループ名、略称、そして「条件文」
                 const searchTargets = [
                     s.name, 
                     s.group, 
@@ -129,8 +125,6 @@
                     ...conditionValues
                 ].map(normalizeKana);
                 
-                // すべての検索語（クエリ）がいずれかのフィールドに含まれているか (AND検索)
-                // これにより「モス デリバリー」のような検索が可能になる
                 return queries.every(q => searchTargets.some(t => t.includes(q)));
             });
 
@@ -146,7 +140,10 @@
 
             filtered.forEach(s => {
                 const isSmbc = s.card_type === 'SMBC';
-                const badgeColor = isSmbc ? 'bg-blue-600' : 'bg-green-600';
+                
+                // 配色定義: SMBC=緑(Green), MUFG=赤(Red)
+                const badgeColor = isSmbc ? 'bg-green-600' : 'bg-red-600';
+                const rateColor = isSmbc ? 'text-green-700' : 'text-red-600';
                 
                 let conditionsHtml = '';
                 const c = s.conditions || {};
@@ -156,9 +153,14 @@
                 if(c.delivery) conditionsHtml += `<div class="text-[10px] leading-tight text-slate-500 mb-1"><span class="font-bold text-slate-700">配達:</span> ${c.delivery}</div>`;
                 if(c.note) conditionsHtml += `<div class="text-[10px] leading-tight text-orange-600 font-bold mt-1 bg-orange-50 p-1 rounded border border-orange-100">⚠️ ${c.note}</div>`;
 
+                // リンク出し分けロジック
                 let linkHtml = '';
                 if (s.official_list_url) {
-                    linkHtml = `<a href="${s.official_list_url}" target="_blank" class="block mt-2 text-[10px] text-blue-500 underline text-right">店舗リストを確認する &rarr;</a>`;
+                    // 特定の店舗リストURLがある場合
+                    linkHtml = `<a href="${s.official_list_url}" target="_blank" class="block mt-2 text-[10px] text-blue-500 underline text-right font-bold">📍 対象店舗リストを見る &rarr;</a>`;
+                } else {
+                    // 汎用公式サイトリンク
+                    linkHtml = `<a href="${s.source_url}" target="_blank" class="block mt-2 text-[10px] text-slate-400 underline text-right">公式サイトで条件を確認 &rarr;</a>`;
                 }
 
                 const html = `
@@ -166,13 +168,13 @@
                     <div class="flex justify-between items-start mb-2">
                         <div>
                             <span class="inline-block px-2 py-0.5 rounded text-[9px] font-black text-white uppercase tracking-wider mb-1 ${badgeColor}">
-                                ${isSmbc ? 'SMBC' : 'MUFG'}
+                                ${isSmbc ? '三井住友' : '三菱UFJ'}
                             </span>
                             ${s.group ? `<span class="ml-1 text-[9px] text-slate-400 font-bold uppercase">${s.group}</span>` : ''}
                             <h3 class="text-lg font-black text-slate-800 leading-tight">${s.name}</h3>
                         </div>
                         <div class="text-right">
-                            <div class="text-3xl font-black ${isSmbc ? 'text-blue-600' : 'text-green-600'} tracking-tighter">
+                            <div class="text-3xl font-black ${rateColor} tracking-tighter">
                                 ${s.currentRate}<span class="text-sm ml-0.5">%</span>
                             </div>
                         </div>
