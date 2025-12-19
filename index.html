@@ -6,51 +6,49 @@
     <title>おトク還元チェッカー PRO</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap');
-        body { font-family: 'Inter', sans-serif; }
-        .glass { background: rgba(255, 255, 255, 0.8); backdrop-filter: blur(10px); }
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&family=Noto+Sans+JP:wght@400;700;900&display=swap');
+        body { font-family: 'Inter', 'Noto Sans JP', sans-serif; background-color: #f8fafc; }
     </style>
 </head>
-<body class="bg-gray-50 min-h-screen pb-20">
+<body class="min-h-screen pb-20">
     <div class="max-w-md mx-auto px-4 pt-8">
-        <header class="mb-8">
-            <h1 class="text-4xl font-black text-gray-900 tracking-tighter">還元チェッカー</h1>
-            <p class="text-gray-500 font-medium">レジ前で迷わない、最強の相棒</p>
+        <header class="mb-8 text-center">
+            <h1 class="text-4xl font-black text-slate-900 tracking-tighter italic">還元チェッカー</h1>
+            <p class="text-slate-400 font-medium text-xs mt-1">決済の最適解を最速で見つける</p>
         </header>
 
-        <details class="bg-white rounded-3xl shadow-sm border border-gray-100 mb-6 overflow-hidden">
-            <summary class="p-4 font-bold text-gray-700 cursor-pointer list-none flex justify-between items-center">
-                <span>⚙️ マイ還元率を設定</span>
-                <span class="text-xs text-blue-500">変更する</span>
+        <details class="bg-white rounded-3xl shadow-sm border border-slate-100 mb-6 overflow-hidden">
+            <summary class="p-4 font-bold text-slate-700 cursor-pointer list-none flex justify-between items-center">
+                <span>⚙️ 還元率の個人設定</span>
+                <span class="text-xs text-blue-500 font-bold uppercase">Settings</span>
             </summary>
             <div class="p-4 pt-0 grid grid-cols-2 gap-4">
                 <div class="space-y-1">
-                    <span class="text-[10px] font-bold text-gray-400 uppercase">三井住友 (SMBC)</span>
-                    <div class="flex items-center bg-gray-50 rounded-xl p-2">
-                        <input type="number" id="smbc-rate" value="7.0" step="0.5" class="bg-transparent w-full font-bold outline-none text-blue-600 text-lg">
-                        <span class="text-gray-400 font-bold">%</span>
+                    <span class="text-[10px] font-bold text-slate-400 uppercase">三井住友 (SMBC)</span>
+                    <div class="flex items-center bg-slate-50 rounded-xl p-2">
+                        <input type="number" id="smbc-rate" class="bg-transparent w-full font-bold outline-none text-blue-600 text-lg">
+                        <span class="text-slate-400 font-bold">%</span>
                     </div>
                 </div>
                 <div class="space-y-1">
-                    <span class="text-[10px] font-bold text-gray-400 uppercase">三菱UFJ (MUFG)</span>
-                    <div class="flex items-center bg-gray-50 rounded-xl p-2">
-                        <input type="number" id="mufg-rate" value="7.0" step="0.5" class="bg-transparent w-full font-bold outline-none text-green-600 text-lg">
-                        <span class="text-gray-400 font-bold">%</span>
+                    <span class="text-[10px] font-bold text-slate-400 uppercase">三菱UFJ (MUFG)</span>
+                    <div class="flex items-center bg-slate-50 rounded-xl p-2">
+                        <input type="number" id="mufg-rate" class="bg-transparent w-full font-bold outline-none text-green-600 text-lg">
+                        <span class="text-slate-400 font-bold">%</span>
                     </div>
                 </div>
             </div>
         </details>
 
         <div class="sticky top-4 z-10 mb-8">
-            <input type="text" id="search" placeholder="店名を検索..." class="w-full p-5 rounded-3xl border-none shadow-xl shadow-blue-100 focus:ring-4 focus:ring-blue-200 outline-none text-lg font-medium">
+            <input type="text" id="search" placeholder="店名・ひらがな・グループ名で検索" class="w-full p-5 rounded-3xl border-none shadow-xl shadow-blue-500/5 focus:ring-4 focus:ring-blue-100 outline-none text-lg font-bold placeholder-slate-300">
         </div>
 
-        <div id="results" class="space-y-4">
-            </div>
+        <div id="results" class="space-y-4"></div>
 
-        <footer class="mt-12 p-6 bg-white rounded-3xl text-[10px] text-gray-400 leading-relaxed shadow-sm">
-            <p class="font-bold mb-1 text-gray-600 uppercase tracking-widest">Caution & Disclaimer</p>
-            <p>本サービスが提供する情報はAIによる自動収集に基づいております。情報の正確性、最新性を保証するものではなく、ご利用により生じた損害について管理者は一切の責任を負いかねます。三井住友・MUFGカード等は、スマートフォンによるタッチ決済が必須条件となります。詳細は必ず公式サイトにてご確認くださいませ。</p>
+        <footer class="mt-12 p-6 bg-white rounded-3xl text-[10px] text-slate-400 leading-relaxed border border-slate-100">
+            <p class="font-bold mb-1 text-slate-600 uppercase">Disclaimer</p>
+            <p>本データはAIによる自動収集に基づきます。正確性は保証されません。三井住友・MUFGカード等はスマホタッチ決済（Apple Pay / Google Pay）が必須です。詳細は必ず公式サイトをご確認ください。</p>
         </footer>
     </div>
 
@@ -60,11 +58,20 @@
         const smbcInput = document.getElementById('smbc-rate');
         const mufgInput = document.getElementById('mufg-rate');
 
+        // Load Persisted Settings
+        smbcInput.value = localStorage.getItem('user-smbc-rate') || "7.0";
+        mufgInput.value = localStorage.getItem('user-mufg-rate') || "7.0";
+
         fetch('./data.json')
             .then(res => res.json())
             .then(data => { storeData = data; render(); });
 
-        [searchInput, smbcInput, mufgInput].forEach(el => el.addEventListener('input', render));
+        [searchInput, smbcInput, mufgInput].forEach(el => el.addEventListener('input', () => {
+            // Persist Settings
+            localStorage.setItem('user-smbc-rate', smbcInput.value);
+            localStorage.setItem('user-mufg-rate', mufgInput.value);
+            render();
+        }));
 
         function render() {
             const query = searchInput.value.toLowerCase();
@@ -73,47 +80,41 @@
             const container = document.getElementById('results');
             container.innerHTML = '';
 
-            const filtered = storeData.filter(s => 
+            // Filtering with Group and Aliases Support
+            let filtered = storeData.filter(s => 
                 s.name.toLowerCase().includes(query) || 
+                (s.group && s.group.toLowerCase().includes(query)) ||
                 (s.aliases && s.aliases.some(a => a.toLowerCase().includes(query)))
             );
 
+            // Independent Rate Calculation for Each Card Entry
+            filtered = filtered.map(s => {
+                const finalRate = (s.card_type === 'SMBC') ? smbcRate : mufgRate;
+                return { ...s, calculatedRate: finalRate };
+            }).sort((a, b) => b.calculatedRate - a.calculatedRate);
+
             if (filtered.length === 0) {
-                container.innerHTML = '<p class="text-center text-gray-400 py-10">店舗が見つかりません</p>';
+                container.innerHTML = '<p class="text-center text-slate-300 py-10 text-sm">該当する店舗は見つかりませんでした</p>';
                 return;
             }
 
             filtered.forEach(s => {
-                const hasSMBC = s.supports.includes('SMBC');
-                const hasMUFG = s.supports.includes('MUFG');
-                
-                let bestCard = "";
-                let bestRate = 0;
-                let cardColor = "blue";
-
-                if (hasSMBC && smbcRate >= mufgRate) {
-                    bestCard = "三井住友カード";
-                    bestRate = smbcRate;
-                    cardColor = "blue";
-                } else if (hasMUFG) {
-                    bestCard = "三菱UFJカード";
-                    bestRate = mufgRate;
-                    cardColor = "green";
-                }
+                const color = (s.card_type === 'SMBC') ? 'blue' : 'green';
+                const label = (s.card_type === 'SMBC') ? '三井住友' : '三菱UFJ';
 
                 const div = document.createElement('div');
-                div.className = "bg-white p-6 rounded-3xl shadow-sm border border-gray-50 flex justify-between items-center";
+                div.className = "bg-white p-6 rounded-3xl shadow-sm border border-slate-100 flex justify-between items-center transition-transform active:scale-95";
                 div.innerHTML = `
-                    <div>
-                        <div class="flex items-center space-x-2 mb-1">
-                            <span class="w-2 h-2 rounded-full bg-${cardColor}-500"></span>
-                            <span class="text-[10px] font-black text-${cardColor}-500 uppercase tracking-tighter">${bestCard}</span>
+                    <div class="flex-1">
+                        <div class="flex items-center gap-2 mb-1">
+                            ${s.group ? `<span class="bg-slate-100 text-slate-500 text-[8px] px-2 py-0.5 rounded-md font-black uppercase tracking-widest">${s.group}</span>` : ''}
+                            <span class="text-[9px] font-black text-${color}-500 uppercase tracking-widest">${label}</span>
                         </div>
-                        <h3 class="text-xl font-bold text-gray-800">${s.name}</h3>
-                        <p class="text-[10px] text-gray-400 font-medium mt-1">※スマホタッチ決済必須</p>
+                        <h3 class="text-xl font-black text-slate-800 leading-tight">${s.name}</h3>
+                        <p class="text-[9px] text-slate-400 font-bold mt-1">Apple/Google Pay 必須</p>
                     </div>
-                    <div class="text-right">
-                        <div class="text-4xl font-black text-gray-900">${bestRate.toFixed(1)}<span class="text-sm text-gray-400 ml-1">%</span></div>
+                    <div class="ml-4 text-right">
+                        <div class="text-4xl font-black text-slate-900 tracking-tighter">${s.calculatedRate.toFixed(1)}<span class="text-sm text-slate-300 ml-0.5">%</span></div>
                     </div>
                 `;
                 container.appendChild(div);
