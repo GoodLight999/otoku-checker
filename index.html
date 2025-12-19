@@ -14,15 +14,15 @@
 <body class="min-h-screen pb-20 text-slate-800">
     <div class="max-w-xl mx-auto px-4 pt-8">
         <header class="mb-6">
-            <h1 class="text-3xl font-black text-slate-900 tracking-tighter italic">還元チェッカー <span class="text-blue-600">PRO</span></h1>
-            <p class="text-xs font-bold text-slate-400 mt-1 uppercase tracking-widest">Powered by Gemini 3.0 Series</p>
+            <h1 class="text-3xl font-black text-slate-900 tracking-tighter italic">還元チェッカー</h1>
+            <p class="text-xs font-bold text-slate-400 mt-1 uppercase tracking-widest">Logic-based Reward Analysis</p>
         </header>
 
         <section class="bg-white rounded-2xl p-5 mb-6 border border-slate-200 card-shadow">
             <div class="grid grid-cols-2 gap-4">
                 <div>
                     <div class="flex justify-between items-center mb-1">
-                        <label class="text-[10px] font-bold text-slate-500 uppercase">SMBC (Max 7%)</label>
+                        <label class="text-[10px] font-bold text-slate-500 uppercase">SMBC (最大7%)</label>
                         <a href="https://www.smbc-card.com/mem/wp/vpoint_up_program/index.jsp" target="_blank" class="text-[10px] text-blue-500 underline">公式詳細</a>
                     </div>
                     <div class="flex items-center bg-slate-50 rounded-xl px-3 py-2 border border-slate-200 focus-within:border-blue-500 focus-within:ring-2 focus-within:ring-blue-100 transition-all">
@@ -32,7 +32,7 @@
                 </div>
                 <div>
                     <div class="flex justify-between items-center mb-1">
-                        <label class="text-[10px] font-bold text-slate-500 uppercase">MUFG (Max 19%)</label>
+                        <label class="text-[10px] font-bold text-slate-500 uppercase">MUFG (最大19%)</label>
                         <a href="https://www.cr.mufg.jp/mufgcard/point/global/save/convenience_store/index.html" target="_blank" class="text-[10px] text-green-600 underline">公式詳細</a>
                     </div>
                     <div class="flex items-center bg-slate-50 rounded-xl px-3 py-2 border border-slate-200 focus-within:border-green-500 focus-within:ring-2 focus-within:ring-green-100 transition-all">
@@ -50,7 +50,7 @@
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                     </svg>
                 </div>
-                <input type="text" id="search" placeholder="店名、ブランド、読み仮名..." 
+                <input type="text" id="search" placeholder="店名・条件 (例: モス デリバリー)" 
                     class="w-full pl-11 pr-4 py-4 rounded-2xl border-none shadow-xl shadow-slate-200/50 focus:ring-4 focus:ring-blue-500/20 outline-none text-lg font-bold placeholder-slate-300 bg-white transition-all">
             </div>
         </div>
@@ -58,10 +58,16 @@
         <div id="results" class="space-y-4"></div>
 
         <footer class="mt-12 text-center pb-8">
-            <p class="text-[10px] text-slate-400">
-                本データはAIによる解析結果です。最新の正確な情報は必ず各公式サイトをご確認ください。<br>
-                特にMUFGカードはブランド(Amex/Visa/JCB)により対象店舗が異なる場合があります。
-            </p>
+            <div class="text-[10px] text-slate-400 leading-relaxed max-w-xs mx-auto">
+                <p class="mb-2">
+                    本データはAI解析による推定値です。必ず公式サイトで最新条件をご確認ください。
+                </p>
+                <p class="font-bold text-slate-500">
+                    ※三菱UFJカード(MUFG)は、国際ブランドが<br>
+                    「Visa/Mastercard/JCB」か「American Express」かで<br>
+                    対象店舗が異なる場合がありますのでご注意ください。
+                </p>
+            </div>
         </footer>
     </div>
 
@@ -72,7 +78,6 @@
         const mufgInput = document.getElementById('mufg-rate');
         const resultsDiv = document.getElementById('results');
 
-        // デフォルト値と保存
         smbcInput.value = localStorage.getItem('otoku-rate-smbc') || "7.0";
         mufgInput.value = localStorage.getItem('otoku-rate-mufg') || "5.5";
 
@@ -82,7 +87,6 @@
             render();
         }));
 
-        // データ取得
         fetch('./data.json')
             .then(res => res.json())
             .then(data => {
@@ -99,44 +103,51 @@
         }
 
         function render() {
-            const query = normalizeKana(searchInput.value);
+            // スペース区切りで検索語を分割（AND検索用）
+            const rawQuery = searchInput.value;
+            const queries = rawQuery.trim().split(/\s+/).map(normalizeKana);
+            
             const smbcRate = parseFloat(smbcInput.value) || 0;
             const mufgRate = parseFloat(mufgInput.value) || 0;
 
             resultsDiv.innerHTML = '';
 
-            if (!query) {
-                resultsDiv.innerHTML = '<p class="text-center text-slate-300 font-bold mt-10 text-sm">店名を入力して検索</p>';
+            if (!rawQuery) {
+                resultsDiv.innerHTML = '<p class="text-center text-slate-300 font-bold mt-10 text-sm">検索ワードを入力</p>';
                 return;
             }
 
-            // 検索フィルタリング
             let filtered = storeData.filter(s => {
+                // 条件文（conditions）の中身もすべて検索対象の文字列として結合
+                const conditionValues = s.conditions ? Object.values(s.conditions) : [];
+                
+                // 検索対象：店名、グループ名、略称、そして「条件文」
                 const searchTargets = [
                     s.name, 
                     s.group, 
-                    ...(s.aliases || [])
+                    ...(s.aliases || []),
+                    ...conditionValues
                 ].map(normalizeKana);
-                return searchTargets.some(t => t.includes(query));
+                
+                // すべての検索語（クエリ）がいずれかのフィールドに含まれているか (AND検索)
+                // これにより「モス デリバリー」のような検索が可能になる
+                return queries.every(q => searchTargets.some(t => t.includes(q)));
             });
 
-            // ソート（還元率が高い順）
             filtered = filtered.map(s => ({
                 ...s,
                 currentRate: (s.card_type === 'SMBC') ? smbcRate : mufgRate
             })).sort((a, b) => b.currentRate - a.currentRate);
 
             if (filtered.length === 0) {
-                resultsDiv.innerHTML = '<p class="text-center text-slate-300 font-bold mt-10">見つかりませんでした</p>';
+                resultsDiv.innerHTML = '<p class="text-center text-slate-300 font-bold mt-10">該当なし</p>';
                 return;
             }
 
             filtered.forEach(s => {
                 const isSmbc = s.card_type === 'SMBC';
-                const colorClass = isSmbc ? 'text-blue-600 bg-blue-50 border-blue-100' : 'text-green-600 bg-green-50 border-green-100';
                 const badgeColor = isSmbc ? 'bg-blue-600' : 'bg-green-600';
                 
-                // 条件表示の生成
                 let conditionsHtml = '';
                 const c = s.conditions || {};
                 
@@ -145,7 +156,6 @@
                 if(c.delivery) conditionsHtml += `<div class="text-[10px] leading-tight text-slate-500 mb-1"><span class="font-bold text-slate-700">配達:</span> ${c.delivery}</div>`;
                 if(c.note) conditionsHtml += `<div class="text-[10px] leading-tight text-orange-600 font-bold mt-1 bg-orange-50 p-1 rounded border border-orange-100">⚠️ ${c.note}</div>`;
 
-                // URLがある場合
                 let linkHtml = '';
                 if (s.official_list_url) {
                     linkHtml = `<a href="${s.official_list_url}" target="_blank" class="block mt-2 text-[10px] text-blue-500 underline text-right">店舗リストを確認する &rarr;</a>`;
