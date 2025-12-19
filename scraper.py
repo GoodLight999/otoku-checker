@@ -4,9 +4,7 @@ import json
 import time
 import re
 import sys
-import traceback
 from google import genai
-from google.genai import types
 from google.genai.errors import ClientError
 
 # --- Configuration ---
@@ -14,14 +12,13 @@ API_KEY = os.environ.get("GEMINI_API_KEY")
 MODEL_ID = os.environ.get("GEMINI_MODEL_ID", "gemini-flash-latest")
 
 # --- Debug Initialization ---
-print("--- INITIALIZING SCRAPER ---")
+print("--- INITIALIZING SCRAPER (AGGRESSIVE CLEANING + FULL PROMPT) ---")
 if not API_KEY:
     print("FATAL ERROR: 'GEMINI_API_KEY' environment variable is missing.")
     sys.exit(1)
 
 client = genai.Client(api_key=API_KEY)
 
-# Jinaを経由せず直接アクセス
 URLS = {
     "SMBC": "https://www.smbc-card.com/mem/wp/vpoint_up_program/index.jsp",
     "MUFG": "https://www.cr.mufg.jp/mufgcard/point/global/save/convenience_store/index.html"
@@ -41,27 +38,42 @@ def clean_json_text(text):
     if match: return match.group()
     return text.strip()
 
-def clean_html(html_text):
+def clean_html_aggressive(html_text):
     """
-    プロンプトをリッチにする分、入力データ（HTML）を徹底的にダイエットさせる。
-    タグの構造（ul, li, div, h3）は残すが、classやstyleなどの属性は全て削除してトークンを節約する。
+    【HTML徹底ダイエット】
+    プロンプトを長く維持するために、入力データ側の無駄を極限まで削る。
     """
-    # 1. script, style, コメント除去
-    html_text = re.sub(r'<script.*?>.*?</script>', '', html_text, flags=re.DOTALL | re.IGNORECASE)
-    html_text = re.sub(r'<style.*?>.*?</style>', '', html_text, flags=re.DOTALL | re.IGNORECASE)
+    if not html_text: return ""
+
+    # 1. 巨大な不要ブロック削除
+    blocks_to_kill = r'<(header|footer|nav|noscript|script|style|iframe|svg|form|aside)[^>]*>.*?</\1>'
+    html_text = re.sub(blocks_to_kill, '', html_text, flags=re.DOTALL | re.IGNORECASE)
+
+    # 2. コメント削除
     html_text = re.sub(r'<!--.*?-->', '', html_text, flags=re.DOTALL)
+
+    # 3. リンク(a href)以外のタグ属性を全削除してトークン節約
+    # <li class="mod-list" ...> -> <li>
+    html_text = re.sub(r'<((?!a\s)[a-z0-9]+)\s+[^>]*>', r'<\1>', html_text, flags=re.IGNORECASE)
     
-    # 2. タグの属性を削除 (<div class="..."> -> <div>)
-    #    <タグ名(スペース)...> のパターンを <タグ名> に置換
-    html_text = re.sub(r'<([a-zA-Z0-9]+)\s+[^>]*>', r'<\1>', html_text)
+    # aタグの中身も、href以外は削除したいが、正規表現が複雑になるため
+    # class, id, style, target, onclick などの主要なゴミ属性を個別に消す
+    attrs_to_remove = ['class', 'id', 'style', 'target', 'rel', 'onclick', 'data-[a-z0-9-]+', 'aria-[a-z-]+', 'role']
+    for attr in attrs_to_remove:
+        html_text = re.sub(r'\s+' + attr + r'="[^"]*"', '', html_text, flags=re.IGNORECASE)
+        html_text = re.sub(r'\s+' + attr + r"='[^']*'", '', html_text, flags=re.IGNORECASE)
+
+    # 4. 構造的に不要な「箱」タグ(div, span, section等)を削除
+    tags_to_strip = ['div', 'span', 'section', 'article', 'main', 'body', 'html', 'head']
+    for tag in tags_to_strip:
+        html_text = re.sub(r'<' + tag + r'[^>]*>', '', html_text, flags=re.IGNORECASE)
+        html_text = re.sub(r'</' + tag + r'>', '\n', html_text, flags=re.IGNORECASE)
+
+    # 5. 空白・改行の圧縮
+    html_text = re.sub(r'\n+', '\n', html_text)
+    html_text = re.sub(r' +', ' ', html_text)
     
-    # 3. inputタグなどはノイズなので消す
-    html_text = re.sub(r'<input[^>]*>', '', html_text, flags=re.IGNORECASE)
-    
-    # 4. 連続する空白・改行を圧縮
-    html_text = re.sub(r'\s+', ' ', html_text)
-    
-    return html_text[:95000] # 文字数制限
+    return html_text[:95000].strip()
 
 def fetch_and_extract(card_name, target_url):
     print(f"\n>>> Processing: {card_name}")
@@ -75,15 +87,19 @@ def fetch_and_extract(card_name, target_url):
         resp.raise_for_status()
         
         raw_html = resp.text
-        # ここでHTMLを軽量化し、プロンプト分のトークン余地を作る
-        content = clean_html(raw_html)
-        print(f"DEBUG: Web content fetched & optimized. Original: {len(raw_html)} -> Cleaned: {len(content)} chars")
+        # ここで強力に削減する
+        content = clean_html_aggressive(raw_html)
+        
+        orig_len = len(raw_html)
+        new_len = len(content)
+        ratio = (1 - new_len/orig_len) * 100 if orig_len > 0 else 0
+        print(f"DEBUG: HTML optimized. {orig_len} -> {new_len} chars. (Reduced by {ratio:.1f}%)")
         
     except Exception as e:
         print(f"ERROR: Failed to fetch web content: {e}")
         return []
 
-    # 【重要】ご指定の完全版プロンプトを使用
+    # 【重要】以前の指定通りの完全版プロンプト
     prompt = f"""
         You are an expert data analyst for Japanese credit card rewards (Poi-katsu).
         Analyze the text and extract store data properly.
@@ -132,13 +148,11 @@ def fetch_and_extract(card_name, target_url):
         {content}
     """
 
-    # リトライロジック (429エラー対策)
     max_retries = 3
     for attempt in range(max_retries):
         try:
             print(f"DEBUG: Sending request to Gemini... (Attempt {attempt+1}/{max_retries})")
             
-            # 安全フィルター全開放・Temperature 0.0 で実行
             response = client.models.generate_content(
                 model=MODEL_ID, 
                 contents=prompt,
@@ -153,28 +167,23 @@ def fetch_and_extract(card_name, target_url):
                     ]
                 }
             )
-            
-            # エラーが出なければループを抜ける
             break 
 
         except ClientError as e:
-            # 429エラー (Resource Exhausted) の場合のみ待機してリトライ
             if "429" in str(e) or "RESOURCE_EXHAUSTED" in str(e):
-                print(f"WARNING: Rate Limit Hit (429). Sleeping 60 seconds before retry...")
-                time.sleep(60) 
+                print(f"WARNING: Rate Limit Hit. Sleeping 5s...")
+                time.sleep(5) 
                 continue
             else:
-                # その他のAPIエラーは即死させる
                 print(f"CRITICAL API ERROR: {e}")
                 return []
         except Exception as e:
-            print(f"UNKNOWN ERROR during API call: {e}")
+            print(f"UNKNOWN ERROR: {e}")
             return []
     else:
-        print("ERROR: Failed after max retries due to Rate Limits.")
+        print("ERROR: Failed after max retries.")
         return []
 
-    # レスポンス処理
     try:
         raw_text = response.text
         cleaned_json = clean_json_text(raw_text)
@@ -183,9 +192,6 @@ def fetch_and_extract(card_name, target_url):
         return data
     except Exception as e:
         print(f"JSON PARSE ERROR: {e}")
-        # デバッグダンプ
-        with open(f"debug_dump_{card_name}.txt", "w", encoding="utf-8") as f:
-            f.write(response.text if response else "No response")
         return []
 
 # --- Main Logic ---
@@ -199,10 +205,8 @@ for i, (card, url) in enumerate(URLS.items()):
             item["source_url"] = OFFICIAL_LINKS[card]
             final_list.append(item)
     
-    # 次のカード処理の前に必ず休憩を入れる (レート制限対策)
     if i < len(URLS) - 1:
-        print("DEBUG: Cooling down for 30 seconds to respect API limits...")
-        time.sleep(30)
+        time.sleep(2)
 
 print(f"\n>>> Total items collected: {len(final_list)}")
 
