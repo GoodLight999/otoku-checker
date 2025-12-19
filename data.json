@@ -12,10 +12,10 @@
         "ハセガワストア"
       ],
       "conditions": {
-        "payment_method": "スマホのタッチ決済のみ",
+        "payment_method": "スマホタッチ決済のみ",
         "mobile_order": "対象外",
         "delivery": "対象外",
-        "note": "タイエー、ハマナスクラブ、ハセガワストアも対象。カード現物のタッチ決済、iD、カードの差し込み、磁気取引は対象外。商業施設内店舗など、一部ポイント加算の対象とならない店舗がある。"
+        "note": "タイエー、ハマナスクラブ、ハセガワストアも対象。商業施設内など一部対象外あり。"
       },
       "official_list_url": null,
       "card_type": "SMBC",
@@ -30,10 +30,10 @@
         "セブンイレブン"
       ],
       "conditions": {
-        "payment_method": "スマホのタッチ決済のみ",
+        "payment_method": "スマホタッチ決済のみ",
         "mobile_order": "対象外",
         "delivery": "対象外",
-        "note": "カード現物のタッチ決済、iD、カードの差し込み、磁気取引は対象外。商業施設内店舗など、一部ポイント加算の対象とならない店舗がある。"
+        "note": "商業施設内など一部対象外あり。"
       },
       "official_list_url": null,
       "card_type": "SMBC",
@@ -47,10 +47,10 @@
         "生活彩家"
       ],
       "conditions": {
-        "payment_method": "スマホのタッチ決済のみ",
+        "payment_method": "スマホタッチ決済のみ",
         "mobile_order": "対象外",
         "delivery": "対象外",
-        "note": "生活彩家も対象。カード現物のタッチ決済、iD、カードの差し込み、磁気取引は対象外。商業施設内店舗など、一部ポイント加算の対象とならない店舗がある。"
+        "note": "生活彩家も対象。商業施設内など一部対象外あり。"
       },
       "official_list_url": null,
       "card_type": "SMBC",
@@ -63,10 +63,10 @@
         "ミニストップ"
       ],
       "conditions": {
-        "payment_method": "スマホのタッチ決済のみ",
+        "payment_method": "スマホタッチ決済のみ",
         "mobile_order": "対象外",
         "delivery": "対象外",
-        "note": "カード現物のタッチ決済、iD、カードの差し込み、磁気取引は対象外。商業施設内店舗など、一部ポイント加算の対象とならない店舗がある。"
+        "note": "商業施設内など一部対象外あり。"
       },
       "official_list_url": null,
       "card_type": "SMBC",
@@ -82,10 +82,10 @@
         "ローソンスリーエフ"
       ],
       "conditions": {
-        "payment_method": "スマホのタッチ決済のみ",
+        "payment_method": "スマホタッチ決済のみ",
         "mobile_order": "対象外",
         "delivery": "対象外",
-        "note": "ナチュラルローソン、ローソンストア100、ローソンスリーエフも対象。カード現物のタッチ決済、iD、カードの差し込み、磁気取引は対象外。商業施設内店舗など、一部ポイント加算の対象とならない店舗がある。"
+        "note": "ナチュラルローソン、ローソンストア100、ローソンスリーエフも対象。商業施設内など一部対象外あり。"
       },
       "official_list_url": null,
       "card_type": "SMBC",
@@ -101,10 +101,10 @@
         "マクドナルド"
       ],
       "conditions": {
-        "payment_method": "スマホのタッチ決済 または モバイルオーダー",
+        "payment_method": "スマホタッチ決済またはモバイルオーダー",
         "mobile_order": "対象",
         "delivery": "対象外",
-        "note": "カード現物のタッチ決済、iD、カードの差し込み、磁気取引は対象外。商業施設内店舗など、一部ポイント加算の対象とならない店舗がある。"
+        "note": "商業施設内など一部対象外あり。"
       },
       "official_list_url": null,
       "card_type": "SMBC",
@@ -119,10 +119,10 @@
         "モスバーガー＆カフェ"
       ],
       "conditions": {
-        "payment_method": "スマホのタッチ決済 または モバイルオーダー",
+        "payment_method": "スマホタッチ決済またはモバイルオーダー",
         "mobile_order": "対象",
-        "delivery": "自社デリバリーは対象",
-        "note": "モスバーガー＆カフェも対象。配達サービスも対象となるが、他社サービスを経由した配達サービスは対象外。カード現物のタッチ決済、iD、カードの差し込み、磁気取引は対象外。商業施設内店舗など、一部ポイント加算の対象とならない店舗がある。"
+        "delivery": "自社配達サービスは対象。他社サービス経由は対象外。",
+        "note": "モスバーガー＆カフェも対象。商業施設内など一部対象外あり。"
       },
       "official_list_url": null,
       "card_type": "SMBC",
@@ -137,10 +137,10 @@
         "ケンタッキー"
       ],
       "conditions": {
-        "payment_method": "スマホのタッチ決済 または モバイルオーダー",
+        "payment_method": "スマホタッチ決済またはモバイルオーダー",
         "mobile_order": "対象",
-        "delivery": "自社デリバリーは対象",
-        "note": "配達サービスも対象となるが、他社サービスを経由した配達サービスは対象外。カード現物のタッチ決済、iD、カードの差し込み、磁気取引は対象外。商業施設内店舗など、一部ポイント加算の対象とならない店舗がある。"
+        "delivery": "自社配達サービスは対象。他社サービス経由は対象外。",
+        "note": "商業施設内など一部対象外あり。"
       },
       "official_list_url": "https://www.smbc-card.com/mem/wp/store_list/kfc.jsp",
       "card_type": "SMBC",
@@ -154,10 +154,10 @@
         "吉牛"
       ],
       "conditions": {
-        "payment_method": "スマホのタッチ決済 または モバイルオーダー",
+        "payment_method": "スマホタッチ決済またはモバイルオーダー",
         "mobile_order": "対象",
         "delivery": "対象外",
-        "note": "カード現物のタッチ決済、iD、カードの差し込み、磁気取引は対象外。商業施設内店舗など、一部ポイント加算の対象とならない店舗がある。"
+        "note": "商業施設内など一部対象外あり。"
       },
       "official_list_url": null,
       "card_type": "SMBC",
@@ -171,10 +171,10 @@
         "サイゼリヤ"
       ],
       "conditions": {
-        "payment_method": "スマホのタッチ決済のみ",
+        "payment_method": "スマホタッチ決済のみ",
         "mobile_order": "対象外",
         "delivery": "対象外",
-        "note": "カード現物のタッチ決済、iD、カードの差し込み、磁気取引は対象外。商業施設内店舗など、一部ポイント加算の対象とならない店舗がある。"
+        "note": "商業施設内など一部対象外あり。"
       },
       "official_list_url": "https://www.smbc-card.com/mem/wp/store_list/saizeriya.jsp",
       "card_type": "SMBC",
@@ -184,13 +184,14 @@
       "name": "ガスト",
       "group": "すかいらーくグループ",
       "aliases": [
-        "ガスト"
+        "ガスト",
+        "Gusto"
       ],
       "conditions": {
-        "payment_method": "スマホのタッチ決済のみ",
+        "payment_method": "スマホタッチ決済のみ",
         "mobile_order": "対象外",
         "delivery": "対象外",
-        "note": "カード現物のタッチ決済、iD、カードの差し込み、磁気取引は対象外。商業施設内店舗など、一部ポイント加算の対象とならない店舗がある。"
+        "note": "商業施設内など一部対象外あり。"
       },
       "official_list_url": null,
       "card_type": "SMBC",
@@ -200,14 +201,13 @@
       "name": "バーミヤン",
       "group": "すかいらーくグループ",
       "aliases": [
-        "バーミヤン",
-        "バーミ"
+        "バーミヤン"
       ],
       "conditions": {
-        "payment_method": "スマホのタッチ決済のみ",
+        "payment_method": "スマホタッチ決済のみ",
         "mobile_order": "対象外",
         "delivery": "対象外",
-        "note": "カード現物のタッチ決済、iD、カードの差し込み、磁気取引は対象外。商業施設内店舗など、一部ポイント加算の対象とならない店舗がある。"
+        "note": "商業施設内など一部対象外あり。"
       },
       "official_list_url": null,
       "card_type": "SMBC",
@@ -220,10 +220,10 @@
         "しゃぶ葉"
       ],
       "conditions": {
-        "payment_method": "スマホのタッチ決済のみ",
+        "payment_method": "スマホタッチ決済のみ",
         "mobile_order": "対象外",
         "delivery": "対象外",
-        "note": "カード現物のタッチ決済、iD、カードの差し込み、磁気取引は対象外。商業施設内店舗など、一部ポイント加算の対象とならない店舗がある。"
+        "note": "商業施設内など一部対象外あり。"
       },
       "official_list_url": null,
       "card_type": "SMBC",
@@ -237,10 +237,10 @@
         "ジョナ"
       ],
       "conditions": {
-        "payment_method": "スマホのタッチ決済のみ",
+        "payment_method": "スマホタッチ決済のみ",
         "mobile_order": "対象外",
         "delivery": "対象外",
-        "note": "カード現物のタッチ決済、iD、カードの差し込み、磁気取引は対象外。商業施設内店舗など、一部ポイント加算の対象とならない店舗がある。"
+        "note": "商業施設内など一部対象外あり。"
       },
       "official_list_url": null,
       "card_type": "SMBC",
@@ -253,38 +253,219 @@
         "夢庵"
       ],
       "conditions": {
-        "payment_method": "スマホのタッチ決済のみ",
+        "payment_method": "スマホタッチ決済のみ",
         "mobile_order": "対象外",
         "delivery": "対象外",
-        "note": "カード現物のタッチ決済、iD、カードの差し込み、磁気取引は対象外。商業施設内店舗など、一部ポイント加算の対象とならない店舗がある。"
+        "note": "商業施設内など一部対象外あり。"
       },
       "official_list_url": null,
       "card_type": "SMBC",
       "source_url": "https://www.smbc-card.com/mem/wp/vpoint_up_program/index.jsp"
     },
     {
-      "name": "その他すかいらーくグループ飲食店",
+      "name": "ステーキガスト",
       "group": "すかいらーくグループ",
       "aliases": [
-        "ステーキガスト",
-        "から好し",
-        "むさしの森珈琲",
-        "藍屋",
-        "グラッチェガーデンズ",
-        "魚屋路",
-        "chawan",
-        "La Ohana",
-        "とんから亭",
-        "ゆめあん食堂",
-        "桃菜",
-        "八郎そば",
-        "三〇三"
+        "ステーキガスト"
       ],
       "conditions": {
-        "payment_method": "スマホのタッチ決済のみ",
+        "payment_method": "スマホタッチ決済のみ",
         "mobile_order": "対象外",
         "delivery": "対象外",
-        "note": "上記のブランドのみ対象。その他のすかいらーくグループ飲食店は対象外。カード現物のタッチ決済、iD、カードの差し込み、磁気取引は対象外。商業施設内店舗など、一部ポイント加算の対象とならない店舗がある。"
+        "note": "商業施設内など一部対象外あり。"
+      },
+      "official_list_url": null,
+      "card_type": "SMBC",
+      "source_url": "https://www.smbc-card.com/mem/wp/vpoint_up_program/index.jsp"
+    },
+    {
+      "name": "から好し",
+      "group": "すかいらーくグループ",
+      "aliases": [
+        "から好し"
+      ],
+      "conditions": {
+        "payment_method": "スマホタッチ決済のみ",
+        "mobile_order": "対象外",
+        "delivery": "対象外",
+        "note": "商業施設内など一部対象外あり。"
+      },
+      "official_list_url": null,
+      "card_type": "SMBC",
+      "source_url": "https://www.smbc-card.com/mem/wp/vpoint_up_program/index.jsp"
+    },
+    {
+      "name": "むさしの森珈琲",
+      "group": "すかいらーくグループ",
+      "aliases": [
+        "むさしの森珈琲"
+      ],
+      "conditions": {
+        "payment_method": "スマホタッチ決済のみ",
+        "mobile_order": "対象外",
+        "delivery": "対象外",
+        "note": "商業施設内など一部対象外あり。"
+      },
+      "official_list_url": null,
+      "card_type": "SMBC",
+      "source_url": "https://www.smbc-card.com/mem/wp/vpoint_up_program/index.jsp"
+    },
+    {
+      "name": "藍屋",
+      "group": "すかいらーくグループ",
+      "aliases": [
+        "藍屋"
+      ],
+      "conditions": {
+        "payment_method": "スマホタッチ決済のみ",
+        "mobile_order": "対象外",
+        "delivery": "対象外",
+        "note": "商業施設内など一部対象外あり。"
+      },
+      "official_list_url": null,
+      "card_type": "SMBC",
+      "source_url": "https://www.smbc-card.com/mem/wp/vpoint_up_program/index.jsp"
+    },
+    {
+      "name": "グラッチェガーデンズ",
+      "group": "すかいらーくグループ",
+      "aliases": [
+        "グラッチェガーデンズ"
+      ],
+      "conditions": {
+        "payment_method": "スマホタッチ決済のみ",
+        "mobile_order": "対象外",
+        "delivery": "対象外",
+        "note": "商業施設内など一部対象外あり。"
+      },
+      "official_list_url": null,
+      "card_type": "SMBC",
+      "source_url": "https://www.smbc-card.com/mem/wp/vpoint_up_program/index.jsp"
+    },
+    {
+      "name": "魚屋路",
+      "group": "すかいらーくグループ",
+      "aliases": [
+        "魚屋路"
+      ],
+      "conditions": {
+        "payment_method": "スマホタッチ決済のみ",
+        "mobile_order": "対象外",
+        "delivery": "対象外",
+        "note": "商業施設内など一部対象外あり。"
+      },
+      "official_list_url": null,
+      "card_type": "SMBC",
+      "source_url": "https://www.smbc-card.com/mem/wp/vpoint_up_program/index.jsp"
+    },
+    {
+      "name": "chawan",
+      "group": "すかいらーくグループ",
+      "aliases": [
+        "chawan"
+      ],
+      "conditions": {
+        "payment_method": "スマホタッチ決済のみ",
+        "mobile_order": "対象外",
+        "delivery": "対象外",
+        "note": "商業施設内など一部対象外あり。"
+      },
+      "official_list_url": null,
+      "card_type": "SMBC",
+      "source_url": "https://www.smbc-card.com/mem/wp/vpoint_up_program/index.jsp"
+    },
+    {
+      "name": "La Ohana",
+      "group": "すかいらーくグループ",
+      "aliases": [
+        "La Ohana"
+      ],
+      "conditions": {
+        "payment_method": "スマホタッチ決済のみ",
+        "mobile_order": "対象外",
+        "delivery": "対象外",
+        "note": "商業施設内など一部対象外あり。"
+      },
+      "official_list_url": null,
+      "card_type": "SMBC",
+      "source_url": "https://www.smbc-card.com/mem/wp/vpoint_up_program/index.jsp"
+    },
+    {
+      "name": "とんから亭",
+      "group": "すかいらーくグループ",
+      "aliases": [
+        "とんから亭"
+      ],
+      "conditions": {
+        "payment_method": "スマホタッチ決済のみ",
+        "mobile_order": "対象外",
+        "delivery": "対象外",
+        "note": "商業施設内など一部対象外あり。"
+      },
+      "official_list_url": null,
+      "card_type": "SMBC",
+      "source_url": "https://www.smbc-card.com/mem/wp/vpoint_up_program/index.jsp"
+    },
+    {
+      "name": "ゆめあん食堂",
+      "group": "すかいらーくグループ",
+      "aliases": [
+        "ゆめあん食堂"
+      ],
+      "conditions": {
+        "payment_method": "スマホタッチ決済のみ",
+        "mobile_order": "対象外",
+        "delivery": "対象外",
+        "note": "商業施設内など一部対象外あり。"
+      },
+      "official_list_url": null,
+      "card_type": "SMBC",
+      "source_url": "https://www.smbc-card.com/mem/wp/vpoint_up_program/index.jsp"
+    },
+    {
+      "name": "桃菜",
+      "group": "すかいらーくグループ",
+      "aliases": [
+        "桃菜"
+      ],
+      "conditions": {
+        "payment_method": "スマホタッチ決済のみ",
+        "mobile_order": "対象外",
+        "delivery": "対象外",
+        "note": "商業施設内など一部対象外あり。"
+      },
+      "official_list_url": null,
+      "card_type": "SMBC",
+      "source_url": "https://www.smbc-card.com/mem/wp/vpoint_up_program/index.jsp"
+    },
+    {
+      "name": "八郎そば",
+      "group": "すかいらーくグループ",
+      "aliases": [
+        "八郎そば"
+      ],
+      "conditions": {
+        "payment_method": "スマホタッチ決済のみ",
+        "mobile_order": "対象外",
+        "delivery": "対象外",
+        "note": "商業施設内など一部対象外あり。"
+      },
+      "official_list_url": null,
+      "card_type": "SMBC",
+      "source_url": "https://www.smbc-card.com/mem/wp/vpoint_up_program/index.jsp"
+    },
+    {
+      "name": "三〇三",
+      "group": "すかいらーくグループ",
+      "aliases": [
+        "三〇三",
+        "みわみ"
+      ],
+      "conditions": {
+        "payment_method": "スマホタッチ決済のみ",
+        "mobile_order": "対象外",
+        "delivery": "対象外",
+        "note": "商業施設内など一部対象外あり。"
       },
       "official_list_url": null,
       "card_type": "SMBC",
@@ -297,10 +478,10 @@
         "すき家"
       ],
       "conditions": {
-        "payment_method": "スマホのタッチ決済 または モバイルオーダー",
+        "payment_method": "スマホタッチ決済またはモバイルオーダー",
         "mobile_order": "対象",
         "delivery": "対象外",
-        "note": "カード現物のタッチ決済、iD、カードの差し込み、磁気取引は対象外。商業施設内店舗など、一部ポイント加算の対象とならない店舗がある。"
+        "note": "商業施設内など一部対象外あり。"
       },
       "official_list_url": null,
       "card_type": "SMBC",
@@ -313,10 +494,10 @@
         "はま寿司"
       ],
       "conditions": {
-        "payment_method": "スマホのタッチ決済のみ",
+        "payment_method": "スマホタッチ決済のみ",
         "mobile_order": "対象外",
         "delivery": "対象外",
-        "note": "カード現物のタッチ決済、iD、カードの差し込み、磁気取引は対象外。商業施設内店舗など、一部ポイント加算の対象とならない店舗がある。"
+        "note": "商業施設内など一部対象外あり。"
       },
       "official_list_url": null,
       "card_type": "SMBC",
@@ -329,10 +510,10 @@
         "ココス"
       ],
       "conditions": {
-        "payment_method": "スマホのタッチ決済のみ",
+        "payment_method": "スマホタッチ決済のみ",
         "mobile_order": "対象外",
         "delivery": "対象外",
-        "note": "カード現物のタッチ決済、iD、カードの差し込み、磁気取引は対象外。商業施設内店舗など、一部ポイント加算の対象とならない店舗がある。"
+        "note": "商業施設内など一部対象外あり。"
       },
       "official_list_url": null,
       "card_type": "SMBC",
@@ -343,13 +524,13 @@
       "group": "ドトール・日レスホールディングス",
       "aliases": [
         "ドトール",
-        "ドトールコーヒーショップ"
+        "Doutor"
       ],
       "conditions": {
-        "payment_method": "スマホのタッチ決済のみ",
+        "payment_method": "スマホタッチ決済のみ",
         "mobile_order": "対象外",
         "delivery": "対象外",
-        "note": "カード現物のタッチ決済、iD、カードの差し込み、磁気取引は対象外。商業施設内店舗など、一部ポイント加算の対象とならない店舗がある。"
+        "note": "商業施設内など一部対象外あり。"
       },
       "official_list_url": null,
       "card_type": "SMBC",
@@ -360,13 +541,13 @@
       "group": "ドトール・日レスホールディングス",
       "aliases": [
         "エクセルシオール",
-        "エクセルシオール カフェ"
+        "エクセルシオールカフェ"
       ],
       "conditions": {
-        "payment_method": "スマホのタッチ決済のみ",
+        "payment_method": "スマホタッチ決済のみ",
         "mobile_order": "対象外",
         "delivery": "対象外",
-        "note": "カード現物のタッチ決済、iD、カードの差し込み、磁気取引は対象外。商業施設内店舗など、一部ポイント加算の対象とならない店舗がある。"
+        "note": "商業施設内など一部対象外あり。"
       },
       "official_list_url": null,
       "card_type": "SMBC",
@@ -374,15 +555,15 @@
     },
     {
       "name": "かっぱ寿司",
-      "group": null,
+      "group": "カッパ・クリエイト",
       "aliases": [
         "かっぱ寿司"
       ],
       "conditions": {
-        "payment_method": "スマホのタッチ決済のみ",
+        "payment_method": "スマホタッチ決済のみ",
         "mobile_order": "対象外",
         "delivery": "対象外",
-        "note": "カード現物のタッチ決済、iD、カードの差し込み、磁気取引は対象外。商業施設内店舗など、一部ポイント加算の対象とならない店舗がある。"
+        "note": "商業施設内など一部対象外あり。"
       },
       "official_list_url": null,
       "card_type": "SMBC",
@@ -393,13 +574,14 @@
       "group": null,
       "aliases": [
         "スタバ",
-        "スターバックス"
+        "スターバックス",
+        "Starbucks"
       ],
       "conditions": {
-        "payment_method": "モバイルオーダー決済 (Apple Payのみ)",
-        "mobile_order": "公式アプリのみ対象",
+        "payment_method": "モバイルオーダー（Apple Pay決済のみ）",
+        "mobile_order": "対象",
         "delivery": "対象外",
-        "note": "モバイルオーダー利用時、Apple Payでの決済のみ対象。カード現物のタッチ決済、iD、カードの差し込み、磁気取引は対象外。商業施設内店舗など、一部ポイント加算の対象とならない店舗がある。"
+        "note": "Apple Payでの決済のみ対象。商業施設内など一部対象外あり。"
       },
       "official_list_url": null,
       "card_type": "SMBC",
