@@ -4,6 +4,7 @@ import json
 import time
 import re
 import sys
+from urllib.parse import urljoin  # 【追加】URL結合用
 from google import genai
 from google.genai import types
 from google.genai.errors import ClientError
@@ -17,8 +18,7 @@ if not API_KEY:
     print("FATAL ERROR: 'GEMINI_API_KEY' environment variable is missing.", flush=True)
     sys.exit(1)
 
-# 【修正】タイムアウトを90秒(90000ms)に短縮
-# 5分も待つ必要はありません。動くときは1分で動きます。ダメな時はすぐ切って次へ行きます。
+# タイムアウト90秒
 client = genai.Client(
     api_key=API_KEY, 
     http_options=types.HttpOptions(timeout=90000) 
@@ -34,6 +34,12 @@ OFFICIAL_LINKS = {
     "MUFG": "https://www.cr.mufg.jp/mufgcard/point/global/save/convenience_store/index.html"
 }
 
+# 【追加】相対パスを絶対パスに変換するためのベースドメイン定義
+BASE_DOMAINS = {
+    "SMBC": "https://www.smbc-card.com",
+    "MUFG": "https://www.cr.mufg.jp"
+}
+
 def clean_json_text(text):
     if not text: return "[]"
     text = re.sub(r'```json\s*', '', text)
@@ -45,7 +51,7 @@ def clean_json_text(text):
 def clean_html_aggressive(html_text):
     if not html_text: return ""
     
-    # 巨大ブロック削除 (formは維持)
+    # 巨大ブロック削除
     blocks_to_kill = r'<(header|footer|nav|noscript|script|style|iframe|svg|aside)[^>]*>.*?</\1>'
     html_text = re.sub(blocks_to_kill, '', html_text, flags=re.DOTALL | re.IGNORECASE)
 
@@ -82,7 +88,6 @@ def fetch_and_extract(card_name, target_url):
         raw_html = resp.text
         content = clean_html_aggressive(raw_html)
         
-        # デバッグ保存
         with open(f"debug_input_{card_name}.html", "w", encoding="utf-8") as f:
             f.write(content)
         print(f"DEBUG: Saved input HTML ({len(content)} chars)", flush=True)
@@ -177,7 +182,6 @@ def fetch_and_extract(card_name, target_url):
                 print(f"CRITICAL API ERROR: {e}", flush=True)
                 return []
         except Exception as e:
-            # タイムアウト等
             print(f"WARNING: Network/Timeout Error ({e}).", flush=True)
             if attempt < max_retries - 1:
                 print("Retrying in 5s...", flush=True)
@@ -186,7 +190,6 @@ def fetch_and_extract(card_name, target_url):
             else:
                 return []
     
-    # デバッグ保存
     try:
         with open(f"debug_response_{card_name}.txt", "w", encoding="utf-8") as f:
             f.write(response_text if response_text else "EMPTY_RESPONSE")
@@ -210,9 +213,21 @@ final_list = []
 for i, (card, url) in enumerate(URLS.items()):
     items = fetch_and_extract(card, url)
     if items:
+        base_domain = BASE_DOMAINS.get(card, "") # そのカードのベースURLを取得
+        
         for item in items:
             item["card_type"] = card
             item["source_url"] = OFFICIAL_LINKS[card]
+            
+            # 【修正】URLの絶対パス変換ロジック
+            # official_list_urlが存在し、かつ「http」で始まっていない(=相対パス)なら結合する
+            raw_url = item.get("official_list_url")
+            if raw_url and not raw_url.startswith("http"):
+                # urljoinは賢いので、baseが "https://.../index.jsp" で pathが "/mem/..." でも
+                # 正しく "https://.../mem/..." に結合してくれます
+                item["official_list_url"] = urljoin(base_domain, raw_url)
+                print(f"DEBUG: Fixed URL -> {item['official_list_url']}", flush=True)
+
         final_list.extend(items)
     
     if i < len(URLS) - 1:
