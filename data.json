@@ -1,716 +1,361 @@
 [
   {
-    "name": "セイコーマート",
-    "aliases": [
-      "ハマナスクラブ",
-      "せいこーまーと",
-      "タイエー",
-      "セイコマ",
-      "Seicomart",
-      "ハセガワストア",
-      "セコマ"
-    ],
-    "supports": [
-      "SMBC"
-    ]
-  },
-  {
-    "name": "セブン-イレブン",
-    "aliases": [
-      "セブンイレブン",
-      "7-Eleven",
-      "せぶんいれぶん",
-      "セブン",
-      "711"
-    ],
-    "supports": [
-      "SMBC"
-    ]
-  },
-  {
-    "name": "ポプラ",
-    "aliases": [
-      "ぽぷら",
-      "生活彩家",
-      "せいかつさいか",
-      "Poplar"
-    ],
-    "supports": [
-      "SMBC"
-    ]
-  },
-  {
-    "name": "ミニストップ",
-    "aliases": [
-      "みにすとっぷ",
-      "Ministop",
-      "ミニスト"
-    ],
-    "supports": [
-      "SMBC"
-    ]
-  },
-  {
-    "name": "ローソン",
-    "aliases": [
-      "ローソン",
-      "ローソンストア100",
-      "100円ローソン",
-      "ナチュラルローソン",
-      "ろーそん",
-      "Lawson",
-      "ローソンスリーエフ",
-      "ローパナ",
-      "LAWSON"
-    ],
-    "supports": [
-      "SMBC",
-      "MUFG"
-    ]
-  },
-  {
     "name": "マクドナルド",
+    "group": null,
     "aliases": [
+      "まくどなるど",
+      "マクドナルド",
       "マック",
       "マクド",
-      "McDonald's",
-      "まくどなるど"
+      "mcdonalds",
+      "マクドナルドモバイルオーダー"
     ],
-    "supports": [
-      "SMBC"
-    ]
+    "caution": "スマホのタッチ決済またはモバイルオーダーのみ対象です。iD、カード現物の差し込み、磁気取引は対象外となります。",
+    "card_type": "SMBC"
   },
   {
     "name": "モスバーガー",
+    "group": null,
     "aliases": [
-      "Mos Burger",
       "もすばーがー",
+      "モスバーガー",
       "モス",
-      "モスバーガー＆カフェ"
+      "mos burger",
+      "モスバーガーモバイルオーダー"
     ],
-    "supports": [
-      "SMBC"
-    ]
+    "caution": "スマホのタッチ決済またはモバイルオーダーのみ対象です。iD、カード現物の差し込み、磁気取引は対象外となります。",
+    "card_type": "SMBC"
   },
   {
     "name": "ケンタッキーフライドチキン",
+    "group": null,
     "aliases": [
-      "ケンタ",
-      "Kentucky Fried Chicken",
-      "ケンタッキー",
       "けんたっきーふらいどちきん",
-      "KFC",
-      "ケンチキ"
+      "ケンタッキーフライドチキン",
+      "ケンタッキー",
+      "ケンタ",
+      "kfc",
+      "kentucky",
+      "ケンタッキーモバイルオーダー"
     ],
-    "supports": [
-      "SMBC"
-    ]
+    "caution": "スマホのタッチ決済またはモバイルオーダーのみ対象です。iD、カード現物の差し込み、磁気取引は対象外となります。",
+    "card_type": "SMBC"
   },
   {
     "name": "吉野家",
+    "group": null,
     "aliases": [
-      "Yoshinoya",
-      "よしのや"
+      "よしのや",
+      "吉野家",
+      "ヨシノヤ",
+      "yoshinoya",
+      "吉野家モバイルオーダー"
     ],
-    "supports": [
-      "SMBC"
-    ]
+    "caution": "スマホのタッチ決済またはモバイルオーダーのみ対象です。iD、カード現物の差し込み、磁気取引は対象外となります。",
+    "card_type": "SMBC"
   },
   {
     "name": "すき家",
+    "group": "ゼンショー",
     "aliases": [
-      "Sukiya",
-      "すきや"
+      "すきや",
+      "スキヤ",
+      "すき家",
+      "ゼンショー",
+      "sukiya",
+      "すき家モバイルオーダー"
     ],
-    "supports": [
-      "SMBC"
-    ]
+    "caution": "スマホのタッチ決済またはモバイルオーダーのみ対象です。iD、カード現物の差し込み、磁気取引は対象外となります。",
+    "card_type": "SMBC"
   },
   {
     "name": "スターバックス",
+    "group": null,
     "aliases": [
-      "スタバ",
       "すたーばっくす",
-      "Starbucks"
+      "スターバックス",
+      "スタバ",
+      "starbucks",
+      "スターバックスモバイルオーダー"
     ],
-    "supports": [
-      "SMBC"
-    ]
+    "caution": "スマホのタッチ決済またはモバイルオーダーのみ対象です。iD、カード現物の差し込み、磁気取引は対象外となります。",
+    "card_type": "SMBC"
   },
   {
-    "name": "サイゼリヤ",
+    "name": "セブン-イレブン",
+    "group": "セブン&アイ",
     "aliases": [
-      "サイゼ",
-      "さいぜりや",
-      "Saizeriya"
-    ],
-    "supports": [
-      "SMBC"
-    ]
-  },
-  {
-    "name": "ガスト",
-    "aliases": [
-      "がすと",
-      "Gusto"
-    ],
-    "supports": [
-      "SMBC"
-    ]
-  },
-  {
-    "name": "バーミヤン",
-    "aliases": [
-      "Bamiyan",
-      "ばーみやん"
-    ],
-    "supports": [
-      "SMBC"
-    ]
-  },
-  {
-    "name": "しゃぶ葉",
-    "aliases": [
-      "Syabuyo",
-      "しゃぶよう"
-    ],
-    "supports": [
-      "SMBC"
-    ]
-  },
-  {
-    "name": "ジョナサン",
-    "aliases": [
-      "Jonathan's",
-      "じょなさん"
-    ],
-    "supports": [
-      "SMBC"
-    ]
-  },
-  {
-    "name": "夢庵",
-    "aliases": [
-      "Yumean",
-      "ゆめあん"
-    ],
-    "supports": [
-      "SMBC"
-    ]
-  },
-  {
-    "name": "ステーキガスト",
-    "aliases": [
-      "Steak Gusto",
-      "すてーきがすと"
-    ],
-    "supports": [
-      "SMBC"
-    ]
-  },
-  {
-    "name": "から好し",
-    "aliases": [
-      "からよし",
-      "Karayoshi"
-    ],
-    "supports": [
-      "SMBC"
-    ]
-  },
-  {
-    "name": "むさしの森珈琲",
-    "aliases": [
-      "Musashino Mori Coffee",
-      "むさしのもりこーひー"
-    ],
-    "supports": [
-      "SMBC"
-    ]
-  },
-  {
-    "name": "藍屋",
-    "aliases": [
-      "Aiya",
-      "あいや"
-    ],
-    "supports": [
-      "SMBC"
-    ]
-  },
-  {
-    "name": "グラッチェガーデンズ",
-    "aliases": [
-      "Grazie Gardens",
-      "ぐらっちぇがーでんず"
-    ],
-    "supports": [
-      "SMBC"
-    ]
-  },
-  {
-    "name": "魚屋路",
-    "aliases": [
-      "ととやみち",
-      "Totoyamichi"
-    ],
-    "supports": [
-      "SMBC"
-    ]
-  },
-  {
-    "name": "chawan",
-    "aliases": [
-      "ちゃわん",
-      "チャワン"
-    ],
-    "supports": [
-      "SMBC"
-    ]
-  },
-  {
-    "name": "La Ohana",
-    "aliases": [
-      "らおはな",
-      "ラオハナ"
-    ],
-    "supports": [
-      "SMBC"
-    ]
-  },
-  {
-    "name": "とんから亭",
-    "aliases": [
-      "とんからてい",
-      "Tonkaratei"
-    ],
-    "supports": [
-      "SMBC"
-    ]
-  },
-  {
-    "name": "ゆめあん食堂",
-    "aliases": [
-      "ゆめあんしょくどう"
-    ],
-    "supports": [
-      "SMBC"
-    ]
-  },
-  {
-    "name": "桃菜",
-    "aliases": [
-      "とうさい",
-      "トウサイ"
-    ],
-    "supports": [
-      "SMBC"
-    ]
-  },
-  {
-    "name": "八郎そば",
-    "aliases": [
-      "はちろうそば"
-    ],
-    "supports": [
-      "SMBC"
-    ]
-  },
-  {
-    "name": "三〇三",
-    "aliases": [
-      "みわみ",
-      "ミワミ"
-    ],
-    "supports": [
-      "SMBC"
-    ]
-  },
-  {
-    "name": "はま寿司",
-    "aliases": [
-      "Hama-sushi",
-      "はまずし"
-    ],
-    "supports": [
-      "SMBC"
-    ]
-  },
-  {
-    "name": "ココス",
-    "aliases": [
-      "COCO'S",
-      "ここす"
-    ],
-    "supports": [
-      "SMBC"
-    ]
-  },
-  {
-    "name": "ドトールコーヒーショップ",
-    "aliases": [
-      "どとーるこーひーしょっぷ",
-      "ドトール",
-      "Doutor"
-    ],
-    "supports": [
-      "SMBC"
-    ]
-  },
-  {
-    "name": "エクセルシオール カフェ",
-    "aliases": [
-      "エクセルシオール",
-      "えくせるしおーるかふぇ",
-      "Excelsior Cafe",
-      "エクセル"
-    ],
-    "supports": [
-      "SMBC"
-    ]
-  },
-  {
-    "name": "かっぱ寿司",
-    "aliases": [
-      "かっぱずし",
-      "Kappa Sushi"
-    ],
-    "supports": [
-      "SMBC"
-    ]
-  },
-  {
-    "name": "セブン‐イレブン",
-    "aliases": [
-      "セブンイレブン",
-      "7-Eleven",
-      "Seven-Eleven",
       "せぶんいれぶん",
-      "セブン"
+      "セブンイレブン",
+      "セブン",
+      "7-eleven",
+      "seven-eleven"
     ],
-    "supports": [
-      "MUFG"
-    ]
+    "caution": "商業施設内の店舗、セブン自販機、スマホレジ、オンライン、デリバリーでの利用は対象外です。",
+    "card_type": "MUFG"
+  },
+  {
+    "name": "ローソン",
+    "group": null,
+    "aliases": [
+      "ろーそん",
+      "ローソン",
+      "ナチュラルローソン",
+      "なちゅらるろーそん",
+      "ローソンストア100",
+      "ろーそんすとあ100",
+      "lawson"
+    ],
+    "caution": "商業施設・ビル内・ガソリンスタンド併設店舗、オンライン、デリバリー、スマホレジは対象外です。",
+    "card_type": "MUFG"
   },
   {
     "name": "コカ・コーラ自販機",
+    "group": null,
     "aliases": [
-      "こかこーらじはんき",
-      "コカコーラジハンキ",
-      "Coca-Cola",
-      "Coke ON Pay",
-      "Coke ON",
+      "こか・こーらじはんき",
       "コカコーラ",
-      "コカ・コーラ"
+      "coca-cola",
+      "Coke ON",
+      "コークオン",
+      "こーくおん"
     ],
-    "supports": [
-      "MUFG"
-    ]
+    "caution": "タッチ決済、QUICPay、Coke ON Pay/Passが対象です。Apple Payでの直接支払いは対象外となります。",
+    "card_type": "MUFG"
   },
   {
     "name": "くら寿司",
+    "group": null,
     "aliases": [
-      "クラズシ",
       "くらずし",
-      "無添くら寿司",
-      "Kura Sushi"
+      "クラズシ",
+      "くら",
+      "kura sushi"
     ],
-    "supports": [
-      "MUFG"
-    ]
+    "caution": "商業施設内の一部店舗や、オンライン事前決済（スマホでお持ち帰り等）は対象外です。",
+    "card_type": "MUFG"
   },
   {
     "name": "スシロー",
+    "group": "FOOD & LIFE COMPANIES",
     "aliases": [
+      "すしろー",
       "スシロー",
       "あきんどスシロー",
-      "すしろー",
-      "Sushiro"
+      "sushiro"
     ],
-    "supports": [
-      "MUFG"
-    ]
+    "caution": "商業施設内の一部店舗、オンライン決済、京樽スシロー、スシローToGoは対象外です。",
+    "card_type": "MUFG"
   },
   {
     "name": "ピザハット",
+    "group": null,
     "aliases": [
-      "Pizza Hut",
-      "ピザハットオンライン",
+      "ぴざはっと",
       "ピザハット",
-      "ぴざはっと"
+      "pizza hut"
     ],
-    "supports": [
-      "MUFG"
-    ]
+    "caution": "公式サイトおよび公式アプリでのオンライン注文時のクレジットカード決済が対象です。",
+    "card_type": "MUFG"
   },
   {
-    "name": "松屋",
+    "name": "松屋フーズ",
+    "group": "松屋フーズ",
     "aliases": [
-      "Matsuya",
       "まつや",
-      "松屋フーズ",
-      "マツヤ"
-    ],
-    "supports": [
-      "MUFG"
-    ]
-  },
-  {
-    "name": "松のや",
-    "aliases": [
+      "マツヤ",
       "まつのや",
-      "マツノヤ",
-      "松乃家",
-      "まつの屋"
+      "松のや",
+      "まいかりーしょくどう",
+      "マイカリー食堂",
+      "ステーキ屋松",
+      "松軒中華食堂",
+      "すし松",
+      "トゥックントゥックン",
+      "松弁ネット",
+      "松弁デリバリー",
+      "松屋モバイルオーダー"
     ],
-    "supports": [
-      "MUFG"
-    ]
-  },
-  {
-    "name": "マイカリー食堂",
-    "aliases": [
-      "マイカリーショクドウ",
-      "マイカリー",
-      "まいかりーしょくどう"
-    ],
-    "supports": [
-      "MUFG"
-    ]
-  },
-  {
-    "name": "ステーキ屋松",
-    "aliases": [
-      "ステーキ松",
-      "すてーきやまつ",
-      "ステーキヤマツ"
-    ],
-    "supports": [
-      "MUFG"
-    ]
-  },
-  {
-    "name": "松軒中華食堂",
-    "aliases": [
-      "まつけんちゅうかしょくどう",
-      "マツケンチュウカショクドウ",
-      "松軒"
-    ],
-    "supports": [
-      "MUFG"
-    ]
-  },
-  {
-    "name": "すし松",
-    "aliases": [
-      "スシマツ",
-      "すしまつ"
-    ],
-    "supports": [
-      "MUFG"
-    ]
-  },
-  {
-    "name": "トゥックントゥックン",
-    "aliases": [
-      "とぅっくんとぅっくん",
-      "トゥックントゥックン"
-    ],
-    "supports": [
-      "MUFG"
-    ]
+    "caution": "券売機・セルフレジでのクレジット・Apple Pay(QUICPay)や松弁ネット等が対象。公式オンラインショップは対象外です。",
+    "card_type": "MUFG"
   },
   {
     "name": "ロッテリア",
+    "group": "ゼンショー",
     "aliases": [
-      "ロッテリア",
       "ろってりあ",
-      "Lotteria"
-    ],
-    "supports": [
-      "MUFG"
-    ]
-  },
-  {
-    "name": "ゼッテリア",
-    "aliases": [
+      "ロッテリア",
       "ぜってりあ",
-      "ZETTERIA",
-      "ゼッテリア"
+      "ゼッテリア",
+      "lotteria",
+      "zetteria"
     ],
-    "supports": [
-      "MUFG"
-    ]
+    "caution": "アメックスのカードは店頭決済のみ対象外です。施設内店舗など一部対象外の店舗があります。",
+    "card_type": "MUFG"
   },
   {
     "name": "アオキスーパー",
+    "group": null,
     "aliases": [
-      "アオキスーパー",
-      "アオキ",
-      "あおきすーぱー"
+      "あおきすーぱー",
+      "アオキスーパー"
     ],
-    "supports": [
-      "MUFG"
-    ]
+    "caution": "アズパーク内の専門店、クイックコマース、ネット利用、レジが異なる売り場は対象外です。",
+    "card_type": "MUFG"
   },
   {
     "name": "オーケー",
+    "group": null,
     "aliases": [
       "おーけー",
-      "OK Store",
-      "オーケーストア",
+      "オーケー",
       "OKストア",
-      "オーケー"
+      "オーケーストア",
+      "ok store"
     ],
-    "supports": [
-      "MUFG"
-    ]
+    "caution": "ネットスーパーでの利用は対象外です。",
+    "card_type": "MUFG"
   },
   {
     "name": "オオゼキ",
+    "group": null,
     "aliases": [
-      "オオゼキ",
       "おおぜき",
-      "Ozeki"
+      "オオゼキ"
     ],
-    "supports": [
-      "MUFG"
-    ]
+    "caution": "オンラインストア、ネットスーパーでの利用は対象外です。",
+    "card_type": "MUFG"
   },
   {
     "name": "サンリブ",
+    "group": "サンリブグループ",
     "aliases": [
-      "サンク",
+      "さんりぶ",
       "サンリブ",
-      "リブホール",
-      "サンリブBUONO",
+      "まるしょく",
       "マルショク",
-      "さんりぶ"
+      "りぶほーる",
+      "リブホール",
+      "さんく",
+      "サンク",
+      "サンリブBUONO"
     ],
-    "supports": [
-      "MUFG"
-    ]
+    "caution": "ネットスーパーでの利用は対象外です。",
+    "card_type": "MUFG"
   },
   {
     "name": "三和",
+    "group": null,
     "aliases": [
       "さんわ",
       "サンワ",
-      "スーパー三和",
-      "SANWA"
-    ],
-    "supports": [
-      "MUFG"
-    ]
-  },
-  {
-    "name": "フードワン",
-    "aliases": [
       "ふーどわん",
-      "FOOD ONE",
-      "フードワン"
+      "フードワン",
+      "sanwa",
+      "food one"
     ],
-    "supports": [
-      "MUFG"
-    ]
+    "caution": "クレジットカード、タッチ決済、Apple Pay（QUICPay）での支払いが対象です。",
+    "card_type": "MUFG"
   },
   {
     "name": "スーパー魚長",
+    "group": null,
     "aliases": [
-      "スーパーウオチョウ",
-      "生鮮乃木市場",
       "すーぱーうおちょう",
+      "スーパーウオチョウ",
+      "せいせんのぎいちば",
+      "生鮮乃木市場",
+      "せいせんげんきいちば",
       "生鮮げんき市場"
     ],
-    "supports": [
-      "MUFG"
-    ]
+    "caution": "クレジットカード、タッチ決済、Apple Pay（QUICPay）での支払いが対象です。",
+    "card_type": "MUFG"
   },
   {
     "name": "近商ストア",
+    "group": "近鉄グループ",
     "aliases": [
-      "Harves",
-      "キンショウストア",
-      "ポシェット",
       "きんしょうすとあ",
+      "キンショウストア",
+      "はーべす",
+      "ハーベス",
       "Pochette",
-      "ハーベス"
+      "ポシェット"
     ],
-    "supports": [
-      "MUFG"
-    ]
+    "caution": "ネットスーパー、食品スーパー以外の売り場での利用は対象外です。",
+    "card_type": "MUFG"
   },
   {
     "name": "東急ストア",
+    "group": "東急グループ",
     "aliases": [
-      "プレッセ",
-      "Precce",
       "とうきゅうすとあ",
-      "Tokyu Store",
+      "トウキュウストア",
+      "ぷれっせ",
+      "プレッセ",
+      "ふーどすてーしょん",
       "フードステーション",
-      "トウキュウストア"
+      "tokyu store"
     ],
-    "supports": [
-      "MUFG"
-    ]
+    "caution": "テナント、ネットスーパーでの利用は対象外です。",
+    "card_type": "MUFG"
   },
   {
     "name": "東武ストア",
+    "group": "東武グループ",
     "aliases": [
-      "Tobu Store",
       "とうぶすとあ",
-      "トウブストア"
+      "トウブストア",
+      "tobu store"
     ],
-    "supports": [
-      "MUFG"
-    ]
+    "caution": "ネットショップ、手ぶら決済、専門店売り場などは対象外です。",
+    "card_type": "MUFG"
   },
   {
     "name": "ドミー",
+    "group": null,
     "aliases": [
       "どみー",
-      "ドミー",
-      "Domy"
+      "ドミー"
     ],
-    "supports": [
-      "MUFG"
-    ]
+    "caution": "クレジットカード、タッチ決済、Apple Pay（QUICPay）での支払いが対象です。",
+    "card_type": "MUFG"
   },
   {
     "name": "肉のハナマサ",
+    "group": "JMホールディングス",
     "aliases": [
       "にくのはなまさ",
-      "ニクノハナマサ",
+      "肉のハナマサ",
       "ハナマサ"
     ],
-    "supports": [
-      "MUFG"
-    ]
+    "caution": "フランチャイズ店舗での利用は対象外です。",
+    "card_type": "MUFG"
   },
   {
     "name": "ジャパンミート",
+    "group": "JMホールディングス",
     "aliases": [
       "じゃぱんみーと",
-      "パワーマート",
       "ジャパンミート",
       "MEATMeet",
-      "JAPAN MEAT"
+      "ぱわーまーと",
+      "パワーマート"
     ],
-    "supports": [
-      "MUFG"
-    ]
+    "caution": "クレジットカード、タッチ決済、Apple Pay（QUICPay）での支払いが対象です。",
+    "card_type": "MUFG"
   },
   {
     "name": "ヤマナカ",
+    "group": null,
     "aliases": [
-      "フランテ",
       "やまなか",
-      "フランテロゼ",
-      "Frante",
-      "ヤマナカ"
+      "ヤマナカ",
+      "ふらんて",
+      "フランテ",
+      "フランテロゼ"
     ],
-    "supports": [
-      "MUFG"
-    ]
+    "caution": "ネットスーパーでの利用は対象外です。",
+    "card_type": "MUFG"
   }
 ]
