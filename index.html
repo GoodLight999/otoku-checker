@@ -22,7 +22,7 @@
             <div class="grid grid-cols-2 gap-4">
                 <div>
                     <div class="flex justify-between items-center mb-1">
-                        <label class="text-[10px] font-bold text-slate-500 uppercase tracking-tighter">三井住友カード (最大7%)</label>
+                        <label class="text-[10px] font-bold text-slate-500 uppercase">三井住友カード (最大7%)</label>
                         <a href="https://www.smbc-card.com/mem/wp/vpoint_up_program/index.jsp" target="_blank" class="text-[10px] text-green-600 underline">公式詳細</a>
                     </div>
                     <div class="flex items-center bg-slate-50 rounded-xl px-3 py-2 border border-slate-200 focus-within:border-green-600 focus-within:ring-2 focus-within:ring-green-100 transition-all">
@@ -32,7 +32,7 @@
                 </div>
                 <div>
                     <div class="flex justify-between items-center mb-1">
-                        <label class="text-[10px] font-bold text-slate-500 uppercase tracking-tighter">三菱UFJカード (最大19%)</label>
+                        <label class="text-[10px] font-bold text-slate-500 uppercase">三菱UFJカード (最大19%)</label>
                         <a href="https://www.cr.mufg.jp/mufgcard/point/global/save/convenience_store/index.html" target="_blank" class="text-[10px] text-red-600 underline">公式詳細</a>
                     </div>
                     <div class="flex items-center bg-slate-50 rounded-xl px-3 py-2 border border-slate-200 focus-within:border-red-600 focus-within:ring-2 focus-within:ring-red-100 transition-all">
@@ -60,7 +60,7 @@
         <footer class="mt-12 text-center pb-8">
             <div id="affiliate-footer" class="mb-8 border-t border-slate-200 pt-8"></div>
             
-            <div class="text-[10px] text-slate-400 leading-relaxed max-w-xs mx-auto">
+            <div class="text-[10px] text-slate-400 leading-relaxed max-w-xs mx-auto text-center">
                 <p class="mb-2">
                     本データはAI解析による推定値です。<br>
                     正確な条件は必ず各公式サイトをご確認ください。
@@ -74,7 +74,7 @@
     </div>
 
     <script>
-        // 【改良】メタデータ対応。旧来の配列形式でも動作するように初期化
+        // 【改良】JSONの辞書構造 (meta, stores) を格納できるように初期化
         let storeData = { meta: {}, stores: [] };
         
         const MOPPY_LINKS = {
@@ -100,6 +100,7 @@
         fetch('./data.json')
             .then(res => res.json())
             .then(data => {
+                // 配列だった場合も考慮して、正常に辞書構造へマージ
                 storeData = data;
                 render();
             })
@@ -122,14 +123,14 @@
             resultsDiv.innerHTML = '';
 
             if (!rawQuery) {
-                resultsDiv.innerHTML = '<p class="text-center text-slate-300 font-bold mt-10 text-sm italic tracking-widest uppercase opacity-50 tracking-tighter">Search for store rewards</p>';
-                updateFooter(); // 未入力時もフッター更新
+                resultsDiv.innerHTML = '<p class="text-center text-slate-300 font-bold mt-20 text-sm italic tracking-widest uppercase opacity-50 tracking-tighter">Search for store rewards</p>';
+                updateFooter(); // 未入力時もフッターを表示
                 return;
             }
 
-            // 【改良】新旧データ構造の両方に対応
+            // 【改良】storesキーからデータを取得。旧来の配列形式でも動作するようフォールバック
             const storesArray = Array.isArray(storeData) ? storeData : (storeData.stores || []);
-            
+
             let filtered = storesArray.filter(s => {
                 const conditionValues = s.conditions ? Object.values(s.conditions) : [];
                 const searchTargets = [
@@ -190,7 +191,7 @@
                         </div>
                     </div>
                     
-                    <div class="bg-slate-50 rounded-xl p-3 border border-slate-100">
+                    <div class="bg-slate-50 rounded-xl p-3 border border-slate-100 text-left">
                         ${conditionsHtml}
                         ${linkHtml}
                     </div>
@@ -201,6 +202,7 @@
             updateFooter();
         }
 
+        // 【改良】JSON内の紹介文 (meta) をフッターに反映
         function updateFooter() {
             if (!footerDiv) return;
             const meta = storeData.meta || {};
