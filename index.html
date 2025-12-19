@@ -6,45 +6,45 @@
     <title>おトク還元チェッカー PRO</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&family=Noto+Sans+JP:wght@400;700;900&display=swap');
-        body { font-family: 'Inter', 'Noto Sans JP', sans-serif; background-color: #f8fafc; }
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;700;900&display=swap');
+        body { font-family: 'Noto Sans JP', sans-serif; background-color: #f8fafc; }
     </style>
 </head>
 <body class="min-h-screen pb-20">
     <div class="max-w-md mx-auto px-4 pt-8">
         <header class="mb-8 text-center">
-            <h1 class="text-4xl font-black text-slate-900 tracking-tighter italic">還元チェッカー</h1>
-            <p class="text-slate-400 font-medium text-xs mt-1">かな・カナ・半角を問わず最速検索</p>
+            <h1 class="text-3xl font-black text-slate-900 italic tracking-tighter">還元チェッカー</h1>
+            <p class="text-slate-400 text-[10px] mt-1 uppercase tracking-widest">Logic-based Reward Analysis</p>
         </header>
 
-        <section class="bg-white rounded-3xl shadow-sm border border-slate-100 mb-6 overflow-hidden p-6">
+        <section class="bg-white rounded-3xl shadow-sm border border-slate-100 mb-6 p-6">
             <div class="grid grid-cols-2 gap-4">
                 <div class="space-y-1">
                     <label class="text-[10px] font-bold text-slate-500 uppercase">三井住友 (SMBC)</label>
                     <div class="flex items-center bg-slate-50 rounded-xl p-2 border border-slate-200 focus-within:border-blue-500">
                         <input type="number" id="smbc-rate" step="0.5" class="bg-transparent w-full font-bold outline-none text-blue-600 text-lg">
-                        <span class="text-slate-400 font-bold">%</span>
+                        <span class="text-slate-400 font-bold text-sm">%</span>
                     </div>
                 </div>
                 <div class="space-y-1">
                     <label class="text-[10px] font-bold text-slate-500 uppercase">三菱UFJ (MUFG)</label>
                     <div class="flex items-center bg-slate-50 rounded-xl p-2 border border-slate-200 focus-within:border-green-500">
                         <input type="number" id="mufg-rate" step="0.5" class="bg-transparent w-full font-bold outline-none text-green-600 text-lg">
-                        <span class="text-slate-400 font-bold">%</span>
+                        <span class="text-slate-400 font-bold text-sm">%</span>
                     </div>
                 </div>
             </div>
         </section>
 
         <div class="sticky top-4 z-10 mb-8">
-            <input type="text" id="search" placeholder="店名・グループ名..." class="w-full p-5 rounded-3xl border-none shadow-xl shadow-blue-500/5 focus:ring-4 focus:ring-blue-100 outline-none text-lg font-bold">
+            <input type="text" id="search" placeholder="店名・よみがな・ブランド..." class="w-full p-5 rounded-3xl border-none shadow-xl shadow-blue-500/5 focus:ring-4 focus:ring-blue-100 outline-none text-lg font-bold placeholder-slate-300">
         </div>
 
         <div id="results" class="space-y-4"></div>
 
-        <footer class="mt-12 p-6 bg-white rounded-3xl text-[10px] text-slate-400 leading-relaxed border border-slate-100">
-            <p class="font-bold mb-1 text-slate-600 uppercase">Disclaimer</p>
-            <p>本データはAIによる自動収集に基づきます。正確性は保証されません。三井住友・MUFGはスマホタッチ決済が必須です。</p>
+        <footer class="mt-12 p-6 bg-white rounded-3xl text-[9px] text-slate-400 leading-relaxed border border-slate-100">
+            <p class="font-bold mb-1 text-slate-600 uppercase">Technical Information</p>
+            <p>本データはLLMによる解析結果であり、カードごとの決済条件（物理カード可否・モバイルオーダー等）を個別に判定しています。必ず決済前に公式詳細をご確認ください。</p>
         </footer>
     </div>
 
@@ -54,71 +54,65 @@
         const smbcInput = document.getElementById('smbc-rate');
         const mufgInput = document.getElementById('mufg-rate');
 
-        // 文字列を「全角ひらがな」に正規化する関数
         function normalizeKana(str) {
             if (!str) return "";
-            // 半角を全角に変換
             let val = str.normalize('NFKC');
-            // カタカナをひらがなに変換 (Unicodeの差分を利用)
-            return val.replace(/[\u30a1-\u30f6]/g, function(match) {
-                return String.fromCharCode(match.charCodeAt(0) - 0x60);
-            }).toLowerCase();
+            return val.replace(/[\u30a1-\u30f6]/g, m => String.fromCharCode(m.charCodeAt(0) - 0x60)).toLowerCase();
         }
 
-        smbcInput.value = localStorage.getItem('otoku-smbc-v4') || "7.0";
-        mufgInput.value = localStorage.getItem('otoku-mufg-v4') || "7.0";
+        smbcInput.value = localStorage.getItem('otoku-rate-smbc') || "7.0";
+        mufgInput.value = localStorage.getItem('otoku-rate-mufg') || "7.0";
 
         fetch('./data.json').then(res => res.json()).then(data => { storeData = data; render(); });
 
         [searchInput, smbcInput, mufgInput].forEach(el => el.addEventListener('input', () => {
-            localStorage.setItem('otoku-smbc-v4', smbcInput.value);
-            localStorage.setItem('otoku-mufg-v4', mufgInput.value);
+            localStorage.setItem('otoku-rate-smbc', smbcInput.value);
+            localStorage.setItem('otoku-rate-mufg', mufgInput.value);
             render();
         }));
 
         function render() {
             const query = normalizeKana(searchInput.value);
-            const smbcUserRate = parseFloat(smbcInput.value) || 0;
-            const mufgUserRate = parseFloat(mufgInput.value) || 0;
+            const smbcRate = parseFloat(smbcInput.value) || 0;
+            const mufgRate = parseFloat(mufgInput.value) || 0;
             const container = document.getElementById('results');
             container.innerHTML = '';
 
             let filtered = storeData.filter(s => {
-                const targetName = normalizeKana(s.name);
-                const targetGroup = normalizeKana(s.group);
-                const targetAliases = s.aliases ? s.aliases.map(a => normalizeKana(a)) : [];
-                
-                return targetName.includes(query) || 
-                       targetGroup.includes(query) || 
-                       targetAliases.some(a => a.includes(query));
+                const names = [s.name, s.group, ...(s.aliases || [])].map(normalizeKana);
+                return names.some(n => n.includes(query));
             });
 
             filtered = filtered.map(s => ({
                 ...s,
-                calculatedRate: (s.card_type === 'SMBC') ? smbcUserRate : mufgUserRate
-            })).sort((a, b) => b.calculatedRate - a.calculatedRate);
+                calcRate: (s.card_type === 'SMBC') ? smbcRate : mufgRate
+            })).sort((a, b) => b.calcRate - a.calcRate);
 
             if (filtered.length === 0) {
-                container.innerHTML = '<p class="text-center text-slate-300 py-10 text-sm">該当なし</p>';
+                container.innerHTML = '<p class="text-center text-slate-300 py-10">見つかりませんでした</p>';
                 return;
             }
 
             filtered.forEach(s => {
-                const isSMBC = s.card_type === 'SMBC';
-                const color = isSMBC ? 'blue' : 'green';
+                const color = s.card_type === 'SMBC' ? 'blue' : 'green';
                 const div = document.createElement('div');
                 div.className = "bg-white p-6 rounded-3xl shadow-sm border border-slate-100 flex justify-between items-center";
                 div.innerHTML = `
                     <div class="flex-1">
                         <div class="flex items-center gap-2 mb-1">
-                            ${s.group ? `<span class="bg-slate-100 text-slate-500 text-[8px] px-2 py-0.5 rounded-md font-black uppercase tracking-widest">${s.group}</span>` : ''}
-                            <span class="text-[9px] font-black text-${color}-500 uppercase tracking-widest">${isSMBC ? '三井住友' : '三菱UFJ'}</span>
+                            ${s.group ? `<span class="bg-slate-100 text-slate-500 text-[8px] px-2 py-0.5 rounded font-bold uppercase">${s.group}</span>` : ''}
+                            <span class="text-[9px] font-black text-${color}-500 uppercase tracking-widest">${s.card_type === 'SMBC' ? '三井住友' : '三菱UFJ'}</span>
                         </div>
                         <h3 class="text-xl font-black text-slate-800 leading-tight">${s.name}</h3>
-                        <p class="text-[9px] text-slate-400 font-bold mt-1">Apple/Google Pay必須</p>
+                        <div class="mt-2 flex flex-wrap gap-1">
+                            <span class="text-[8px] font-bold px-1.5 py-0.5 rounded border ${s.touch_only ? 'border-red-200 text-red-500 bg-red-50' : 'border-slate-200 text-slate-500 bg-slate-50'}">
+                                ${s.touch_only ? 'スマホタッチ必須' : '物理カードOK'}
+                            </span>
+                            ${s.mobile_order ? '<span class="text-[8px] font-bold px-1.5 py-0.5 rounded border border-blue-200 text-blue-500 bg-blue-50">モバイルオーダー対応</span>' : ''}
+                        </div>
                     </div>
                     <div class="ml-4 text-right">
-                        <div class="text-4xl font-black text-slate-900 tracking-tighter">${s.calculatedRate.toFixed(1)}<span class="text-sm text-slate-300 ml-0.5">%</span></div>
+                        <div class="text-4xl font-black text-slate-900 tracking-tighter">${s.calcRate.toFixed(1)}<span class="text-xs text-slate-300 ml-0.5">%</span></div>
                     </div>
                 `;
                 container.appendChild(div);
