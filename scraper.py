@@ -5,6 +5,7 @@ import time
 import re
 import sys
 from google import genai
+from google.genai import types
 from google.genai.errors import ClientError
 
 # --- Configuration ---
@@ -16,8 +17,12 @@ if not API_KEY:
     print("FATAL ERROR: 'GEMINI_API_KEY' environment variable is missing.")
     sys.exit(1)
 
-# タイムアウト設定(300秒)
-client = genai.Client(api_key=API_KEY, http_options={'timeout': 300})
+# 【修正】タイムアウトはミリ秒指定。300秒 = 300,000ms
+# これで「短すぎる」エラーは消え、かつ5分で損切りできるようになります
+client = genai.Client(
+    api_key=API_KEY, 
+    http_options=types.HttpOptions(timeout=300000) 
+)
 
 URLS = {
     "SMBC": "https://www.smbc-card.com/mem/wp/vpoint_up_program/index.jsp",
@@ -40,30 +45,24 @@ def clean_json_text(text):
 def clean_html_aggressive(html_text):
     if not html_text: return ""
 
-    # 1. 巨大な不要ブロック削除 (formは除外)
-    # formタグの中身を消すとページが白紙になるサイトがあるため除外
+    # formタグは消さない
     blocks_to_kill = r'<(header|footer|nav|noscript|script|style|iframe|svg|aside)[^>]*>.*?</\1>'
     html_text = re.sub(blocks_to_kill, '', html_text, flags=re.DOTALL | re.IGNORECASE)
 
-    # 2. コメント削除
     html_text = re.sub(r'<!--.*?-->', '', html_text, flags=re.DOTALL)
 
-    # 3. リンク(a href)以外のタグ属性を全削除
     html_text = re.sub(r'<((?!a\s)[a-z0-9]+)\s+[^>]*>', r'<\1>', html_text, flags=re.IGNORECASE)
     
-    # aタグのゴミ属性削除
     attrs_to_remove = ['class', 'id', 'style', 'target', 'rel', 'onclick', 'data-[a-z0-9-]+', 'aria-[a-z-]+', 'role']
     for attr in attrs_to_remove:
         html_text = re.sub(r'\s+' + attr + r'="[^"]*"', '', html_text, flags=re.IGNORECASE)
         html_text = re.sub(r'\s+' + attr + r"='[^']*'", '', html_text, flags=re.IGNORECASE)
 
-    # 4. 不要な「箱」タグ削除
     tags_to_strip = ['div', 'span', 'section', 'article', 'main', 'body', 'html', 'head']
     for tag in tags_to_strip:
         html_text = re.sub(r'<' + tag + r'[^>]*>', '', html_text, flags=re.IGNORECASE)
         html_text = re.sub(r'</' + tag + r'>', '\n', html_text, flags=re.IGNORECASE)
 
-    # 5. 空白・改行の圧縮
     html_text = re.sub(r'\n+', '\n', html_text)
     html_text = re.sub(r' +', ' ', html_text)
     
@@ -72,7 +71,6 @@ def clean_html_aggressive(html_text):
 def fetch_and_extract(card_name, target_url):
     print(f"\n>>> Processing: {card_name}")
     
-    # 1. コンテンツ取得
     try:
         headers = {
             "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36"
@@ -83,21 +81,20 @@ def fetch_and_extract(card_name, target_url):
         raw_html = resp.text
         content = clean_html_aggressive(raw_html)
         
-        # 【デバッグ】入力HTMLの保存
-        debug_filename = f"debug_input_{card_name}.html"
-        with open(debug_filename, "w", encoding="utf-8") as f:
+        # デバッグ保存
+        with open(f"debug_input_{card_name}.html", "w", encoding="utf-8") as f:
             f.write(content)
-        print(f"DEBUG: Saved cleaned HTML to {debug_filename} ({len(content)} chars)")
+        print(f"DEBUG: Saved input HTML ({len(content)} chars)")
         
         if len(content) < 100:
-            print("FATAL: Cleaned HTML is empty! Regex deleted everything.")
+            print("FATAL: Cleaned HTML is empty!")
             return []
         
     except Exception as e:
         print(f"ERROR: Failed to fetch web content: {e}")
         return []
 
-    # 【重要】指定された完全版プロンプト（一文字も削っていません）
+    # プロンプト（完全版）
     prompt = f"""
         You are an expert data analyst for Japanese credit card rewards (Poi-katsu).
         Analyze the text and extract store data properly.
@@ -146,7 +143,6 @@ def fetch_and_extract(card_name, target_url):
         {content}
     """
 
-    # リトライは最大1回（合計2回）
     max_retries = 2
     response_text = ""
 
@@ -187,12 +183,10 @@ def fetch_and_extract(card_name, target_url):
             else:
                 return []
     
-    # 【デバッグ】AIレスポンス保存
-    debug_res_filename = f"debug_response_{card_name}.txt"
+    # デバッグ保存
     try:
-        with open(debug_res_filename, "w", encoding="utf-8") as f:
+        with open(f"debug_response_{card_name}.txt", "w", encoding="utf-8") as f:
             f.write(response_text if response_text else "EMPTY_RESPONSE")
-        print(f"DEBUG: Saved raw API response to {debug_res_filename}")
     except:
         pass
 
@@ -213,7 +207,6 @@ final_list = []
 for i, (card, url) in enumerate(URLS.items()):
     items = fetch_and_extract(card, url)
     if items:
-        # Copilot指摘の修正：辞書更新とリスト拡張
         for item in items:
             item["card_type"] = card
             item["source_url"] = OFFICIAL_LINKS[card]
