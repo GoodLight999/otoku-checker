@@ -2,6 +2,7 @@ import os
 import requests
 import json
 import time
+import re
 from google import genai
 
 # --- 設定 ---
@@ -12,16 +13,12 @@ def get_best_flash_model():
     latest_alias = "gemini-flash-latest"
     try:
         info = client.models.get(model=latest_alias)
-        if "gemini-3" in info.name.lower():
-            return latest_alias
-        else:
-            return "gemini-3-flash-preview"
+        return latest_alias if "gemini-3" in info.name.lower() else "gemini-3-flash-preview"
     except:
         return "gemini-3-flash-preview"
 
 MODEL_ID = get_best_flash_model()
 
-# ターゲットURL
 URLS = {
     "SMBC": "https://r.jina.ai/https://www.smbc-card.com/mem/wp/vpoint_up_program/index.jsp",
     "MUFG": "https://r.jina.ai/https://www.cr.mufg.jp/mufgcard/point/global/save/convenience_store/index.html"
@@ -31,39 +28,51 @@ def fetch_and_extract(card_name, target_url):
     print(f"🔍 {card_name}を解析中...")
     try:
         content = requests.get(target_url, timeout=30).text
-        
         prompt = f"""
         Extract real-world store rewards for {card_name} from the text. 
-        Return ONLY a JSON array.
-        Fields: name, rate, aliases (list of nicknames), caution (polite note on conditions), url.
+        Return ONLY a JSON array of objects.
+        Fields: name (Official store name), aliases (list of common nicknames/variations), caution (brief polite note in Japanese).
+        Ignore online shops.
         Text: {content[:15000]}
         """
-        
-        time.sleep(2) # 無料枠のレート制限対策
+        time.sleep(2)
         response = client.models.generate_content(model=MODEL_ID, contents=prompt)
         raw_text = response.text.strip()
         
-        # Markdownの除去
-        if "```json" in raw_text:
-            raw_text = raw_text.split("```json")[1].split("```")[0].strip()
-        elif "```" in raw_text:
-            raw_text = raw_text.split("```")[1].split("```")[0].strip()
-            
-        return json.loads(raw_text)
+        # Markdownコードブロックを正規表現で確実に除去
+        json_match = re.search(r'\[.*\]', raw_text, re.DOTALL)
+        if json_match:
+            return json.loads(json_match.group())
+        return []
     except Exception as e:
         print(f"❌ {card_name}でエラー: {e}")
         return []
 
-# メイン処理
-final_data = []
+# メイン処理：店舗統合ロジック
+merged_stores = {}
+
 for card, url in URLS.items():
-    data = fetch_and_extract(card, url)
-    for item in data:
-        item["card_type"] = card
-    final_data.extend(data)
+    raw_data = fetch_and_extract(card, url)
+    for item in raw_data:
+        name = item["name"]
+        if name not in merged_stores:
+            merged_stores[name] = {
+                "name": name,
+                "aliases": item.get("aliases", []),
+                "supports": [] # 対応カードのリスト
+            }
+        
+        if card not in merged_stores[name]["supports"]:
+            merged_stores[name]["supports"].append(card)
+        
+        # 別称をマージして重複削除
+        existing_aliases = set(merged_stores[name]["aliases"])
+        existing_aliases.update(item.get("aliases", []))
+        merged_stores[name]["aliases"] = list(existing_aliases)
 
-# ファイル書き出し (これが重要！)
+# リストに変換して保存
+final_list = list(merged_stores.values())
 with open("data.json", "w", encoding="utf-8") as f:
-    json.dump(final_data, f, ensure_ascii=False, indent=2)
+    json.dump(final_list, f, ensure_ascii=False, indent=2)
 
-print(f"✅ data.json に {len(final_data)} 件のデータを保存しました。")
+print(f"✅ 統合完了: {len(final_list)} 店舗のデータを保存しました。")
