@@ -27,7 +27,7 @@ def summon_model_info():
         print("-" * 30)
 
         if "gemini-3" in model_info.name:
-            print("✨ 朗報です先輩。最新のGemini 3が召喚されています。")
+            print("✨ 朗報です。最新のGemini 3が召喚されています。")
         else:
             print("🍵 まだGemini 2.5のようですね。手動で 'gemini-3-flash-preview' を指定しましょうか？")
 
