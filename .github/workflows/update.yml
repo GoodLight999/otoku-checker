@@ -27,6 +27,9 @@ jobs:
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
           # 変数が設定されていなければ gemini-flash-latest を使用
           GEMINI_MODEL_ID: ${{ vars.GEMINI_MODEL_ID || 'gemini-flash-latest' }}
+          # リファラルURLを環境変数としてスクリプトに渡す
+          SMBC_REFERRAL_URL: ${{ vars.SMBC_REFERRAL_URL }}
+          MUFG_REFERRAL_URL: ${{ vars.MUFG_REFERRAL_URL }}
         run: python scraper.py
         
       - name: Commit and Push
