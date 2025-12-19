@@ -1,0 +1,6 @@
+- name: Run Scraper
+        env:
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+        run: |
+          # 連続で叩くと無料枠は即死するので、少し待機時間を設ける
+          python scraper.py
