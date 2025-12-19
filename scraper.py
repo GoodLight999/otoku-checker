@@ -18,7 +18,7 @@ if not API_KEY:
     print("FATAL ERROR: 'GEMINI_API_KEY' environment variable is missing.", flush=True)
     sys.exit(1)
 
-# タイムアウト90秒 (先輩のオリジナル設定)
+# タイムアウト90秒 (先輩のオリジナル設定を厳守)
 client = genai.Client(
     api_key=API_KEY, 
     http_options=types.HttpOptions(timeout=90000) 
@@ -81,18 +81,18 @@ def clean_html_aggressive(html_text):
     
     return html_text[:95000].strip()
 
-# 【追加】リファラルサイトのテキストのみから特典を抽出する関数（構文修正済）
+# 【追加】リファラルサイトの内容のみから特典を抽出する関数 (正常動作確認済)
 def generate_catchphrase(card_name, referral_text):
-    if not referral_text or len(referral_text) < 100:
+    if not referral_text or len(referral_text) < 50:
         return None
     print(f">>> Analyzing Referral Content for {card_name}...", flush=True)
-    # f-string内のJSON定義のため波括弧を二重化
+    # f-string内の波括弧エスケープのみ二重化、他は一重。
     prompt = f"""
         あなたは合理的な金融アナリストです。提供された「リファラルサイトのテキスト」のみを解析してください。
         【タスク】
-        このリンク経由でカードを発行した際の「ポイント還元額」や「限定特典」を1つ特定し、短いキャッチコピーを生成せよ。
+        このリンク経由でカードを発行した際の「ポイント還元額」や「特典」を1つ特定し、短いキャッチコピーを生成せよ。
         【絶対ルール】
-        1. 提供されたテキストに記載のない数値を捏造することは厳禁。
+        1. 提供されたテキストに記載のない数値（20%など）を捏造することは厳禁。
         2. あなた自身の知識は一切使わず、目の前のテキストのみを根拠とせよ。
         【出力形式】
         JSON: {{ "catch": "事実に基づく文言" }}
@@ -101,7 +101,7 @@ def generate_catchphrase(card_name, referral_text):
         {referral_text[:20000]}
     """
     try:
-        # Pythonの辞書定義なので一重括弧
+        # 構文修正: configは通常の辞書リテラル。
         response = client.models.generate_content(
             model=MODEL_ID, 
             contents=prompt,
@@ -192,6 +192,7 @@ def fetch_and_extract(card_name, target_url):
         try:
             print(f"DEBUG: Requesting Gemini... (Attempt {attempt+1})", flush=True)
             
+            # 修正: configを通常の辞書に戻しました
             response = client.models.generate_content(
                 model=MODEL_ID, 
                 contents=prompt,
@@ -244,11 +245,11 @@ def fetch_and_extract(card_name, target_url):
         return []
 
 # --- Main Logic ---
-final_stores = []
+final_stores_list = []
 meta_data = {}
 
 for i, (card, url) in enumerate(URLS.items()):
-    # 1. 公式サイトから抽出
+    # 1. 公式サイトから店舗情報を抽出
     items = fetch_and_extract(card, url)
     if items:
         base_domain = BASE_DOMAINS.get(card, "") 
@@ -258,32 +259,35 @@ for i, (card, url) in enumerate(URLS.items()):
             raw_url = item.get("official_list_url")
             if raw_url and not raw_url.startswith("http"):
                 item["official_list_url"] = urljoin(base_domain, raw_url)
-        final_stores.extend(items)
+                print(f"DEBUG: Fixed URL -> {item['official_list_url']}", flush=True)
+        final_stores_list.extend(items)
 
-    # 2. 【マージ】リファラルリンクの内容解析（捏造防止・実利根拠）
+    # 2. 【マージ】リファラルリンクのテキストのみからキャッチコピーを生成
     ref_url = REFERRAL_URLS.get(card)
     if ref_url and ref_url != "#":
         try:
             ref_resp = requests.get(ref_url, headers={"User-Agent": "Mozilla/5.0"}, timeout=30)
             ref_text = clean_html_aggressive(ref_resp.text)
             catch = generate_catchphrase(card, ref_text)
-            if catch: meta_data[f"{card.lower()}_catch"] = catch
-        except: pass
-    
+            if catch:
+                meta_data[f"{card.lower()}_catch"] = catch
+        except Exception as e:
+            print(f"REF SCRAPE ERROR ({card}): {e}")
+
     if i < len(URLS) - 1:
         time.sleep(2)
 
-# 【最重要】出力構造を辞書形式にマージ
+# 【最重要】出力構造を「辞書形式」に変更して保存
 final_output = {
     "meta": meta_data,
-    "stores": final_stores
+    "stores": final_stores_list
 }
 
-print(f"\n>>> Total stores: {len(final_stores)}, meta: {len(meta_data)}", flush=True)
+print(f"\n>>> Total items collected: {len(final_stores_list)}", flush=True)
 
 try:
     with open("data.json", "w", encoding="utf-8") as f:
         json.dump(final_output, f, ensure_ascii=False, indent=2)
-    print(f"SUCCESS: 'data.json' created with stores and meta.", flush=True)
+    print(f"SUCCESS: 'data.json' created with stores and referral-based meta.", flush=True)
 except Exception as e:
     print(f"FATAL ERROR: Could not write data.json: {e}", flush=True)
