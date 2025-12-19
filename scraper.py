@@ -7,7 +7,7 @@ from google import genai
 
 # --- Configuration ---
 API_KEY = os.environ.get("GEMINI_API_KEY")
-# GitHub Actionsの変数からモデルIDを取得（デフォルトはlatest）
+# GitHub Actions変数でモデルを指定。なければlatest
 MODEL_ID = os.environ.get("GEMINI_MODEL_ID", "gemini-flash-latest")
 
 client = genai.Client(api_key=API_KEY)
@@ -22,32 +22,64 @@ OFFICIAL_LINKS = {
     "MUFG": "https://www.cr.mufg.jp/mufgcard/point/global/save/convenience_store/index.html"
 }
 
+def clean_json_text(text):
+    """
+    AIが良かれと思って付けたMarkdown記法(```json ... ```)を剥ぎ取る。
+    これが無いとjson.loadsで死ぬ。
+    """
+    # ```json などの除去
+    text = re.sub(r'```json\s*', '', text)
+    text = re.sub(r'```\s*', '', text)
+    
+    # 最初の [ から 最後の ] までを強引に抽出
+    match = re.search(r'\[.*\]', text, re.DOTALL)
+    if match:
+        return match.group()
+    return text.strip()
+
 def fetch_and_extract(card_name, target_url):
     print(f"DEBUG: Analyzing {card_name} data using {MODEL_ID}...")
     try:
-        content = requests.get(target_url, timeout=60).text
+        # Jinaや公式サイトに弾かれないようUser-Agentを偽装
+        headers = {
+            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
+        }
+        content = requests.get(target_url, headers=headers, timeout=60).text
         
-        # プロンプト：Amex警告とURL抽出を強化
+        # コンテンツが空なら即死
+        if not content or len(content) < 100:
+            print(f"FATAL: Empty content for {card_name}")
+            return []
+
+        # プロンプト：グループ定義を復活させ、例示と条件をMAXまで盛った厳格仕様
         prompt = f"""
-        You are an expert data analyst for Japanese credit card rewards.
+        You are an expert data analyst for Japanese credit card rewards (Poi-katsu).
         Analyze the text and extract store data properly.
 
         【CRITICAL RULES】
         1. **OUTPUT LANGUAGE**: All string values MUST be in **JAPANESE**.
-        2. **ALIASES (略称)**: Generate rich search keywords.
-           - "McDonald's" -> ["マクド", "マック", "Mac", "マクドナルド"]
-           - "Seven-Eleven" -> ["セブン", "セブイレ", "セブンイレブン"]
+        
+        2. **GROUP NAME**: You MUST extract the formal group name if applicable.
+           - Example: "ガスト" -> group: "すかいらーくグループ"
+           - Example: "セブン-イレブン" -> group: null
 
-        3. **MUFG SPECIAL CAUTION (Amex)**: 
+        3. **ALIASES (略称)**: You MUST generate a rich list of search keywords, including slang.
+           - "McDonald's" -> ["マクド", "マック", "Mac", "マクドナルド"]
+           - "Seicomart" -> ["セコマ", "セイコーマート"]
+           - "Seven-Eleven" -> ["セブン", "セブイレ", "セブンイレブン"]
+           - "Starbucks" -> ["スタバ", "スターバックス"]
+           - "KFC" -> ["ケンタ", "ケンタッキー"]
+        
+        4. **MUFG SPECIAL CAUTION (Amex)**: 
            - **CRITICAL**: MUFG American Express rules are often NOT in the text (provided only via images). 
            - For ALL MUFG stores, you MUST append this warning to the `note`: "Amexは条件が異なる可能性があるため公式サイトを確認推奨".
-           - Do not assume Amex eligibility unless explicitly stated in text.
+           - Separate rules for Visa/Master/JCB vs Amex if text explicitly mentions it.
 
-        4. **SPECIFIC STORE URLS**:
+        5. **SPECIFIC STORE URLS**:
            - If the text provides a specific URL for a store list (e.g., "サイゼリヤの対象店舗一覧はこちら", "ケンタッキー...はこちら"), EXTRACT that specific URL into `official_list_url`.
            - **Saizeriya (SMBC)**: Must link to the specific store list URL if found.
            - **KFC (SMBC)**: Must link to the specific store list URL if found.
-           - If no specific list URL is found, set `official_list_url` to null (do NOT use the general campaign URL).
+           - If no specific list URL is found, set `official_list_url` to null.
 
         【Output JSON Schema】
         Return a JSON ARRAY.
@@ -59,13 +91,13 @@ def fetch_and_extract(card_name, target_url):
                 "payment_method": "String (e.g., 'スマホタッチ決済のみ', '物理カードOK')",
                 "mobile_order": "String (e.g., '対象外', '公式アプリのみ対象')",
                 "delivery": "String (e.g., '対象外', '自社デリバリーは対象')",
-                "note": "String (e.g., '商業施設内は対象外。Amexは要確認')"
+                "note": "String (e.g., 'Amexは要確認')"
             }},
             "official_list_url": "Specific Store List URL or null"
         }}
 
         Target Text:
-        {content[:60000]}
+        {content[:80000]}
         """
         
         response = client.models.generate_content(
@@ -74,15 +106,23 @@ def fetch_and_extract(card_name, target_url):
             config={"response_mime_type": "application/json"}
         )
         
-        return json.loads(response.text)
+        # Markdownを除去してからロード
+        cleaned_json = clean_json_text(response.text)
+        data = json.loads(cleaned_json)
+        
+        print(f"SUCCESS: Extracted {len(data)} items for {card_name}")
+        return data
 
     except Exception as e:
         print(f"ERROR: {card_name} extraction failed: {e}")
+        # エラー時、レスポンスがあれば中身をログに出す（デバッグ用）
+        if 'response' in locals() and hasattr(response, 'text'):
+            print(f"Raw Response Dump: {response.text[:200]}...") 
         return []
 
+# --- Main Execution ---
 final_list = []
 for card, url in URLS.items():
-    print(f"Processing {card}...")
     items = fetch_and_extract(card, url)
     for item in items:
         item["card_type"] = card
@@ -90,7 +130,10 @@ for card, url in URLS.items():
         final_list.append(item)
     time.sleep(2)
 
+if not final_list:
+    print("WARNING: Final list is empty. Check the logs above.")
+
 with open("data.json", "w", encoding="utf-8") as f:
     json.dump(final_list, f, ensure_ascii=False, indent=2)
 
-print(f"SUCCESS: Generated {len(final_list)} entries.")
+print(f"COMPLETE: Generated {len(final_list)} entries.")
