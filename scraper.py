@@ -57,9 +57,13 @@ def clean_json_text(text):
 def clean_html_aggressive(html_text):
     if not html_text: return ""
     
+    # 巨大ブロック削除
     blocks_to_kill = r'<(header|footer|nav|noscript|script|style|iframe|svg|aside)[^>]*>.*?</\1>'
     html_text = re.sub(blocks_to_kill, '', html_text, flags=re.DOTALL | re.IGNORECASE)
+
     html_text = re.sub(r'', '', html_text, flags=re.DOTALL)
+
+    # リンク以外削除
     html_text = re.sub(r'<((?!a\s)[a-z0-9]+)\s+[^>]*>', r'<\1>', html_text, flags=re.IGNORECASE)
     
     attrs_to_remove = ['class', 'id', 'style', 'target', 'rel', 'onclick', 'data-[a-z0-9-]+', 'aria-[a-z-]+', 'role']
@@ -77,11 +81,12 @@ def clean_html_aggressive(html_text):
     
     return html_text[:95000].strip()
 
-# 【追加】リファラルリンクの内容のみから文言を生成する独立した関数 (構文エラー修正済)
+# 【追加】リファラルリンクの内容のみを根拠にする生成ロジック
 def generate_catchphrase(card_name, referral_text):
-    if not referral_text or len(referral_text) < 100:
+    if not referral_text or len(referral_text) < 50:
         return None
     print(f">>> Analyzing Referral Content for {card_name}...", flush=True)
+    # f-string内でのJSON構造の波括弧エスケープ（二重化）
     prompt = f"""
         あなたは合理的な金融アナリストです。提供された「リファラルサイトのテキスト」のみを解析してください。
         【タスク】
@@ -96,7 +101,7 @@ def generate_catchphrase(card_name, referral_text):
         {referral_text[:20000]}
     """
     try:
-        # 修正: configは通常の辞書リテラル{}を使用。TypeErrorを回避。
+        # 修正済: configは通常の辞書リテラル
         response = client.models.generate_content(
             model=MODEL_ID, 
             contents=prompt,
@@ -107,7 +112,7 @@ def generate_catchphrase(card_name, referral_text):
         return None
 
 def fetch_and_extract(card_name, target_url):
-    print(f"\n>>> Processing: {card_name}", flush=True)
+    print(f"\n>>> Processing Official: {card_name}", flush=True)
     
     try:
         headers = {
@@ -131,7 +136,7 @@ def fetch_and_extract(card_name, target_url):
         print(f"ERROR: Failed to fetch web content: {e}", flush=True)
         return []
 
-    # 完全版プロンプト (先輩のオリジナルを1文字も変えずに完全維持)
+    # 先輩の「完全版プロンプト」（一文字も変えず完全維持）
     prompt = f"""
         You are an expert data analyst for Japanese credit card rewards (Poi-katsu).
         Analyze the text and extract store data properly.
@@ -187,6 +192,7 @@ def fetch_and_extract(card_name, target_url):
         try:
             print(f"DEBUG: Requesting Gemini... (Attempt {attempt+1})", flush=True)
             
+            # 修正済: configは通常の辞書
             response = client.models.generate_content(
                 model=MODEL_ID, 
                 contents=prompt,
@@ -256,7 +262,8 @@ for i, (card, url) in enumerate(URLS.items()):
                 print(f"DEBUG: Fixed URL -> {item['official_list_url']}", flush=True)
         final_stores_list.extend(items)
 
-    # 2. リファラルリンクの解析（捏造防止・実利根拠）
+    # 2. 【マージ】リファラルリンクのテキストのみからキャッチコピーを生成
+    # これにより「15,000P」等の実利がmetaに流し込まれます
     ref_url = REFERRAL_URLS.get(card)
     if ref_url and ref_url != "#":
         try:
@@ -271,17 +278,17 @@ for i, (card, url) in enumerate(URLS.items()):
     if i < len(URLS) - 1:
         time.sleep(2)
 
-# 【最重要】出力構造を「辞書形式」に変更
+# 【最重要】出力構造を辞書形式に変更し、UI側の meta 参照を有効化
 final_output = {
     "meta": meta_data,
     "stores": final_stores_list
 }
 
-print(f"\n>>> Total items collected: {len(final_stores_list)}", flush=True)
+print(f"\n>>> Total items: {len(final_stores_list)}, meta generated: {len(meta_data)}", flush=True)
 
 try:
     with open("data.json", "w", encoding="utf-8") as f:
         json.dump(final_output, f, ensure_ascii=False, indent=2)
-    print(f"SUCCESS: 'data.json' created with stores and meta.", flush=True)
+    print(f"SUCCESS: 'data.json' created with stores and referral-based meta.", flush=True)
 except Exception as e:
     print(f"FATAL ERROR: Could not write data.json: {e}", flush=True)
