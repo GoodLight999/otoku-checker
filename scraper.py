@@ -25,27 +25,33 @@ URLS = {
 }
 
 def fetch_and_extract(card_name, target_url):
-    print(f"DEBUG: Processing {card_name} (Strict Official Name Mode)")
+    print(f"DEBUG: Analyzing {card_name} data with high-context reasoning...")
     try:
+        # 読み込み範囲を最大化し、情報の取りこぼしを防ぐ
         content = requests.get(target_url, timeout=45).text
         
-        # 指示を「意味のある別称」と「正式グループ名」に絞る
         prompt = f"""
-        Extract EVERY real-world store for {card_name}. DO NOT summarize.
-        Return ONLY a JSON array of objects.
+        Analyze the text and extract EVERY store reward for {card_name}. 
+        You must interpret the specific conditions for each brand.
 
-        【Rules】
-        - name: Use the exact official store name (e.g., "ガスト", "セブン-イレブン").
-        - group: The formal group name (e.g., "すかいらーくグループ", "セブン&アイ・ホールディングス"). null if none.
-        - aliases: ONLY include meaningful variations. 
-          - Nicknames (e.g., "マック", "マクド")
-          - English/Original names (e.g., "McDonald's", "7-Eleven")
-          - Related brands (e.g., for "セイコーマート", add "ハセガワストア", "タイエー")
-          - DO NOT include simple Hiragana/Katakana conversions of the name itself. The search engine will handle it.
-        - caution: Short polite note on conditions.
+        【Output JSON Schema】
+        - name: Official store name.
+        - group: Formal group name (e.g., "すかいらーくグループ").
+        - aliases: Search keywords. INCLUDE Hiragana, Katakana, English, and SUB-BRANDS (e.g., for "セイコーマート", add "ハセガワストア", "タイエー").
+        - mobile_order: boolean (true if mobile order is explicitly mentioned as a reward target).
+        - touch_only: boolean (true if ONLY smartphone touch payment is eligible for max reward).
+        - caution: Specific condition note (e.g., "物理カードOK", "Apple Pay必須").
+
+        【Contextual Reasoning Rules for {card_name}】
+        - If SMBC: Check if smartphone touch payment (Apple/Google Pay) is required for the 7%+.
+        - If MUFG: Check if physical card use is eligible (Usually YES for MUFG).
+        - Identify if mobile order (e.g., McDonald's Mobile Order) is eligible.
+
+        DO NOT summarize. Extract every brand like "Seicomart", "Hasegawa Store", etc.
+        Return ONLY a JSON array.
 
         Text Content:
-        {content[:40000]}
+        {content[:45000]}
         """
         
         time.sleep(2)
@@ -57,9 +63,10 @@ def fetch_and_extract(card_name, target_url):
             return json.loads(json_match.group())
         return []
     except Exception as e:
-        print(f"ERROR: {card_name} - {e}")
+        print(f"ERROR: {card_name} extraction failed: {e}")
         return []
 
+# 実行・保存
 final_list = []
 for card, url in URLS.items():
     raw_data = fetch_and_extract(card, url)
@@ -70,4 +77,4 @@ for card, url in URLS.items():
 with open("data.json", "w", encoding="utf-8") as f:
     json.dump(final_list, f, ensure_ascii=False, indent=2)
 
-print(f"✅ data.json updated.")
+print(f"SUCCESS: Generated {len(final_list)} entries.")
