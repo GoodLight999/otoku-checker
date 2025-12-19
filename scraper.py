@@ -134,7 +134,7 @@ def fetch_and_extract(card_name, target_url):
         print(f"ERROR: Failed to fetch web content: {e}", flush=True)
         return []
 
-    # 完全版プロンプト (オリジナルを1文字も変えずに完全維持)
+    # 完全版プロンプト (ひらがな対応のルールを追加)
     prompt = f"""
         You are an expert data analyst for Japanese credit card rewards (Poi-katsu).
         Analyze the text and extract store data properly.
@@ -147,11 +147,11 @@ def fetch_and_extract(card_name, target_url):
            - Example: "セブン-イレブン" -> group: null
 
         3. **ALIASES (略称)**: You MUST generate a rich list of search keywords, including slang.
+           - **KANJI TO HIRAGANA**: If the store name contains Kanji, you MUST include the Hiragana reading in aliases.
+           - "吉野家" -> ["よしのや", "吉牛", "よしの家"]
            - "McDonald's" -> ["マクド", "マック", "Mac", "マクドナルド"]
-           - "Seicomart" -> ["セコマ", "セイコーマート"]
+           - "Seicomart" -> ["セコマ", "セイコーマート", "せいこーまーと"]
            - "Seven-Eleven" -> ["セブン", "セブイレ", "セブンイレブン"]
-           - "Starbucks" -> ["スタバ", "スターバックス"]
-           - "KFC" -> ["ケンタ", "ケンタッキー"]
         
         4. **MUFG SPECIAL CAUTION (Amex)**: 
            - **CRITICAL**: MUFG American Express rules are often NOT in the text (provided only via images). 
@@ -169,7 +169,7 @@ def fetch_and_extract(card_name, target_url):
         {{
             "name": "Store Name (JAPANESE)",
             "group": "Group Name or null (JAPANESE)",
-            "aliases": ["Array", "of", "search", "keywords"],
+            "aliases": ["Array", "of", "search", "keywords (Include Hiragana)"],
             "conditions": {{
                 "payment_method": "String (e.g., 'スマホタッチ決済のみ', '物理カードOK')",
                 "mobile_order": "String (e.g., '対象外', '公式アプリのみ対象')",
