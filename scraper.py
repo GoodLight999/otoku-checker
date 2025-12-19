@@ -25,30 +25,27 @@ URLS = {
 }
 
 def fetch_and_extract(card_name, target_url):
-    print(f"DEBUG: Extracting {card_name} stores from {target_url}")
+    print(f"DEBUG: Processing {card_name} (Strict Official Name Mode)")
     try:
-        # 読み込み範囲を5万文字に拡大（欠損防止）
         content = requests.get(target_url, timeout=45).text
         
-        # 網羅性を最優先し、AIに「全店舗の出力」を強制
+        # 指示を「意味のある別称」と「正式グループ名」に絞る
         prompt = f"""
-        Extract EVERY SINGLE store reward for {card_name} listed in the text below. 
-        DO NOT omit, summarize, or truncate. I need an exhaustive list.
-        
+        Extract EVERY real-world store for {card_name}. DO NOT summarize.
         Return ONLY a JSON array of objects.
-        
-        【JSON Structure】
-        - name: Official store name.
-        - group: Parent group name (e.g., "すかいらーく", "セブン&アイ") if mentioned.
-        - aliases: Exhaustive search terms. Include:
-            1. Hiragana reading (MUST include for every store)
-            2. Katakana reading
-            3. Common nicknames
-            4. Sub-brands sharing the same reward (e.g., for "セイコーマート", include "ハセガワストア", "タイエー")
-        - caution: Short payment condition note.
+
+        【Rules】
+        - name: Use the exact official store name (e.g., "ガスト", "セブン-イレブン").
+        - group: The formal group name (e.g., "すかいらーくグループ", "セブン&アイ・ホールディングス"). null if none.
+        - aliases: ONLY include meaningful variations. 
+          - Nicknames (e.g., "マック", "マクド")
+          - English/Original names (e.g., "McDonald's", "7-Eleven")
+          - Related brands (e.g., for "セイコーマート", add "ハセガワストア", "タイエー")
+          - DO NOT include simple Hiragana/Katakana conversions of the name itself. The search engine will handle it.
+        - caution: Short polite note on conditions.
 
         Text Content:
-        {content[:50000]}
+        {content[:40000]}
         """
         
         time.sleep(2)
@@ -57,15 +54,12 @@ def fetch_and_extract(card_name, target_url):
         
         json_match = re.search(r'\[.*\]', raw_text, re.DOTALL)
         if json_match:
-            data = json.loads(json_match.group())
-            print(f"SUCCESS: Extracted {len(data)} items for {card_name}")
-            return data
+            return json.loads(json_match.group())
         return []
     except Exception as e:
-        print(f"ERROR: Failed to process {card_name}: {e}")
+        print(f"ERROR: {card_name} - {e}")
         return []
 
-# 各カードのデータを独立して保持（セブンが2回出る仕様を確定）
 final_list = []
 for card, url in URLS.items():
     raw_data = fetch_and_extract(card, url)
@@ -73,6 +67,7 @@ for card, url in URLS.items():
         item["card_type"] = card
         final_list.append(item)
 
-# Save results
 with open("data.json", "w", encoding="utf-8") as f:
     json.dump(final_list, f, ensure_ascii=False, indent=2)
+
+print(f"✅ data.json updated.")
