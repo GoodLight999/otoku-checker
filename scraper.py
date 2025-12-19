@@ -25,21 +25,34 @@ URLS = {
 }
 
 def fetch_and_extract(card_name, target_url):
-    print(f"🔍 {card_name}を解析中...")
+    print(f"🔍 {card_name}を解析中（介護モード実行中）...")
     try:
         content = requests.get(target_url, timeout=30).text
+        # プロンプトを強化：読み仮名と例示を大量に
         prompt = f"""
         Extract real-world store rewards for {card_name} from the text. 
         Return ONLY a JSON array of objects.
-        Fields: name (Official store name), aliases (list of common nicknames/variations), caution (brief polite note in Japanese).
-        Ignore online shops.
+        
+        【JSON Structure】
+        - name: Official store name (e.g., "東急ストア")
+        - aliases: ALL possible search terms including:
+            1. Hiragana reading (e.g., "とうきゅうすとあ")
+            2. Katakana reading (e.g., "トウキュウストア")
+            3. Common nicknames (e.g., "マック", "マクド")
+            4. English names if applicable (e.g., "McDonald's")
+        - caution: Polite usage note in Japanese.
+        
+        【Rules】
+        - Ignore online-only shops.
+        - Be exhaustive with aliases to help users find stores easily.
+        
         Text: {content[:15000]}
         """
+        
         time.sleep(2)
         response = client.models.generate_content(model=MODEL_ID, contents=prompt)
         raw_text = response.text.strip()
         
-        # Markdownコードブロックを正規表現で確実に除去
         json_match = re.search(r'\[.*\]', raw_text, re.DOTALL)
         if json_match:
             return json.loads(json_match.group())
@@ -48,9 +61,8 @@ def fetch_and_extract(card_name, target_url):
         print(f"❌ {card_name}でエラー: {e}")
         return []
 
-# メイン処理：店舗統合ロジック
+# 店舗統合ロジック
 merged_stores = {}
-
 for card, url in URLS.items():
     raw_data = fetch_and_extract(card, url)
     for item in raw_data:
@@ -59,20 +71,18 @@ for card, url in URLS.items():
             merged_stores[name] = {
                 "name": name,
                 "aliases": item.get("aliases", []),
-                "supports": [] # 対応カードのリスト
+                "supports": []
             }
-        
         if card not in merged_stores[name]["supports"]:
             merged_stores[name]["supports"].append(card)
         
-        # 別称をマージして重複削除
+        # 読み仮名・別称をマージして重複削除
         existing_aliases = set(merged_stores[name]["aliases"])
         existing_aliases.update(item.get("aliases", []))
         merged_stores[name]["aliases"] = list(existing_aliases)
 
-# リストに変換して保存
 final_list = list(merged_stores.values())
 with open("data.json", "w", encoding="utf-8") as f:
     json.dump(final_list, f, ensure_ascii=False, indent=2)
 
-print(f"✅ 統合完了: {len(final_list)} 店舗のデータを保存しました。")
+print(f"✅ 介護用データの生成が完了しました: {len(final_list)} 店舗")
