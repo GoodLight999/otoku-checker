@@ -2,40 +2,35 @@ name: Daily Data Update
 
 on:
   schedule:
-    - cron: '0 18 * * *' # 日本時間の午前3時
-  workflow_dispatch: # これで「Run workflow」ボタンが出ます
+    - cron: '0 18 * * *' # 日本時間午前3時
+  workflow_dispatch:
 
 jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      # 1. リポジトリのファイルを持ってくる
       - uses: actions/checkout@v4
       
-      # 2. Pythonをインストールする
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
           python-version: '3.11'
           
-      # 3. 必要なライブラリをインストールする
       - name: Install dependencies
         run: |
           pip install requests google-genai
           
-      # 4. スクレイピング実行
       - name: Run Scraper
         env:
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
         run: |
           python scraper.py
+          ls -la # ファイルが生成されたか確認用
         
-      # 5. 生成された data.json をリポジトリに保存（push）する
       - name: Commit and Push
         run: |
           git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
           git add data.json
-          # data.jsonに変更がない場合はエラーにせず終了する
           git commit -m "Update store data" || exit 0
           git push
