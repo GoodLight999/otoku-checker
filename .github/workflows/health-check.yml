@@ -1,0 +1,22 @@
+name: Gemini API Health Check
+
+on:
+  schedule:
+    - cron: '0 0 * * *' # 毎日午前9時にチェック
+  workflow_dispatch: # ボタン一発で手動実行
+
+jobs:
+  check-latest:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install Latest SDK
+        run: pip install -U google-genai
+      - name: Run Summoner
+        env:
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+        run: python check_model.py
