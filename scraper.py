@@ -18,7 +18,7 @@ if not API_KEY:
     print("FATAL ERROR: 'GEMINI_API_KEY' environment variable is missing.", flush=True)
     sys.exit(1)
 
-# タイムアウト90秒 (先輩のオリジナル設定を厳守)
+# タイムアウト90秒 (先輩のオリジナル設定)
 client = genai.Client(
     api_key=API_KEY, 
     http_options=types.HttpOptions(timeout=90000) 
@@ -34,13 +34,13 @@ OFFICIAL_LINKS = {
     "MUFG": "https://www.cr.mufg.jp/mufgcard/point/global/save/convenience_store/index.html"
 }
 
-# 【追加】相対パスを絶対パスに変換するためのベースドメイン定義
+# 相対パスを絶対パスに変換するためのベースドメイン定義
 BASE_DOMAINS = {
     "SMBC": "https://www.smbc-card.com",
     "MUFG": "https://www.cr.mufg.jp"
 }
 
-# 環境変数からリファラルURLを取得（モッピー以外のURLに変更されても対応可能）
+# 【追加】環境変数からリファラルURLを取得
 REFERRAL_URLS = {
     "SMBC": os.environ.get("SMBC_REFERRAL_URL"),
     "MUFG": os.environ.get("MUFG_REFERRAL_URL")
@@ -81,29 +81,27 @@ def clean_html_aggressive(html_text):
     
     return html_text[:95000].strip()
 
-# 【新規】リファラルリンク（モッピー等）の内容のみを根拠にする生成ロジック
+# 【追加】リファラルサイトのテキストのみから特典を抽出する関数（構文修正済）
 def generate_catchphrase(card_name, referral_text):
     if not referral_text or len(referral_text) < 100:
-        return f"{card_name}の最新情報をチェック"
-    
+        return None
     print(f">>> Analyzing Referral Content for {card_name}...", flush=True)
-    # f-string内のJSON構造定義のため、波括弧を二重化(エスケープ)しています
+    # f-string内のJSON定義のため波括弧を二重化
     prompt = f"""
         あなたは合理的な金融アナリストです。提供された「リファラルサイトのテキスト」のみを解析してください。
         【タスク】
-        提供されたテキストから、このリンク経由でカードを新規発行した際の「最大還元額(P)」や「特典」を1つ特定し、短いキャッチコピーを生成せよ。
+        このリンク経由でカードを発行した際の「ポイント還元額」や「限定特典」を1つ特定し、短いキャッチコピーを生成せよ。
         【絶対ルール】
-        1. 提供されたテキストに記載のない数値（20%など）を捏造することは厳禁。
-        2. テキストに「15,000P」とあればそれを使い、数値がなければ特典内容を簡潔に示せ。
-        3. あなた自身の知識（学習データ）は一切使わず、目の前のテキストのみを根拠とせよ。
+        1. 提供されたテキストに記載のない数値を捏造することは厳禁。
+        2. あなた自身の知識は一切使わず、目の前のテキストのみを根拠とせよ。
         【出力形式】
-        JSON: {{ "catch": "事実に基づくコピー" }}
+        JSON: {{ "catch": "事実に基づく文言" }}
         
-        解析対象:
+        解析対象テキスト:
         {referral_text[:20000]}
     """
     try:
-        # 修正ポイント: configは通常の辞書リテラル{}を使用。TypeErrorを回避。
+        # Pythonの辞書定義なので一重括弧
         response = client.models.generate_content(
             model=MODEL_ID, 
             contents=prompt,
@@ -111,10 +109,10 @@ def generate_catchphrase(card_name, referral_text):
         )
         return json.loads(response.text).get("catch")
     except:
-        return f"{card_name}の最新情報をチェック"
+        return None
 
 def fetch_and_extract(card_name, target_url):
-    print(f"\n>>> Processing Official Site: {card_name}", flush=True)
+    print(f"\n>>> Processing: {card_name}", flush=True)
     
     try:
         headers = {
@@ -138,7 +136,7 @@ def fetch_and_extract(card_name, target_url):
         print(f"ERROR: Failed to fetch web content: {e}", flush=True)
         return []
 
-    # 完全版プロンプト (先輩のオリジナルを1文字も変えずに維持)
+    # 先輩の「完全版プロンプト」（一文字も変えず完全維持）
     prompt = f"""
         You are an expert data analyst for Japanese credit card rewards (Poi-katsu).
         Analyze the text and extract store data properly.
@@ -194,7 +192,6 @@ def fetch_and_extract(card_name, target_url):
         try:
             print(f"DEBUG: Requesting Gemini... (Attempt {attempt+1})", flush=True)
             
-            # 修正ポイント: configは通常の辞書リテラルを使用
             response = client.models.generate_content(
                 model=MODEL_ID, 
                 contents=prompt,
@@ -247,11 +244,11 @@ def fetch_and_extract(card_name, target_url):
         return []
 
 # --- Main Logic ---
-final_stores_list = []
+final_stores = []
 meta_data = {}
 
 for i, (card, url) in enumerate(URLS.items()):
-    # 1. 公式サイトから店舗抽出
+    # 1. 公式サイトから抽出
     items = fetch_and_extract(card, url)
     if items:
         base_domain = BASE_DOMAINS.get(card, "") 
@@ -261,33 +258,32 @@ for i, (card, url) in enumerate(URLS.items()):
             raw_url = item.get("official_list_url")
             if raw_url and not raw_url.startswith("http"):
                 item["official_list_url"] = urljoin(base_domain, raw_url)
-                print(f"DEBUG: Fixed URL -> {item['official_list_url']}", flush=True)
-        final_stores_list.extend(items)
+        final_stores.extend(items)
 
-    # 2. リファラルサイトから宣伝文を生成（捏造禁止・実利根拠）
+    # 2. 【マージ】リファラルリンクの内容解析（捏造防止・実利根拠）
     ref_url = REFERRAL_URLS.get(card)
     if ref_url and ref_url != "#":
         try:
             ref_resp = requests.get(ref_url, headers={"User-Agent": "Mozilla/5.0"}, timeout=30)
             ref_text = clean_html_aggressive(ref_resp.text)
-            meta_data[f"{card.lower()}_catch"] = generate_catchphrase(card, ref_text)
-        except Exception as e:
-            print(f"REF SCRAPE ERROR ({card}): {e}")
-
+            catch = generate_catchphrase(card, ref_text)
+            if catch: meta_data[f"{card.lower()}_catch"] = catch
+        except: pass
+    
     if i < len(URLS) - 1:
         time.sleep(2)
 
-# 構造化された最終出力
+# 【最重要】出力構造を辞書形式にマージ
 final_output = {
     "meta": meta_data,
-    "stores": final_stores_list
+    "stores": final_stores
 }
 
-print(f"\n>>> Total items collected: {len(final_stores_list)}", flush=True)
+print(f"\n>>> Total stores: {len(final_stores)}, meta: {len(meta_data)}", flush=True)
 
 try:
     with open("data.json", "w", encoding="utf-8") as f:
         json.dump(final_output, f, ensure_ascii=False, indent=2)
-    print(f"SUCCESS: 'data.json' created with meta and stores.", flush=True)
+    print(f"SUCCESS: 'data.json' created with stores and meta.", flush=True)
 except Exception as e:
     print(f"FATAL ERROR: Could not write data.json: {e}", flush=True)
