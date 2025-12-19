@@ -3,13 +3,29 @@ import requests
 import json
 import time
 import re
+import sys
+import traceback
 from google import genai
+from google.genai import types
 
 # --- Configuration ---
+# ここは絶対に変えません
 API_KEY = os.environ.get("GEMINI_API_KEY")
 # デフォルトは "gemini-flash-latest" に戻しました。
 # GitHub Actionsの変数(GEMINI_MODEL_ID)があればそれを優先します。
 MODEL_ID = os.environ.get("GEMINI_MODEL_ID", "gemini-flash-latest")
+
+# --- Debug Initialization ---
+print("--- INITIALIZING SCRAPER ---")
+if not API_KEY:
+    print("FATAL ERROR: 'GEMINI_API_KEY' environment variable is missing.")
+    # キーがないと絶対動かないのでここで終了させます
+    sys.exit(1)
+else:
+    # セキュリティのためキーの一部だけ表示して確認
+    print(f"DEBUG: API_KEY loaded (starts with: {API_KEY[:4]}...)")
+
+print(f"DEBUG: Target Model ID: {MODEL_ID}")
 
 client = genai.Client(api_key=API_KEY)
 
@@ -25,40 +41,44 @@ OFFICIAL_LINKS = {
 
 def clean_json_text(text):
     """
-    AIの出力からJSON配列部分だけを外科手術のように正確に切り出す。
-    以前の r'\[.*\]' は、前置きに [Note] とかあると死ぬため、
-    「[{」で始まり「}]」で終わるパターンを優先的に探す。
+    AIの出力からJSON配列部分を抽出。
     """
-    # 1. まずMarkdown記法を除去
+    if not text: 
+        return "[]"
+    
+    # Markdownコードブロックの除去
     text = re.sub(r'```json\s*', '', text)
     text = re.sub(r'```\s*', '', text)
     
-    # 2. 「配列の中にオブジェクトが入っている」構造 ( [{ ... }] ) を探す
-    #    re.DOTALL で改行も無視してマッチさせる
-    match = re.search(r'\[\s*\{.*\}\s*\]', text, re.DOTALL)
-    if match:
+    # '[' から ']' までを抽出
+    match = re.search(r'\[.*\]', text, re.DOTALL)
+    if match: 
         return match.group()
     
-    # 3. それで見つからなければ、単純な [] を探す（フォールバック）
-    match_simple = re.search(r'\[.*\]', text, re.DOTALL)
-    if match_simple:
-        return match_simple.group()
-        
     return text.strip()
 
 def fetch_and_extract(card_name, target_url):
-    print(f"DEBUG: Analyzing {card_name} data using {MODEL_ID}...")
+    print(f"\n>>> Processing: {card_name}")
+    print(f"DEBUG: Fetching URL: {target_url}")
+    
+    # 1. コンテンツ取得
     try:
         headers = {
             "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
         }
-        content = requests.get(target_url, headers=headers, timeout=60).text
+        resp = requests.get(target_url, headers=headers, timeout=60)
+        resp.raise_for_status() # HTTPエラー(404/500等)なら即例外へ
+        content = resp.text
+        print(f"DEBUG: Web content fetched successfully. Length: {len(content)} chars")
         
-        if not content or len(content) < 100:
-            print(f"FATAL: Empty content for {card_name}")
-            return []
+        if len(content) < 500:
+            print("WARNING: Content is suspiciously short. Check if the URL is blocked.")
+    except Exception as e:
+        print(f"ERROR: Failed to fetch web content: {e}")
+        return []
 
-        prompt = f"""
+    # 2. プロンプト構築（ご指定の高機能版）
+    prompt = f"""
         You are an expert data analyst for Japanese credit card rewards (Poi-katsu).
         Analyze the text and extract store data properly.
 
@@ -104,40 +124,93 @@ def fetch_and_extract(card_name, target_url):
 
         Target Text:
         {content[:80000]}
-        """
-        
+    """
+
+    print(f"DEBUG: Sending request to Gemini ({MODEL_ID})...")
+
+    # 3. API実行
+    try:
         response = client.models.generate_content(
             model=MODEL_ID, 
             contents=prompt,
-            config={"response_mime_type": "application/json"}
+            config={
+                "response_mime_type": "application/json",
+                "temperature": 0.0, # 安定化のため0にする
+                # Safety Filterによるブロック回避
+                "safety_settings": [
+                    {"category": "HARM_CATEGORY_HATE_SPEECH", "threshold": "BLOCK_NONE"},
+                    {"category": "HARM_CATEGORY_HARASSMENT", "threshold": "BLOCK_NONE"},
+                    {"category": "HARM_CATEGORY_SEXUALLY_EXPLICIT", "threshold": "BLOCK_NONE"},
+                    {"category": "HARM_CATEGORY_DANGEROUS_CONTENT", "threshold": "BLOCK_NONE"},
+                ]
+            }
         )
-        
-        cleaned_json = clean_json_text(response.text)
-        data = json.loads(cleaned_json)
-        
-        print(f"SUCCESS: Extracted {len(data)} items for {card_name}")
-        return data
-
     except Exception as e:
-        print(f"ERROR: {card_name} extraction failed: {e}")
-        if 'response' in locals() and hasattr(response, 'text'):
-            print(f"Raw Response Dump: {response.text[:200]}...") 
+        print(f"CRITICAL ERROR: Gemini API request raised an exception: {e}")
+        traceback.print_exc()
         return []
 
-# --- Main Execution ---
+    # 4. レスポンス検証（ここがデバッグの重要ポイント）
+    if not response:
+        print("ERROR: Response object is None.")
+        return []
+
+    # テキスト取り出しを試みる（ブロック時はここで例外が出る場合がある）
+    try:
+        raw_text = response.text
+        if not raw_text:
+            print("ERROR: response.text is empty.")
+            return []
+    except ValueError as ve:
+        print(f"ERROR: Could not access response.text. Likely BLOCKED by safety filter.")
+        # 理由があれば表示
+        if hasattr(response, 'candidates') and response.candidates:
+            print(f"DEBUG: Finish Reason: {response.candidates[0].finish_reason}")
+        return []
+
+    print(f"DEBUG: Response received. Length: {len(raw_text)} chars")
+    
+    # 5. JSONパース
+    cleaned_json = clean_json_text(raw_text)
+    
+    try:
+        data = json.loads(cleaned_json)
+        print(f"SUCCESS: Extracted {len(data)} items for {card_name}")
+        return data
+    except json.JSONDecodeError as je:
+        print(f"JSON PARSE ERROR: {je}")
+        print("--- RAW RESPONSE START ---")
+        print(raw_text[:500] + "...") # 冒頭500文字を表示
+        print("--- RAW RESPONSE END ---")
+        
+        # デバッグ用にファイルにダンプする
+        dump_file = f"debug_dump_{card_name}.txt"
+        with open(dump_file, "w", encoding="utf-8") as f:
+            f.write(raw_text)
+        print(f"DEBUG: Saved raw invalid JSON to {dump_file} for inspection.")
+        return []
+
+# --- Main Logic ---
 final_list = []
+
 for card, url in URLS.items():
     items = fetch_and_extract(card, url)
-    for item in items:
-        item["card_type"] = card
-        item["source_url"] = OFFICIAL_LINKS[card]
-        final_list.append(item)
-    time.sleep(2)
+    if items:
+        for item in items:
+            item["card_type"] = card
+            item["source_url"] = OFFICIAL_LINKS[card]
+            final_list.append(item)
+    else:
+        print(f"WARNING: No data found for {card}. Check logs.")
+    
+    time.sleep(5)
 
-if not final_list:
-    print("WARNING: Final list is empty. Check the logs above.")
+print(f"\n>>> Total items collected: {len(final_list)}")
 
-with open("data.json", "w", encoding="utf-8") as f:
-    json.dump(final_list, f, ensure_ascii=False, indent=2)
-
-print(f"COMPLETE: Generated {len(final_list)} entries.")
+# JSON保存
+try:
+    with open("data.json", "w", encoding="utf-8") as f:
+        json.dump(final_list, f, ensure_ascii=False, indent=2)
+    print(f"SUCCESS: 'data.json' created with {len(final_list)} entries.")
+except Exception as e:
+    print(f"FATAL ERROR: Could not write data.json: {e}")
