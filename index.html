@@ -74,14 +74,8 @@
     </div>
 
     <script>
-        // 【改良】JSONの辞書構造 (meta, stores) を格納できるように初期化
         let storeData = { meta: {}, stores: [] };
         
-        const MOPPY_LINKS = {
-            'SMBC': 'https://pc.moppy.jp/entry/invite.php?invite=Gupre100&s_id=149052',
-            'MUFG': 'https://pc.moppy.jp/entry/invite.php?invite=Gupre100&s_id=157374'
-        };
-
         const searchInput = document.getElementById('search');
         const smbcInput = document.getElementById('smbc-rate');
         const mufgInput = document.getElementById('mufg-rate');
@@ -100,7 +94,6 @@
         fetch('./data.json')
             .then(res => res.json())
             .then(data => {
-                // 配列だった場合も考慮して、正常に辞書構造へマージ
                 storeData = data;
                 render();
             })
@@ -111,6 +104,26 @@
             return str.normalize('NFKC')
                       .replace(/[\u30a1-\u30f6]/g, m => String.fromCharCode(m.charCodeAt(0) - 0x60))
                       .toLowerCase();
+        }
+
+        // URLからドメイン名を取得して表示用ラベルを作る関数
+        function getSiteName(url) {
+            try {
+                if (!url) return "Official";
+                const hostname = new URL(url).hostname;
+                // 一般的なアフィリエイト/ポイントサイトの識別
+                if (hostname.includes('moppy')) return 'Moppy';
+                if (hostname.includes('hapitas')) return 'Hapitas';
+                if (hostname.includes('a8.net')) return 'A8.net';
+                if (hostname.includes('smbc-card')) return 'SMBC';
+                if (hostname.includes('mufg')) return 'MUFG';
+                
+                // それ以外はドメインの先頭を表示
+                const domainPart = hostname.replace('www.', '').split('.')[0];
+                return domainPart.charAt(0).toUpperCase() + domainPart.slice(1);
+            } catch {
+                return "Link";
+            }
         }
 
         function render() {
@@ -124,11 +137,10 @@
 
             if (!rawQuery) {
                 resultsDiv.innerHTML = '<p class="text-center text-slate-300 font-bold mt-20 text-sm italic tracking-widest uppercase opacity-50 tracking-tighter">Search for store rewards</p>';
-                updateFooter(); // 未入力時もフッターを表示
+                updateFooter();
                 return;
             }
 
-            // 【改良】storesキーからデータを取得。旧来の配列形式でも動作するようフォールバック
             const storesArray = Array.isArray(storeData) ? storeData : (storeData.stores || []);
 
             let filtered = storesArray.filter(s => {
@@ -202,23 +214,31 @@
             updateFooter();
         }
 
-        // 【改良】JSON内の紹介文 (meta) をフッターに反映
+        // data.jsonからURLを取得してリンクを生成する
         function updateFooter() {
             if (!footerDiv) return;
             const meta = storeData.meta || {};
+            
+            // URLが取得できない場合は公式サイトへフォールバック
+            const smbcUrl = meta.smbc_url || "https://www.smbc-card.com/mem/wp/vpoint_up_program/index.jsp";
+            const mufgUrl = meta.mufg_url || "https://www.cr.mufg.jp/mufgcard/point/global/save/convenience_store/index.html";
+
+            const smbcLabel = getSiteName(smbcUrl);
+            const mufgLabel = getSiteName(mufgUrl);
+
             footerDiv.innerHTML = `
                 <div class="px-4">
                     <p class="text-[9px] text-slate-400 leading-relaxed max-w-xs mx-auto mb-6 font-medium italic">
                         ユーザーに利益のないアフィリエイトリンクよりも、ユーザー還元が大きい選択肢を提示することが、本ツールの持続的な信頼に繋がると判断しています。
                     </p>
                     <div class="flex flex-col gap-2 max-w-xs mx-auto">
-                        <a href="${MOPPY_LINKS.SMBC}" target="_blank" class="flex justify-between items-center px-4 py-2 bg-white border border-slate-200 rounded-lg text-[10px] text-slate-600 active:bg-slate-50 transition-colors shadow-sm shadow-slate-200/50">
+                        <a href="${smbcUrl}" target="_blank" class="flex justify-between items-center px-4 py-2 bg-white border border-slate-200 rounded-lg text-[10px] text-slate-600 active:bg-slate-50 transition-colors shadow-sm shadow-slate-200/50">
                             <span class="font-black tracking-tight">${meta.smbc_catch || '三井住友カード発行'}</span>
-                            <span class="text-slate-300 text-[8px] font-black uppercase">Moppy ↗</span>
+                            <span class="text-slate-300 text-[8px] font-black uppercase">${smbcLabel} ↗</span>
                         </a>
-                        <a href="${MOPPY_LINKS.MUFG}" target="_blank" class="flex justify-between items-center px-4 py-2 bg-white border border-slate-200 rounded-lg text-[10px] text-slate-600 active:bg-slate-50 transition-colors shadow-sm shadow-slate-200/50">
+                        <a href="${mufgUrl}" target="_blank" class="flex justify-between items-center px-4 py-2 bg-white border border-slate-200 rounded-lg text-[10px] text-slate-600 active:bg-slate-50 transition-colors shadow-sm shadow-slate-200/50">
                             <span class="font-black tracking-tight">${meta.mufg_catch || '三菱UFJカード発行'}</span>
-                            <span class="text-slate-300 text-[8px] font-black uppercase">Moppy ↗</span>
+                            <span class="text-slate-300 text-[8px] font-black uppercase">${mufgLabel} ↗</span>
                         </a>
                     </div>
                 </div>`;
