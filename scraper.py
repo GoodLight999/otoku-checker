@@ -264,9 +264,13 @@ for i, (card, url) in enumerate(URLS.items()):
                 print(f"DEBUG: Fixed URL -> {item['official_list_url']}", flush=True)
         final_stores_list.extend(items)
 
-    # 2. リファラルサイトのテキストのみからキャッチコピーを生成
+    # 2. リファラルサイトの情報処理 (URL保存 ＆ キャッチコピー生成)
     ref_url = REFERRAL_URLS.get(card)
+    
+    # 修正ポイント: 環境変数のURLをmetaデータに必ず保存する
     if ref_url and ref_url != "#":
+        meta_data[f"{card.lower()}_url"] = ref_url
+        
         try:
             ref_resp = requests.get(ref_url, headers={"User-Agent": "Mozilla/5.0"}, timeout=30)
             ref_text = clean_html_aggressive(ref_resp.text)
@@ -275,6 +279,9 @@ for i, (card, url) in enumerate(URLS.items()):
                 meta_data[f"{card.lower()}_catch"] = catch
         except Exception as e:
             print(f"REF SCRAPE ERROR ({card}): {e}")
+    else:
+        # リファラルがない場合は公式へのリンクなどを入れておく（空だと困る場合への保険）
+        meta_data[f"{card.lower()}_url"] = OFFICIAL_LINKS[card]
 
     if i < len(URLS) - 1:
         time.sleep(2)
