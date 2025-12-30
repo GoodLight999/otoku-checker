@@ -9,64 +9,69 @@
     <style>
         body { font-family: 'Inter', 'Noto Sans JP', sans-serif; background-color: #f1f5f9; }
         .card-shadow { box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06); }
+        /* スクロールバーを少しおしゃれに */
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #f1f5f9; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
     </style>
 </head>
 <body class="min-h-screen pb-20 text-slate-800">
-    <div class="max-w-xl mx-auto px-4 pt-8">
-        <header class="mb-6">
-            <h1 class="text-3xl font-black text-slate-900 tracking-tighter italic">還元チェッカー</h1>
+    <div class="max-w-2xl mx-auto px-6 pt-10">
+        <header class="mb-8">
+            <h1 class="text-4xl font-black text-slate-900 tracking-tighter italic">還元チェッカー</h1>
             <p class="text-xs font-bold text-slate-400 mt-1 uppercase tracking-widest">LLM-based Reward Analysis</p>
         </header>
 
-        <section class="bg-white rounded-2xl p-5 mb-6 border border-slate-200 card-shadow">
-            <div class="grid grid-cols-2 gap-4">
+        <section class="bg-white rounded-2xl p-6 mb-8 border border-slate-200 card-shadow">
+            <div class="grid grid-cols-2 gap-6">
                 <div>
-                    <div class="flex justify-between items-center mb-1">
-                        <label class="text-[10px] font-bold text-slate-500 uppercase">三井住友カード (最大20%)</label>
-                        <a href="https://www.smbc-card.com/mem/wp/vpoint_up_program/index.jsp" target="_blank" class="text-[10px] text-green-600 underline">公式詳細</a>
+                    <div class="flex justify-between items-center mb-2">
+                        <label class="text-xs font-bold text-slate-500 uppercase">三井住友カード (最大20%)</label>
+                        <a href="https://www.smbc-card.com/mem/wp/vpoint_up_program/index.jsp" target="_blank" class="text-xs text-green-600 underline hover:text-green-700">公式詳細</a>
                     </div>
-                    <div class="flex items-center bg-slate-50 rounded-xl px-3 py-2 border border-slate-200 focus-within:border-green-600 focus-within:ring-2 focus-within:ring-green-100 transition-all">
-                        <input type="number" id="smbc-rate" step="0.5" class="bg-transparent w-full font-black outline-none text-green-700 text-xl" placeholder="7.0">
-                        <span class="text-slate-400 font-bold text-xs">%</span>
+                    <div class="flex items-center bg-slate-50 rounded-xl px-4 py-3 border border-slate-200 focus-within:border-green-600 focus-within:ring-2 focus-within:ring-green-100 transition-all">
+                        <input type="number" id="smbc-rate" step="0.5" class="bg-transparent w-full font-black outline-none text-green-700 text-2xl" placeholder="7.0">
+                        <span class="text-slate-400 font-bold text-sm">%</span>
                     </div>
                 </div>
                 <div>
-                    <div class="flex justify-between items-center mb-1">
-                        <label class="text-[10px] font-bold text-slate-500 uppercase">三菱UFJカード (最大20%)</label>
-                        <a href="https://www.cr.mufg.jp/mufgcard/point/global/save/convenience_store/index.html" target="_blank" class="text-[10px] text-red-600 underline">公式詳細</a>
+                    <div class="flex justify-between items-center mb-2">
+                        <label class="text-xs font-bold text-slate-500 uppercase">三菱UFJカード (最大20%)</label>
+                        <a href="https://www.cr.mufg.jp/mufgcard/point/global/save/convenience_store/index.html" target="_blank" class="text-xs text-red-600 underline hover:text-red-700">公式詳細</a>
                     </div>
-                    <div class="flex items-center bg-slate-50 rounded-xl px-3 py-2 border border-slate-200 focus-within:border-red-600 focus-within:ring-2 focus-within:ring-red-100 transition-all">
-                        <input type="number" id="mufg-rate" step="0.5" class="bg-transparent w-full font-black outline-none text-red-600 text-xl" placeholder="5.5">
-                        <span class="text-slate-400 font-bold text-xs">%</span>
+                    <div class="flex items-center bg-slate-50 rounded-xl px-4 py-3 border border-slate-200 focus-within:border-red-600 focus-within:ring-2 focus-within:ring-red-100 transition-all">
+                        <input type="number" id="mufg-rate" step="0.5" class="bg-transparent w-full font-black outline-none text-red-600 text-2xl" placeholder="5.5">
+                        <span class="text-slate-400 font-bold text-sm">%</span>
                     </div>
                 </div>
             </div>
         </section>
 
-        <div class="sticky top-4 z-20 mb-6">
+        <div class="sticky top-6 z-20 mb-8">
             <div class="relative group">
-                <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                    <svg class="h-5 w-5 text-slate-400 group-focus-within:text-indigo-500 transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <div class="absolute inset-y-0 left-0 pl-5 flex items-center pointer-events-none">
+                    <svg class="h-6 w-6 text-slate-400 group-focus-within:text-indigo-500 transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                     </svg>
                 </div>
                 <input type="text" id="search" placeholder="店名・条件 (例: モス デリバリー)" 
-                    class="w-full pl-11 pr-4 py-4 rounded-2xl border-none shadow-xl shadow-slate-200/50 focus:ring-4 focus:ring-indigo-500/20 outline-none text-lg font-bold placeholder-slate-300 bg-white transition-all">
+                    class="w-full pl-14 pr-6 py-5 rounded-2xl border-none shadow-xl shadow-slate-200/50 focus:ring-4 focus:ring-indigo-500/20 outline-none text-xl font-bold placeholder-slate-300 bg-white transition-all">
             </div>
         </div>
 
-        <div id="results" class="space-y-4"></div>
+        <div id="results" class="space-y-5"></div>
 
-        <footer class="mt-12 text-center pb-8">
-            <div id="affiliate-footer" class="mb-8 border-t border-slate-200 pt-8"></div>
+        <footer class="mt-16 text-center pb-12">
+            <div id="affiliate-footer" class="mb-10 border-t border-slate-200 pt-10"></div>
             
-            <div class="text-[10px] text-slate-400 leading-relaxed max-w-xs mx-auto text-center">
-                <p class="mb-2">
+            <div class="text-xs text-slate-400 leading-relaxed max-w-md mx-auto text-center">
+                <p class="mb-3">
                     本データはAI解析による推定値です。<br>
                     正確な条件は必ず各公式サイトをご確認ください。
                 </p>
-                <p class="font-bold text-red-400">
-                    ※三菱UFJカードのAmexブランドは、<br>
+                <p class="font-bold text-red-400 bg-red-50 inline-block px-3 py-1 rounded-lg">
+                    ※三菱UFJカードのAmexブランドは、<br class="sm:hidden">
                     対象店舗や条件が大きく異なる場合があります。
                 </p>
             </div>
@@ -106,19 +111,16 @@
                       .toLowerCase();
         }
 
-        // URLからドメイン名を取得して表示用ラベルを作る関数
         function getSiteName(url) {
             try {
                 if (!url) return "Official";
                 const hostname = new URL(url).hostname;
-                // 一般的なアフィリエイト/ポイントサイトの識別
                 if (hostname.includes('moppy')) return 'Moppy';
                 if (hostname.includes('hapitas')) return 'Hapitas';
                 if (hostname.includes('a8.net')) return 'A8.net';
                 if (hostname.includes('smbc-card')) return 'SMBC';
                 if (hostname.includes('mufg')) return 'MUFG';
                 
-                // それ以外はドメインの先頭を表示
                 const domainPart = hostname.replace('www.', '').split('.')[0];
                 return domainPart.charAt(0).toUpperCase() + domainPart.slice(1);
             } catch {
@@ -136,7 +138,7 @@
             resultsDiv.innerHTML = '';
 
             if (!rawQuery) {
-                resultsDiv.innerHTML = '<p class="text-center text-slate-300 font-bold mt-20 text-sm italic tracking-widest uppercase opacity-50 tracking-tighter">Search for store rewards</p>';
+                resultsDiv.innerHTML = '<p class="text-center text-slate-300 font-bold mt-24 text-base italic tracking-widest uppercase opacity-50 tracking-tighter">Search for store rewards</p>';
                 updateFooter();
                 return;
             }
@@ -174,36 +176,37 @@
                 let conditionsHtml = '';
                 const c = s.conditions || {};
                 
-                if(c.payment_method) conditionsHtml += `<div class="text-[10px] leading-tight text-slate-500 mb-1"><span class="font-bold text-slate-700">決済:</span> ${c.payment_method}</div>`;
-                if(c.mobile_order) conditionsHtml += `<div class="text-[10px] leading-tight text-slate-500 mb-1"><span class="font-bold text-slate-700">スマホ注文:</span> ${c.mobile_order}</div>`;
-                if(c.delivery) conditionsHtml += `<div class="text-[10px] leading-tight text-slate-500 mb-1"><span class="font-bold text-slate-700">配達:</span> ${c.delivery}</div>`;
-                if(c.note) conditionsHtml += `<div class="text-[10px] leading-tight text-orange-600 font-bold mt-1 bg-orange-50 p-1 rounded border border-orange-100">⚠️ ${c.note}</div>`;
+                // 文字サイズ調整: text-[10px] -> text-xs
+                if(c.payment_method) conditionsHtml += `<div class="text-xs leading-tight text-slate-500 mb-1.5"><span class="font-bold text-slate-700">決済:</span> ${c.payment_method}</div>`;
+                if(c.mobile_order) conditionsHtml += `<div class="text-xs leading-tight text-slate-500 mb-1.5"><span class="font-bold text-slate-700">スマホ注文:</span> ${c.mobile_order}</div>`;
+                if(c.delivery) conditionsHtml += `<div class="text-xs leading-tight text-slate-500 mb-1.5"><span class="font-bold text-slate-700">配達:</span> ${c.delivery}</div>`;
+                if(c.note) conditionsHtml += `<div class="text-xs leading-normal text-orange-700 font-medium mt-2 bg-orange-50 p-2 rounded-lg border border-orange-100">⚠️ ${c.note}</div>`;
 
                 let linkHtml = '';
                 if (s.official_list_url) {
-                    linkHtml = `<a href="${s.official_list_url}" target="_blank" class="block mt-2 text-[10px] text-blue-500 underline text-right font-bold">📍 対象店舗リストを見る &rarr;</a>`;
+                    linkHtml = `<a href="${s.official_list_url}" target="_blank" class="block mt-3 text-xs text-blue-500 underline text-right font-bold hover:text-blue-600">📍 対象店舗リストを見る &rarr;</a>`;
                 } else {
-                    linkHtml = `<a href="${s.source_url}" target="_blank" class="block mt-2 text-[10px] text-slate-400 underline text-right">公式サイトで条件を確認 &rarr;</a>`;
+                    linkHtml = `<a href="${s.source_url}" target="_blank" class="block mt-3 text-xs text-slate-400 underline text-right hover:text-slate-500">公式サイトで条件を確認 &rarr;</a>`;
                 }
 
                 const html = `
-                <div class="bg-white rounded-2xl p-5 border border-slate-100 shadow-sm relative overflow-hidden">
-                    <div class="flex justify-between items-start mb-2">
+                <div class="bg-white rounded-2xl p-6 border border-slate-100 shadow-sm relative overflow-hidden group hover:shadow-md transition-shadow">
+                    <div class="flex justify-between items-start mb-3">
                         <div>
-                            <span class="inline-block px-2 py-0.5 rounded text-[9px] font-black text-white uppercase tracking-wider mb-1 ${badgeColor}">
+                            <span class="inline-block px-2.5 py-0.5 rounded text-[10px] font-black text-white uppercase tracking-wider mb-1.5 ${badgeColor}">
                                 ${isSmbc ? '三井住友' : '三菱UFJ'}
                             </span>
-                            ${s.group ? `<span class="ml-1 text-[9px] text-slate-400 font-bold uppercase">${s.group}</span>` : ''}
-                            <h3 class="text-lg font-black text-slate-800 leading-tight">${s.name}</h3>
+                            ${s.group ? `<span class="ml-2 text-[10px] text-slate-400 font-bold uppercase">${s.group}</span>` : ''}
+                            <h3 class="text-xl font-black text-slate-800 leading-tight">${s.name}</h3>
                         </div>
                         <div class="text-right">
-                            <div class="text-3xl font-black ${rateColor} tracking-tighter">
-                                ${s.currentRate}<span class="text-sm ml-0.5">%</span>
+                            <div class="text-4xl font-black ${rateColor} tracking-tighter">
+                                ${s.currentRate}<span class="text-base ml-1">%</span>
                             </div>
                         </div>
                     </div>
                     
-                    <div class="bg-slate-50 rounded-xl p-3 border border-slate-100 text-left">
+                    <div class="bg-slate-50 rounded-xl p-4 border border-slate-100 text-left">
                         ${conditionsHtml}
                         ${linkHtml}
                     </div>
@@ -214,32 +217,52 @@
             updateFooter();
         }
 
-        // data.jsonからURLを取得してリンクを生成する
+        // デザイン修正版フッター更新関数
         function updateFooter() {
             if (!footerDiv) return;
             const meta = storeData.meta || {};
             
-            // URLが取得できない場合は公式サイトへフォールバック
             const smbcUrl = meta.smbc_url || "https://www.smbc-card.com/mem/wp/vpoint_up_program/index.jsp";
             const mufgUrl = meta.mufg_url || "https://www.cr.mufg.jp/mufgcard/point/global/save/convenience_store/index.html";
 
             const smbcLabel = getSiteName(smbcUrl);
             const mufgLabel = getSiteName(mufgUrl);
 
+            // コンテナ幅を広げ、レイアウトをFlex-Rowで分離
+            // max-w-xs を削除し、親の幅に合わせる
             footerDiv.innerHTML = `
                 <div class="px-4">
-                    <p class="text-[9px] text-slate-400 leading-relaxed max-w-xs mx-auto mb-6 font-medium italic">
+                    <p class="text-xs text-slate-400 leading-relaxed max-w-lg mx-auto mb-8 font-medium italic">
                         ユーザーに利益のないアフィリエイトリンクよりも、ユーザー還元が大きい選択肢を提示することが、本ツールの持続的な信頼に繋がると判断しています。
                     </p>
-                    <div class="flex flex-col gap-2 max-w-xs mx-auto">
-                        <a href="${smbcUrl}" target="_blank" class="flex justify-between items-center px-4 py-2 bg-white border border-slate-200 rounded-lg text-[10px] text-slate-600 active:bg-slate-50 transition-colors shadow-sm shadow-slate-200/50">
-                            <span class="font-black tracking-tight">${meta.smbc_catch || '三井住友カード発行'}</span>
-                            <span class="text-slate-300 text-[8px] font-black uppercase">${smbcLabel} ↗</span>
+                    <div class="flex flex-col gap-4 max-w-xl mx-auto">
+                        
+                        <a href="${smbcUrl}" target="_blank" class="flex flex-row items-center justify-between gap-6 px-6 py-4 bg-white border border-slate-200 rounded-xl text-slate-700 active:bg-slate-50 transition-all shadow-sm shadow-slate-200/50 hover:shadow-md hover:border-green-200 group">
+                            <div class="flex-1 text-left">
+                                <span class="block font-bold text-sm leading-snug group-hover:text-green-700 transition-colors">
+                                    ${meta.smbc_catch || '三井住友カード発行'}
+                                </span>
+                            </div>
+                            <div class="shrink-0">
+                                <span class="text-slate-400 text-[10px] font-black uppercase bg-slate-100 px-2 py-1 rounded border border-slate-200 group-hover:bg-green-50 group-hover:text-green-600 group-hover:border-green-100 transition-colors">
+                                    ${smbcLabel} ↗
+                                </span>
+                            </div>
                         </a>
-                        <a href="${mufgUrl}" target="_blank" class="flex justify-between items-center px-4 py-2 bg-white border border-slate-200 rounded-lg text-[10px] text-slate-600 active:bg-slate-50 transition-colors shadow-sm shadow-slate-200/50">
-                            <span class="font-black tracking-tight">${meta.mufg_catch || '三菱UFJカード発行'}</span>
-                            <span class="text-slate-300 text-[8px] font-black uppercase">${mufgLabel} ↗</span>
+
+                        <a href="${mufgUrl}" target="_blank" class="flex flex-row items-center justify-between gap-6 px-6 py-4 bg-white border border-slate-200 rounded-xl text-slate-700 active:bg-slate-50 transition-all shadow-sm shadow-slate-200/50 hover:shadow-md hover:border-red-200 group">
+                            <div class="flex-1 text-left">
+                                <span class="block font-bold text-sm leading-snug group-hover:text-red-700 transition-colors">
+                                    ${meta.mufg_catch || '三菱UFJカード発行'}
+                                </span>
+                            </div>
+                            <div class="shrink-0">
+                                <span class="text-slate-400 text-[10px] font-black uppercase bg-slate-100 px-2 py-1 rounded border border-slate-200 group-hover:bg-red-50 group-hover:text-red-600 group-hover:border-red-100 transition-colors">
+                                    ${mufgLabel} ↗
+                                </span>
+                            </div>
                         </a>
+
                     </div>
                 </div>`;
         }
