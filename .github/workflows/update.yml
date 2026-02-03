@@ -20,7 +20,7 @@ jobs:
           
       - name: Install dependencies
         run: |
-          pip install requests google-genai
+          pip install requests google-genai curl_cffi
           
       - name: Run Scraper
         env:
