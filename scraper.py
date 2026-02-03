@@ -135,16 +135,20 @@ def fetch_and_extract(card_name, target_url):
         print(f"DEBUG: Direct fetch successful ({len(content)} chars)", flush=True)
 
     except Exception as e:
-        print(f"WARNING: Direct fetch failed ({e}). Trying Jina AI proxy...", flush=True)
-        # 2. Jina AI プロキシ経由での試行
-        try:
-            jina_url = f"https://r.jina.ai/{target_url}"
-            resp = requests.get(jina_url, timeout=60)
-            resp.raise_for_status()
-            content = resp.text # JinaはMarkdownを返す
-            print(f"DEBUG: Jina AI fetch successful ({len(content)} chars)", flush=True)
-        except Exception as jina_e:
-            print(f"ERROR: Jina AI fetch also failed: {jina_e}", flush=True)
+        print(f"WARNING: Direct fetch failed ({e}). Checking for local cache...", flush=True)
+        # 2. ローカルキャッシュ（リポジトリ内のファイル）を確認
+        # 自宅サーバーから定期的にPushされたHTMLがあればそれを使う
+        cache_path = f"html_cache/{card_name}.html"
+        if os.path.exists(cache_path):
+            try:
+                with open(cache_path, "r", encoding="utf-8") as f:
+                    content = f.read()
+                print(f"DEBUG: Local cache found and loaded ({len(content)} chars)", flush=True)
+            except Exception as cache_e:
+                print(f"ERROR: Failed to load local cache: {cache_e}", flush=True)
+                return []
+        else:
+            print(f"ERROR: No local cache found at {cache_path}. Giving up.", flush=True)
             return []
 
     if len(content) < 100:
