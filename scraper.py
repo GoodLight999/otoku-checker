@@ -1,5 +1,5 @@
 import os
-from curl_cffi import requests
+import requests
 import json
 import time
 import re
