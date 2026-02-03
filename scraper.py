@@ -112,27 +112,48 @@ def generate_catchphrase(card_name, referral_text):
 def fetch_and_extract(card_name, target_url):
     print(f"\n>>> Processing Official: {card_name}", flush=True)
     
+    content = ""
+    # 1. 既存のrequests + 偽装ヘッダーでの試行
     try:
-        # curl_cffiを使用してChromeブラウザに偽装する
-        # impersonate="chrome" によりTLSフィンガープリントまでChromeになりすます
-        resp = requests.get(target_url, impersonate="chrome", timeout=60)
+        headers = {
+            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/123.0.0.0 Safari/537.36",
+            "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7",
+            "Accept-Language": "ja,en-US;q=0.9,en;q=0.8",
+            "Sec-Ch-Ua": '"Google Chrome";v="123", "Not:A-Brand";v="8", "Chromium";v="123"',
+            "Sec-Ch-Ua-Mobile": "?0",
+            "Sec-Ch-Ua-Platform": '"Windows"',
+            "Sec-Fetch-Dest": "document",
+            "Sec-Fetch-Mode": "navigate",
+            "Sec-Fetch-Site": "none",
+            "Sec-Fetch-User": "?1",
+            "Upgrade-Insecure-Requests": "1"
+        }
+        resp = requests.get(target_url, headers=headers, timeout=60)
         resp.raise_for_status()
-        
         raw_html = resp.text
         content = clean_html_aggressive(raw_html)
-        
-        with open(f"debug_input_{card_name}.html", "w", encoding="utf-8") as f:
-            f.write(content)
-        print(f"DEBUG: Saved input HTML ({len(content)} chars)", flush=True)
-        
-        if len(content) < 100:
-            print("FATAL: Cleaned HTML is empty!", flush=True)
-            return []
-        
-    except Exception as e:
-        print(f"ERROR: Failed to fetch web content: {e}", flush=True)
-        return []
+        print(f"DEBUG: Direct fetch successful ({len(content)} chars)", flush=True)
 
+    except Exception as e:
+        print(f"WARNING: Direct fetch failed ({e}). Trying Jina AI proxy...", flush=True)
+        # 2. Jina AI プロキシ経由での試行
+        try:
+            jina_url = f"https://r.jina.ai/{target_url}"
+            resp = requests.get(jina_url, timeout=60)
+            resp.raise_for_status()
+            content = resp.text # JinaはMarkdownを返す
+            print(f"DEBUG: Jina AI fetch successful ({len(content)} chars)", flush=True)
+        except Exception as jina_e:
+            print(f"ERROR: Jina AI fetch also failed: {jina_e}", flush=True)
+            return []
+
+    if len(content) < 100:
+        print("FATAL: Content is empty!", flush=True)
+        return []
+        
+    with open(f"debug_input_{card_name}.html", "w", encoding="utf-8") as f:
+        f.write(content)
+        
     # 完全版プロンプト (商業施設内の対象外警告を強化)
     prompt = f"""
         You are an expert data analyst for Japanese credit card rewards (Poi-katsu).
@@ -272,7 +293,7 @@ for i, (card, url) in enumerate(URLS.items()):
         
         try:
             # こちらも偽装しておく
-            ref_resp = requests.get(ref_url, impersonate="chrome", timeout=30)
+            ref_resp = requests.get(ref_url, headers={"User-Agent": "Mozilla/5.0"}, timeout=30)
             ref_text = clean_html_aggressive(ref_resp.text)
             catch = generate_catchphrase(card, ref_text)
             if catch:
