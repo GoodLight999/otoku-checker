@@ -8,6 +8,7 @@ from urllib.parse import urljoin
 from google import genai
 from google.genai import types
 from google.genai.errors import ClientError
+import trafilatura
 
 # --- Configuration ---
 API_KEY = os.environ.get("GEMINI_API_KEY")
@@ -55,31 +56,33 @@ def clean_json_text(text):
     return text.strip()
 
 def clean_html_aggressive(html_text):
-    if not html_text: return ""
+    """
+    trafilatura を使ってHTMLからメインコンテンツを抽出
+    """
+    if not html_text:
+        return ""
     
-    # 巨大ブロック削除
-    blocks_to_kill = r'<(header|footer|nav|noscript|script|style|iframe|svg|aside)[^>]*>.*?</\1>'
-    html_text = re.sub(blocks_to_kill, '', html_text, flags=re.DOTALL | re.IGNORECASE)
-
-    html_text = re.sub(r'', '', html_text, flags=re.DOTALL)
-
-    # リンク以外削除
-    html_text = re.sub(r'<((?!a\s)[a-z0-9]+)\s+[^>]*>', r'<\1>', html_text, flags=re.IGNORECASE)
+    # trafilatura でメインコンテンツを抽出（テーブルも含む）
+    extracted = trafilatura.extract(
+        html_text,
+        output_format="txt",
+        include_tables=True,
+        include_links=True,
+        no_fallback=False
+    )
     
-    attrs_to_remove = ['class', 'id', 'style', 'target', 'rel', 'onclick', 'data-[a-z0-9-]+', 'aria-[a-z-]+', 'role']
-    for attr in attrs_to_remove:
-        html_text = re.sub(r'\s+' + attr + r'="[^"]*"', '', html_text, flags=re.IGNORECASE)
-        html_text = re.sub(r'\s+' + attr + r"='[^']*'", '', html_text, flags=re.IGNORECASE)
-
-    tags_to_strip = ['div', 'span', 'section', 'article', 'main', 'body', 'html', 'head']
-    for tag in tags_to_strip:
-        html_text = re.sub(r'<' + tag + r'[^>]*>', '', html_text, flags=re.IGNORECASE)
-        html_text = re.sub(r'</' + tag + r'>', '\n', html_text, flags=re.IGNORECASE)
-
-    html_text = re.sub(r'\n+', '\n', html_text)
-    html_text = re.sub(r' +', ' ', html_text)
+    if not extracted:
+        # フォールバック: 元の正規表現ベースのクリーニング
+        print("WARNING: trafilatura extraction failed, using regex fallback", flush=True)
+        blocks_to_kill = r'<(header|footer|nav|noscript|script|style|iframe|svg|aside)[^>]*>.*?</\1>'
+        html_text = re.sub(blocks_to_kill, '', html_text, flags=re.DOTALL | re.IGNORECASE)
+        html_text = re.sub(r'<((?!a\s)[a-z0-9]+)\s+[^>]*>', r'<\1>', html_text, flags=re.IGNORECASE)
+        html_text = re.sub(r'\n+', '\n', html_text)
+        html_text = re.sub(r' +', ' ', html_text)
+        return html_text[:95000].strip()
     
-    return html_text[:95000].strip()
+    # 文字数制限（Gemini API の制限に合わせる）
+    return extracted[:50000].strip()
 
 # リファラルリンクのテキストのみを根拠にする生成関数
 def generate_catchphrase(card_name, referral_text):
