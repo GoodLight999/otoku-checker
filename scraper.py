@@ -241,8 +241,8 @@ def fetch_and_extract(card_name, target_url):
 
         except ClientError as e:
             if "429" in str(e) or "RESOURCE_EXHAUSTED" in str(e):
-                print(f"WARNING: Rate Limit (429). Sleeping 5s...", flush=True)
-                time.sleep(5)
+                print(f"WARNING: Rate Limit (429). Sleeping 20s...", flush=True)
+                time.sleep(20)
                 continue
             else:
                 print(f"CRITICAL API ERROR: {e}", flush=True)
@@ -250,8 +250,8 @@ def fetch_and_extract(card_name, target_url):
         except Exception as e:
             print(f"WARNING: Network/Timeout Error ({e}).", flush=True)
             if attempt < max_retries - 1:
-                print("Retrying in 5s...", flush=True)
-                time.sleep(5)
+                print("Retrying in 20s...", flush=True)
+                time.sleep(20)
                 continue
             else:
                 return []
