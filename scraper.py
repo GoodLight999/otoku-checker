@@ -62,10 +62,10 @@ def clean_html_aggressive(html_text):
     if not html_text:
         return ""
     
-    # trafilatura でメインコンテンツを抽出（テーブルも含む）
+    # trafilatura でメインコンテンツを抽出（XMLフォーマット - 構造を保持）
     extracted = trafilatura.extract(
         html_text,
-        output_format="txt",
+        output_format="xml",
         include_tables=True,
         include_links=True,
         no_fallback=False
@@ -82,7 +82,7 @@ def clean_html_aggressive(html_text):
         return html_text[:95000].strip()
     
     # 文字数制限（Gemini API の制限に合わせる）
-    return extracted[:50000].strip()
+    return extracted[:70000].strip()
 
 # リファラルリンクのテキストのみを根拠にする生成関数
 def generate_catchphrase(card_name, referral_text):
