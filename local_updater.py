@@ -13,7 +13,7 @@ URLS = {
     "MUFG": "https://www.cr.mufg.jp/mufgcard/point/global/save/convenience_store/index.html"
 }
 
-CACHE_DIR = "otoku-checker/html_cache"
+CACHE_DIR = os.path.join(os.path.dirname(__file__), "html_cache")
 
 def clean_html_aggressive(html_text):
     import re
