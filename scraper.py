@@ -9,6 +9,7 @@ from google import genai
 from google.genai import types
 from google.genai.errors import ClientError
 import trafilatura
+from bs4 import BeautifulSoup
 
 # --- Configuration ---
 API_KEY = os.environ.get("GEMINI_API_KEY")
@@ -58,9 +59,22 @@ def clean_json_text(text):
 def clean_html_aggressive(html_text, card_name=""):
     """
     trafilatura を使ってHTMLからメインコンテンツを抽出
+    MUFGの場合はCSSセレクタで特定セクションのみ抽出
     """
     if not html_text:
         return ""
+    
+    # MUFGのみ、特定セクションをCSSセレクタで抽出
+    if card_name == "MUFG":
+        try:
+            soup = BeautifulSoup(html_text, 'html.parser')
+            # CSSセレクタ: #anc01
+            target = soup.select_one('#anc01')
+            if target:
+                html_text = str(target)
+                print(f"DEBUG: MUFG #anc01 extracted ({len(html_text)} chars)", flush=True)
+        except Exception as e:
+            print(f"WARNING: MUFG CSS selector extraction failed: {e}", flush=True)
     
     # trafilatura でメインコンテンツを抽出（テキスト形式）
     extracted = trafilatura.extract(
