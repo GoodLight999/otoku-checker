@@ -68,12 +68,12 @@ def clean_html_aggressive(html_text, card_name=""):
     if card_name == "MUFG":
         try:
             soup = BeautifulSoup(html_text, 'html.parser')
-            # CSSセレクタ: #anc01
-            target = soup.select_one('#anc01')
+            # CSSセレクタ: div.mt20:nth-child(4) #apuriLinkParticipatingStores > div:nth-child(7) #anc01 > section:nth-child(5/6)
+            target = soup.select_one('div.mt20:nth-child(4) #apuriLinkParticipatingStores > div:nth-child(7) #anc01 > section:nth-child(5) #anc01 > section:nth-child(6)')
             if target:
                 # trafilaturaをスキップして、BeautifulSoupで直接テキスト化
                 section_text = target.get_text(separator=' ', strip=True)
-                print(f"DEBUG: MUFG #anc01 extracted via BeautifulSoup ({len(section_text)} chars)", flush=True)
+                print(f"DEBUG: MUFG apuriLinkStores extracted via BeautifulSoup ({len(section_text)} chars)", flush=True)
                 return section_text[:95000]
         except Exception as e:
             print(f"WARNING: MUFG CSS selector extraction failed: {e}", flush=True)
