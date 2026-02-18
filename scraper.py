@@ -56,9 +56,23 @@ def clean_json_text(text):
 def clean_html_aggressive(html_text, card_name=""):
     """
     trafilatura を使ってHTMLからメインコンテンツを抽出
+    MUFGの場合はBeautifulSoupで#anc01を抽出して直接返す
     """
     if not html_text:
         return ""
+    
+    # MUFGのみ、BeautifulSoupで#anc01を抽出して直接返す
+    if card_name == "MUFG":
+        try:
+            from bs4 import BeautifulSoup
+            soup = BeautifulSoup(html_text, 'html.parser')
+            target = soup.select_one('#anc01')
+            if target:
+                section_text = target.get_text(separator=' ', strip=True)
+                print(f"DEBUG: MUFG #anc01 extracted via BeautifulSoup ({len(section_text)} chars)", flush=True)
+                return section_text[:95000]
+        except Exception as e:
+            print(f"WARNING: MUFG CSS selector extraction failed: {e}", flush=True)
     
     # trafilatura でメインコンテンツを抽出（テキスト形式）
     extracted = trafilatura.extract(
