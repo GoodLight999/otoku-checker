@@ -9,7 +9,6 @@ from google import genai
 from google.genai import types
 from google.genai.errors import ClientError
 import trafilatura
-from bs4 import BeautifulSoup
 
 # --- Configuration ---
 API_KEY = os.environ.get("GEMINI_API_KEY")
