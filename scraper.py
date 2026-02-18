@@ -9,6 +9,7 @@ from google import genai
 from google.genai import types
 from google.genai.errors import ClientError
 import trafilatura
+from bs4 import BeautifulSoup
 
 # --- Configuration ---
 API_KEY = os.environ.get("GEMINI_API_KEY")
@@ -55,12 +56,25 @@ def clean_json_text(text):
     if match: return match.group()
     return text.strip()
 
-def clean_html_aggressive(html_text):
+def clean_html_aggressive(html_text, card_name=""):
     """
     trafilatura を使ってHTMLからメインコンテンツを抽出
+    MUFGの場合はCSSセレクタで特定セクションのみ抽出
     """
     if not html_text:
         return ""
+    
+    # MUFGのみ、特定セクションをCSSセレクタで抽出
+    if card_name == "MUFG":
+        try:
+            soup = BeautifulSoup(html_text, 'html.parser')
+            # CSSセレクタ: #anc01
+            target = soup.select_one('#anc01')
+            if target:
+                html_text = str(target)
+                print(f"DEBUG: MUFG specific section extracted ({len(html_text)} chars)", flush=True)
+        except Exception as e:
+            print(f"WARNING: MUFG CSS selector extraction failed: {e}", flush=True)
     
     # trafilatura でメインコンテンツを抽出（テキスト形式）
     extracted = trafilatura.extract(
@@ -134,7 +148,7 @@ def fetch_and_extract(card_name, target_url):
         resp = requests.get(target_url, headers=headers, timeout=60)
         resp.raise_for_status()
         raw_html = resp.text
-        content = clean_html_aggressive(raw_html)
+        content = clean_html_aggressive(raw_html, card_name)
         print(f"DEBUG: Direct fetch successful ({len(content)} chars)", flush=True)
 
     except Exception as e:
@@ -301,7 +315,7 @@ for i, (card, url) in enumerate(URLS.items()):
         try:
             # こちらも偽装しておく
             ref_resp = requests.get(ref_url, headers={"User-Agent": "Mozilla/5.0"}, timeout=30)
-            ref_text = clean_html_aggressive(ref_resp.text)
+            ref_text = clean_html_aggressive(ref_resp.text, card)
             catch = generate_catchphrase(card, ref_text)
             if catch:
                 meta_data[f"{card.lower()}_catch"] = catch
