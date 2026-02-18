@@ -19,10 +19,10 @@ if not API_KEY:
     print("FATAL ERROR: 'GEMINI_API_KEY' environment variable is missing.", flush=True)
     sys.exit(1)
 
-# タイムアウト90秒 (オリジナル設定を厳守)
+# タイムアウト180秒
 client = genai.Client(
-    api_key=API_KEY, 
-    http_options=types.HttpOptions(timeout=90000) 
+    api_key=API_KEY,
+    http_options=types.HttpOptions(timeout=180000)
 )
 
 URLS = {
