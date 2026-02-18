@@ -9,7 +9,6 @@ from google import genai
 from google.genai import types
 from google.genai.errors import ClientError
 import trafilatura
-from bs4 import BeautifulSoup
 
 # --- Configuration ---
 API_KEY = os.environ.get("GEMINI_API_KEY")
@@ -36,13 +35,11 @@ OFFICIAL_LINKS = {
     "MUFG": "https://www.cr.mufg.jp/mufgcard/point/global/save/convenience_store/index.html"
 }
 
-# 相対パスを絶対パスに変換するためのベースドメイン定義
 BASE_DOMAINS = {
     "SMBC": "https://www.smbc-card.com",
     "MUFG": "https://www.cr.mufg.jp"
 }
 
-# 環境変数からリファラルURLを取得 (GitHub ActionsのVariablesから)
 REFERRAL_URLS = {
     "SMBC": os.environ.get("SMBC_REFERRAL_URL"),
     "MUFG": os.environ.get("MUFG_REFERRAL_URL")
@@ -59,24 +56,9 @@ def clean_json_text(text):
 def clean_html_aggressive(html_text, card_name=""):
     """
     trafilatura を使ってHTMLからメインコンテンツを抽出
-    MUFGの場合はCSSセレクタで特定セクションのみ抽出
     """
     if not html_text:
         return ""
-    
-    # MUFGのみ、特定セクションをCSSセレクタで抽出
-    if card_name == "MUFG":
-        try:
-            soup = BeautifulSoup(html_text, 'html.parser')
-            # CSSセレクタ: div.mt20:nth-child(4) #apuriLinkParticipatingStores > div:nth-child(7) #anc01 > section:nth-child(5/6)
-            target = soup.select_one('div.mt20:nth-child(4) #apuriLinkParticipatingStores > div:nth-child(7) #anc01 > section:nth-child(5) #anc01 > section:nth-child(6)')
-            if target:
-                # trafilaturaをスキップして、BeautifulSoupで直接テキスト化
-                section_text = target.get_text(separator=' ', strip=True)
-                print(f"DEBUG: MUFG apuriLinkStores extracted via BeautifulSoup ({len(section_text)} chars)", flush=True)
-                return section_text[:95000]
-        except Exception as e:
-            print(f"WARNING: MUFG CSS selector extraction failed: {e}", flush=True)
     
     # trafilatura でメインコンテンツを抽出（テキスト形式）
     extracted = trafilatura.extract(
@@ -100,7 +82,6 @@ def clean_html_aggressive(html_text, card_name=""):
     # 文字数制限（Gemini API の制限に合わせる）
     return extracted[:50000].strip()
 
-# リファラルリンクのテキストのみを根拠にする生成関数
 def generate_catchphrase(card_name, referral_text):
     if not referral_text or len(referral_text) < 50:
         return None
@@ -132,7 +113,6 @@ def fetch_and_extract(card_name, target_url):
     print(f"\n>>> Processing Official: {card_name}", flush=True)
     
     content = ""
-    # 1. 既存のrequests + 偽装ヘッダーでの試行
     try:
         headers = {
             "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/123.0.0.0 Safari/537.36",
@@ -155,8 +135,6 @@ def fetch_and_extract(card_name, target_url):
 
     except Exception as e:
         print(f"WARNING: Direct fetch failed ({e}). Checking for local cache...", flush=True)
-        # 2. ローカルキャッシュ（リポジトリ内のファイル）を確認
-        # 自宅サーバーから定期的にPushされたHTMLがあればそれを使う
         cache_path = f"html_cache/{card_name}.html"
         if os.path.exists(cache_path):
             try:
@@ -177,39 +155,38 @@ def fetch_and_extract(card_name, target_url):
     with open(f"debug_input_{card_name}.html", "w", encoding="utf-8") as f:
         f.write(content)
         
-    # 完全版プロンプト (商業施設内の対象外警告を強化)
     prompt = f"""
         You are an expert data analyst for Japanese credit card rewards (Poi-katsu).
-        Analyze the text and extract store data properly.
+        Analyze text and extract store data properly.
 
         【CRITICAL RULES】
         1. **OUTPUT LANGUAGE**: All string values MUST be in **JAPANESE**.
         
-        2. **GROUP NAME**: You MUST extract the formal group name if applicable.
+        2. **GROUP NAME**: You MUST extract formal group name if applicable.
            - Example: "ガスト" -> group: "すかいらーくグループ"
            - Example: "セブン-イレブン" -> group: null
 
         3. **ALIASES (略称)**: You MUST generate a rich list of search keywords, including slang.
-           - **KANJI TO HIRAGANA**: If the store name contains Kanji, you MUST include the Hiragana reading in aliases.
+           - **KANJI TO HIRAGANA**: If store name contains Kanji, you MUST include Hiragana reading in aliases.
            - "吉野家" -> ["よしのや", "吉牛", "よしの家"]
            - "McDonald's" -> ["マクド", "マック", "Mac", "マクドナルド"]
            - "Seicomart" -> ["セコマ", "セイコーマート", "せいこーまーと"]
            - "Seven-Eleven" -> ["セブン", "セブイレ", "セブンイレブン"]
         
         4. **MUFG SPECIAL CAUTION (Amex)**: 
-           - **CRITICAL**: MUFG American Express rules are often NOT in the text (provided only via images). 
-           - For ALL MUFG stores, you MUST append this warning to the `note`: "Amexは条件が異なる可能性があるため公式サイトを確認推奨".
+           - **CRITICAL**: MUFG American Express rules are often NOT in text (provided only via images). 
+           - For ALL MUFG stores, you MUST append this warning to `note`: "Amexは条件が異なる可能性があるため公式サイトを確認推奨".
            - Separate rules for Visa/Master/JCB vs Amex if text explicitly mentions it.
 
         5. **SPECIFIC STORE URLS**:
-           - If the text provides a specific URL for a store list (e.g., "サイゼリヤの対象店舗一覧はこちら", "ケンタッキー...はこちら"), EXTRACT that specific URL into `official_list_url`.
-           - **Saizeriya (SMBC)**: Must link to the specific store list URL if found.
-           - **KFC (SMBC)**: Must link to the specific store list URL if found.
+           - If text provides a specific URL for a store list (e.g., "サイゼリヤの対象店舗一覧はこちら", "ケンタッキー...はこちら"), EXTRACT that specific URL into `official_list_url`.
+           - **Saizeriya (SMBC)**: Must link to specific store list URL if found.
+           - **KFC (SMBC)**: Must link to specific store list URL if found.
            - If no specific list URL is found, set `official_list_url` to null.
            
         6. **COMMERCIAL FACILITIES (商業施設)**:
            - Check for footnotes or warnings about "commercial facilities" (商業施設).
-           - If the text mentions that stores inside commercial facilities/stations are excluded, you MUST explicitly include "商業施設内の店舗は対象外の場合あり" in the `note`.
+           - If text mentions that stores inside commercial facilities/stations are excluded, you MUST explicitly include "商業施設内の店舗は対象外の場合あり" in `note`.
            - This is highly critical for SMBC related stores.
 
         【Output JSON Schema】
@@ -294,7 +271,6 @@ final_stores_list = []
 meta_data = {}
 
 for i, (card, url) in enumerate(URLS.items()):
-    # 1. 公式サイトから店舗情報を抽出
     items = fetch_and_extract(card, url)
     if items:
         base_domain = BASE_DOMAINS.get(card, "") 
@@ -307,30 +283,25 @@ for i, (card, url) in enumerate(URLS.items()):
                 print(f"DEBUG: Fixed URL -> {item['official_list_url']}", flush=True)
         final_stores_list.extend(items)
 
-    # 2. リファラルサイトの情報処理 (URL保存 ＆ キャッチコピー生成)
     ref_url = REFERRAL_URLS.get(card)
     
-    # 修正ポイント: 環境変数のURLをmetaデータに必ず保存する
     if ref_url and ref_url != "#":
         meta_data[f"{card.lower()}_url"] = ref_url
         
         try:
-            # こちらも偽装しておく
             ref_resp = requests.get(ref_url, headers={"User-Agent": "Mozilla/5.0"}, timeout=30)
-            ref_text = clean_html_aggressive(ref_resp.text, card)
+            ref_text = clean_html_aggressive(ref_resp.text)
             catch = generate_catchphrase(card, ref_text)
             if catch:
                 meta_data[f"{card.lower()}_catch"] = catch
         except Exception as e:
             print(f"REF SCRAPE ERROR ({card}): {e}")
     else:
-        # リファラルがない場合は公式へのリンクなどを入れておく（空だと困る場合への保険）
         meta_data[f"{card.lower()}_url"] = OFFICIAL_LINKS[card]
 
     if i < len(URLS) - 1:
         time.sleep(2)
 
-# 出力構造を辞書形式に変更し、HTML側の参照を成立させる
 final_output = {
     "meta": meta_data,
     "stores": final_stores_list
