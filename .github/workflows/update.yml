@@ -20,7 +20,7 @@ jobs:
           
       - name: Install dependencies
         run: |
-          pip install requests google-genai trafilatura
+          pip install requests google-genai trafilatura beautifulsoup4
           
       - name: Run Scraper
         env:
