@@ -59,27 +59,9 @@ def clean_json_text(text):
 def clean_html_aggressive(html_text, card_name=""):
     """
     trafilatura を使ってHTMLからメインコンテンツを抽出
-    MUFGの場合はCSSセレクタで特定セクションのみ抽出
     """
     if not html_text:
         return ""
-    
-    # MUFGのみ、特定セクションをCSSセレクタで抽出
-    if card_name == "MUFG":
-        try:
-            soup = BeautifulSoup(html_text, 'html.parser')
-            # CSSセレクタ: section.section02 (店舗データが含まれるセクション)
-            sections = soup.select('section.section02')
-            if sections:
-                # 全てのsection02を結合してテキスト化
-                section_text = ''.join(str(s) for s in sections)
-                section_soup = BeautifulSoup(section_text, 'html.parser')
-                html_text = section_soup.get_text(separator=' ', strip=True)
-                print(f"DEBUG: MUFG section02 extracted ({len(html_text)} chars)", flush=True)
-                # traifulaturaをスキップして直接返す
-                return html_text[:95000]
-        except Exception as e:
-            print(f"WARNING: MUFG CSS selector extraction failed: {e}", flush=True)
     
     # trafilatura でメインコンテンツを抽出（テキスト形式）
     extracted = trafilatura.extract(
