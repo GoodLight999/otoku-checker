@@ -1,29 +1,33 @@
 import os
-import requests
 import json
 import time
 import re
 import sys
+from copy import deepcopy
+from pathlib import Path
 from urllib.parse import urljoin
 from google import genai
 from google.genai import types
 from google.genai.errors import ClientError
 import trafilatura
 
+from scrape_common import (
+    build_session,
+    decode_bytes,
+    decode_response,
+    headers_for,
+    is_useful_content,
+    repair_mojibake,
+)
+
 # --- Configuration ---
 API_KEY = os.environ.get("GEMINI_API_KEY")
 MODEL_ID = os.environ.get("GEMINI_MODEL_ID", "gemini-flash-latest")
-
-print(f"--- INITIALIZING DEBUG SCRAPER (MODEL: {MODEL_ID}) ---", flush=True)
-if not API_KEY:
-    print("FATAL ERROR: 'GEMINI_API_KEY' environment variable is missing.", flush=True)
-    sys.exit(1)
-
-# タイムアウト180秒
-client = genai.Client(
-    api_key=API_KEY,
-    http_options=types.HttpOptions(timeout=180000)
-)
+ROOT_DIR = Path(__file__).resolve().parent
+CACHE_DIR = ROOT_DIR / "html_cache"
+DATA_FILE = ROOT_DIR / "data.json"
+SESSION = build_session()
+_client = None
 
 URLS = {
     "SMBC": "https://www.smbc-card.com/mem/wp/vpoint_up_program/index.jsp",
@@ -44,6 +48,100 @@ REFERRAL_URLS = {
     "SMBC": os.environ.get("SMBC_REFERRAL_URL"),
     "MUFG": os.environ.get("MUFG_REFERRAL_URL")
 }
+
+def get_client():
+    global _client
+    if _client:
+        return _client
+    if not API_KEY:
+        print("FATAL ERROR: 'GEMINI_API_KEY' environment variable is missing.", flush=True)
+        sys.exit(1)
+
+    # タイムアウト180秒
+    _client = genai.Client(
+        api_key=API_KEY,
+        http_options=types.HttpOptions(timeout=180000)
+    )
+    return _client
+
+def load_previous_output():
+    if not DATA_FILE.exists():
+        return {}
+    try:
+        with DATA_FILE.open("r", encoding="utf-8") as f:
+            return json.load(f)
+    except Exception as e:
+        print(f"WARNING: Could not load previous data.json: {e}", flush=True)
+        return {}
+
+def fallback_items(card_name, reason):
+    previous = load_previous_output()
+    stores = [
+        deepcopy(item)
+        for item in previous.get("stores", [])
+        if item.get("card_type") == card_name
+    ]
+    if stores:
+        print(f"WARNING: Using previous {card_name} data ({len(stores)} items). Reason: {reason}", flush=True)
+    else:
+        print(f"ERROR: No previous {card_name} data available. Reason: {reason}", flush=True)
+    return stores
+
+def read_cached_html(card_name):
+    cache_path = CACHE_DIR / f"{card_name}.html"
+    if not cache_path.exists():
+        print(f"ERROR: No local cache found at {cache_path}.", flush=True)
+        return ""
+    try:
+        content = decode_bytes(cache_path.read_bytes())
+        content = repair_mojibake(content)
+        print(f"DEBUG: Local cache loaded ({len(content)} chars)", flush=True)
+        return content
+    except Exception as e:
+        print(f"ERROR: Failed to load local cache: {e}", flush=True)
+        return ""
+
+def get_source_html(card_name, target_url, cache_only=False):
+    if not cache_only:
+        try:
+            resp = SESSION.get(target_url, headers=headers_for(card_name), timeout=60)
+            print(f"DEBUG: Direct fetch status={resp.status_code} for {card_name}", flush=True)
+            resp.raise_for_status()
+            raw_html = decode_response(resp)
+            cleaned = clean_html_aggressive(raw_html, card_name)
+            if is_useful_content(card_name, cleaned):
+                print(f"DEBUG: Direct fetch validated ({len(cleaned)} chars)", flush=True)
+                return raw_html, "direct"
+            print("WARNING: Direct fetch did not contain expected official content. Checking cache...", flush=True)
+        except Exception as e:
+            print(f"WARNING: Direct fetch failed ({e}). Checking cache...", flush=True)
+    else:
+        print(f"DEBUG: Cache-only source check for {card_name}", flush=True)
+
+    cached = read_cached_html(card_name)
+    if not cached:
+        return "", "missing"
+
+    cleaned_cache = clean_html_aggressive(cached, card_name)
+    if is_useful_content(card_name, cleaned_cache):
+        print(f"DEBUG: Local cache validated ({len(cleaned_cache)} chars)", flush=True)
+        return cached, "cache"
+
+    return "", "invalid"
+
+def check_sources(cache_only=False):
+    ok = True
+    for card_name, url in URLS.items():
+        raw_html, source = get_source_html(card_name, url, cache_only=cache_only)
+        if not raw_html:
+            print(f"CHECK FAILED: {card_name} source unavailable ({source})", flush=True)
+            ok = False
+            continue
+        content = clean_html_aggressive(raw_html, card_name)
+        valid = is_useful_content(card_name, content)
+        print(f"CHECK {card_name}: source={source}, chars={len(content)}, valid={valid}", flush=True)
+        ok = ok and valid
+    return 0 if ok else 1
 
 def clean_json_text(text):
     if not text: return "[]"
@@ -114,7 +212,7 @@ def generate_catchphrase(card_name, referral_text):
         {referral_text[:20000]}
     """
     try:
-        response = client.models.generate_content(
+        response = get_client().models.generate_content(
             model=MODEL_ID, 
             contents=prompt,
             config={"response_mime_type": "application/json", "temperature": 0.0}
@@ -125,48 +223,17 @@ def generate_catchphrase(card_name, referral_text):
 
 def fetch_and_extract(card_name, target_url):
     print(f"\n>>> Processing Official: {card_name}", flush=True)
-    
-    content = ""
-    try:
-        headers = {
-            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/123.0.0.0 Safari/537.36",
-            "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7",
-            "Accept-Language": "ja,en-US;q=0.9,en;q=0.8",
-            "Sec-Ch-Ua": '"Google Chrome";v="123", "Not:A-Brand";v="8", "Chromium";v="123"',
-            "Sec-Ch-Ua-Mobile": "?0",
-            "Sec-Ch-Ua-Platform": '"Windows"',
-            "Sec-Fetch-Dest": "document",
-            "Sec-Fetch-Mode": "navigate",
-            "Sec-Fetch-Site": "none",
-            "Sec-Fetch-User": "?1",
-            "Upgrade-Insecure-Requests": "1"
-        }
-        resp = requests.get(target_url, headers=headers, timeout=60)
-        resp.raise_for_status()
-        raw_html = resp.text
-        content = clean_html_aggressive(raw_html, card_name)
-        print(f"DEBUG: Direct fetch successful ({len(content)} chars)", flush=True)
+    raw_html, source = get_source_html(card_name, target_url)
+    if not raw_html:
+        return fallback_items(card_name, f"source html unavailable ({source})")
 
-    except Exception as e:
-        print(f"WARNING: Direct fetch failed ({e}). Checking for local cache...", flush=True)
-        cache_path = f"html_cache/{card_name}.html"
-        if os.path.exists(cache_path):
-            try:
-                with open(cache_path, "r", encoding="utf-8") as f:
-                    content = f.read()
-                print(f"DEBUG: Local cache found and loaded ({len(content)} chars)", flush=True)
-            except Exception as cache_e:
-                print(f"ERROR: Failed to load local cache: {cache_e}", flush=True)
-                return []
-        else:
-            print(f"ERROR: No local cache found at {cache_path}. Giving up.", flush=True)
-            return []
+    content = clean_html_aggressive(raw_html, card_name)
 
     if len(content) < 100:
         print("FATAL: Content is empty!", flush=True)
-        return []
+        return fallback_items(card_name, "cleaned content is empty")
         
-    with open(f"debug_input_{card_name}.html", "w", encoding="utf-8") as f:
+    with open(ROOT_DIR / f"debug_input_{card_name}.html", "w", encoding="utf-8") as f:
         f.write(content)
         
     prompt = f"""
@@ -229,7 +296,7 @@ def fetch_and_extract(card_name, target_url):
         try:
             print(f"DEBUG: Requesting Gemini... (Attempt {attempt+1})", flush=True)
             
-            response = client.models.generate_content(
+            response = get_client().models.generate_content(
                 model=MODEL_ID, 
                 contents=prompt,
                 config={
@@ -253,7 +320,7 @@ def fetch_and_extract(card_name, target_url):
                 continue
             else:
                 print(f"CRITICAL API ERROR: {e}", flush=True)
-                return []
+                return fallback_items(card_name, "Gemini API client error")
         except Exception as e:
             print(f"WARNING: Network/Timeout Error ({e}).", flush=True)
             if attempt < max_retries - 1:
@@ -261,10 +328,10 @@ def fetch_and_extract(card_name, target_url):
                 time.sleep(20)
                 continue
             else:
-                return []
+                return fallback_items(card_name, "Gemini request failed after retries")
     
     try:
-        with open(f"debug_response_{card_name}.txt", "w", encoding="utf-8") as f:
+        with open(ROOT_DIR / f"debug_response_{card_name}.txt", "w", encoding="utf-8") as f:
             f.write(response_text if response_text else "EMPTY_RESPONSE")
     except:
         pass
@@ -272,60 +339,77 @@ def fetch_and_extract(card_name, target_url):
     try:
         cleaned_json = clean_json_text(response_text)
         data = json.loads(cleaned_json)
+        if not isinstance(data, list) or not data:
+            return fallback_items(card_name, "Gemini response did not contain store items")
         print(f"SUCCESS: Extracted {len(data)} items for {card_name}", flush=True)
         return data
     except Exception as e:
         print(f"JSON PARSE ERROR: {e}", flush=True)
-        with open(f"debug_error_{card_name}.txt", "w", encoding="utf-8") as f:
+        with open(ROOT_DIR / f"debug_error_{card_name}.txt", "w", encoding="utf-8") as f:
             f.write(str(e) + "\n\n" + response_text)
-        return []
+        return fallback_items(card_name, "Gemini response was not valid JSON")
 
-# --- Main Logic ---
-final_stores_list = []
-meta_data = {}
+def main():
+    print(f"--- INITIALIZING DEBUG SCRAPER (MODEL: {MODEL_ID}) ---", flush=True)
 
-for i, (card, url) in enumerate(URLS.items()):
-    items = fetch_and_extract(card, url)
-    if items:
-        base_domain = BASE_DOMAINS.get(card, "") 
-        for item in items:
-            item["card_type"] = card
-            item["source_url"] = OFFICIAL_LINKS[card]
-            raw_url = item.get("official_list_url")
-            if raw_url and not raw_url.startswith("http"):
-                item["official_list_url"] = urljoin(base_domain, raw_url)
-                print(f"DEBUG: Fixed URL -> {item['official_list_url']}", flush=True)
-        final_stores_list.extend(items)
+    final_stores_list = []
+    previous_output = load_previous_output()
+    meta_data = dict(previous_output.get("meta", {}))
 
-    ref_url = REFERRAL_URLS.get(card)
-    
-    if ref_url and ref_url != "#":
-        meta_data[f"{card.lower()}_url"] = ref_url
-        
-        try:
-            ref_resp = requests.get(ref_url, headers={"User-Agent": "Mozilla/5.0"}, timeout=30)
-            ref_text = clean_html_aggressive(ref_resp.text)
-            catch = generate_catchphrase(card, ref_text)
-            if catch:
-                meta_data[f"{card.lower()}_catch"] = catch
-        except Exception as e:
-            print(f"REF SCRAPE ERROR ({card}): {e}")
-    else:
-        meta_data[f"{card.lower()}_url"] = OFFICIAL_LINKS[card]
+    for i, (card, url) in enumerate(URLS.items()):
+        items = fetch_and_extract(card, url)
+        if items:
+            base_domain = BASE_DOMAINS.get(card, "")
+            for item in items:
+                item["card_type"] = card
+                item["source_url"] = OFFICIAL_LINKS[card]
+                raw_url = item.get("official_list_url")
+                if raw_url and not raw_url.startswith("http"):
+                    item["official_list_url"] = urljoin(base_domain, raw_url)
+                    print(f"DEBUG: Fixed URL -> {item['official_list_url']}", flush=True)
+            final_stores_list.extend(items)
 
-    if i < len(URLS) - 1:
-        time.sleep(2)
+        ref_url = REFERRAL_URLS.get(card)
 
-final_output = {
-    "meta": meta_data,
-    "stores": final_stores_list
-}
+        if ref_url and ref_url != "#":
+            meta_data[f"{card.lower()}_url"] = ref_url
 
-print(f"\n>>> Total items collected: {len(final_stores_list)}", flush=True)
+            try:
+                ref_resp = SESSION.get(ref_url, headers=headers_for(card), timeout=30)
+                ref_resp.raise_for_status()
+                ref_text = clean_html_aggressive(decode_response(ref_resp))
+                catch = generate_catchphrase(card, ref_text)
+                if catch:
+                    meta_data[f"{card.lower()}_catch"] = catch
+            except Exception as e:
+                print(f"REF SCRAPE ERROR ({card}): {e}")
+        else:
+            meta_data[f"{card.lower()}_url"] = OFFICIAL_LINKS[card]
 
-try:
-    with open("data.json", "w", encoding="utf-8") as f:
-        json.dump(final_output, f, ensure_ascii=False, indent=2)
-    print(f"SUCCESS: 'data.json' created with stores and referral-based meta.", flush=True)
-except Exception as e:
-    print(f"FATAL ERROR: Could not write data.json: {e}", flush=True)
+        if i < len(URLS) - 1:
+            time.sleep(2)
+
+    if not final_stores_list:
+        final_stores_list = deepcopy(previous_output.get("stores", []))
+        print("WARNING: All extraction failed; keeping previous stores data.", flush=True)
+
+    final_output = {
+        "meta": meta_data,
+        "stores": final_stores_list
+    }
+
+    print(f"\n>>> Total items collected: {len(final_stores_list)}", flush=True)
+
+    try:
+        with DATA_FILE.open("w", encoding="utf-8") as f:
+            json.dump(final_output, f, ensure_ascii=False, indent=2)
+        print(f"SUCCESS: 'data.json' created with stores and referral-based meta.", flush=True)
+    except Exception as e:
+        print(f"FATAL ERROR: Could not write data.json: {e}", flush=True)
+        sys.exit(1)
+
+
+if __name__ == "__main__":
+    if "--check-sources" in sys.argv:
+        sys.exit(check_sources(cache_only="--cache-only" in sys.argv))
+    main()

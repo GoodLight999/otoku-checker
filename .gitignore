@@ -1,2 +1,10 @@
 venv/
 venv_new/
+.venv/
+.venv311/
+.deps/
+.tmp/
+__pycache__/
+debug_input_*.html
+debug_response_*.txt
+debug_error_*.txt

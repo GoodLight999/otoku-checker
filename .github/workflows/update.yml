@@ -21,6 +21,12 @@ jobs:
       - name: Install dependencies
         run: |
           pip install requests google-genai trafilatura beautifulsoup4
+
+      - name: Run preflight checks
+        run: |
+          python -m unittest test_scrape_common.py
+          python scraper.py --check-sources
+          python scraper.py --check-sources --cache-only
           
       - name: Run Scraper
         env:

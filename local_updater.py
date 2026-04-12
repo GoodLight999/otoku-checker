@@ -1,8 +1,6 @@
 import os
-import requests
-import sys
-import datetime
-from urllib.parse import urljoin
+
+from scrape_common import build_session, decode_response, headers_for, is_useful_content
 
 # --- Configuration ---
 # このスクリプトは自宅サーバー(IP制限のない環境)で実行され、
@@ -14,6 +12,7 @@ URLS = {
 }
 
 CACHE_DIR = os.path.join(os.path.dirname(__file__), "html_cache")
+SESSION = build_session()
 
 def clean_html_aggressive(html_text):
     import re
@@ -37,33 +36,24 @@ def clean_html_aggressive(html_text):
 
     html_text = re.sub(r'\n+', '\n', html_text)
     html_text = re.sub(r' +', ' ', html_text)
-    return html_text[:95000].strip()
+    html_text = "\n".join(line.rstrip() for line in html_text.splitlines())
+    return html_text[:95000].strip() + "\n"
 
 def fetch_and_save(name, url):
     print(f"Fetching {name} from {url}...")
     try:
-        headers = {
-            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/123.0.0.0 Safari/537.36",
-             "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7",
-            "Accept-Language": "ja,en-US;q=0.9,en;q=0.8",
-            "Sec-Ch-Ua": '"Google Chrome";v="123", "Not:A-Brand";v="8", "Chromium";v="123"',
-            "Sec-Ch-Ua-Mobile": "?0",
-            "Sec-Ch-Ua-Platform": '"Windows"',
-            "Sec-Fetch-Dest": "document",
-            "Sec-Fetch-Mode": "navigate",
-            "Sec-Fetch-Site": "none",
-            "Sec-Fetch-User": "?1",
-            "Upgrade-Insecure-Requests": "1"
-        }
-        resp = requests.get(url, headers=headers, timeout=30)
+        resp = SESSION.get(url, headers=headers_for(name), timeout=30)
         resp.raise_for_status()
+        raw_html = decode_response(resp)
         
         # HTMLを軽量化してから保存
-        content = clean_html_aggressive(resp.text)
+        content = clean_html_aggressive(raw_html)
+        if not is_useful_content(name, content):
+            raise ValueError("Fetched HTML does not include expected official content")
         
         # 保存
         filepath = os.path.join(CACHE_DIR, f"{name}.html")
-        with open(filepath, "w", encoding="utf-8") as f:
+        with open(filepath, "w", encoding="utf-8", newline="\n") as f:
             f.write(content)
         print(f"Saved {name} to {filepath} ({len(content)} chars)")
         return True
@@ -80,10 +70,14 @@ def main():
         if fetch_and_save(name, url):
             success_count += 1
             
-    if success_count > 0:
+    if success_count == len(URLS):
         print("Updates found. Ready to commit.")
+    elif success_count > 0:
+        print(f"Partial cache update: {success_count}/{len(URLS)} files updated.")
+        raise SystemExit(1)
     else:
-        print("No updates or errors occurred.")
+        print("No cache files were updated.")
+        raise SystemExit(1)
 
 if __name__ == "__main__":
     main()
