@@ -104,11 +104,19 @@
             })
             .catch(err => resultsDiv.innerHTML = '<p class="text-center text-red-400 font-bold mt-10">データ読み込みエラー</p>');
 
-        function normalizeKana(str) {
+        function normalizeSearchText(str) {
             if (!str) return "";
             return str.normalize('NFKC')
                       .replace(/[\u30a1-\u30f6]/g, m => String.fromCharCode(m.charCodeAt(0) - 0x60))
+                      .replace(/[\p{P}\p{S}\s]+/gu, '')
                       .toLowerCase();
+        }
+
+        function splitSearchQueries(str) {
+            return str.trim()
+                      .split(/\s+/)
+                      .map(normalizeSearchText)
+                      .filter(Boolean);
         }
 
         function getSiteName(url) {
@@ -130,14 +138,14 @@
 
         function render() {
             const rawQuery = searchInput.value;
-            const queries = rawQuery.trim().split(/\s+/).map(normalizeKana);
+            const queries = splitSearchQueries(rawQuery);
             
             const smbcRate = parseFloat(smbcInput.value) || 0;
             const mufgRate = parseFloat(mufgInput.value) || 0;
 
             resultsDiv.innerHTML = '';
 
-            if (!rawQuery) {
+            if (queries.length === 0) {
                 resultsDiv.innerHTML = '<p class="text-center text-slate-300 font-bold mt-24 text-base italic tracking-widest uppercase opacity-50 tracking-tighter">Search for store rewards</p>';
                 updateFooter();
                 return;
@@ -152,7 +160,7 @@
                     s.group, 
                     ...(s.aliases || []),
                     ...conditionValues
-                ].map(normalizeKana);
+                ].map(normalizeSearchText);
                 
                 return queries.every(q => searchTargets.some(t => t.includes(q)));
             });
