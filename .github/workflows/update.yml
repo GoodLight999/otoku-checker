@@ -1,6 +1,16 @@
 name: Daily Data Update
 
 on:
+  push:
+    branches:
+      - main
+    paths:
+      - '.github/workflows/update.yml'
+      - 'scraper.py'
+      - 'scrape_common.py'
+      - 'local_updater.py'
+      - 'test_scrape_common.py'
+      - 'html_cache/**'
   schedule:
     - cron: '0 18 * * *' # 日本時間午前3時
   workflow_dispatch:
