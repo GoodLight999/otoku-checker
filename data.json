@@ -462,20 +462,20 @@
       "source_url": "https://www.smbc-card.com/mem/wp/vpoint_up_program/index.jsp"
     },
     {
-      "name": "セブン-イレブン",
+      "name": "セブン‐イレブン",
       "group": "セブン&アイ・ホールディングス",
       "aliases": [
         "せぶんいれぶん",
         "セブン",
         "セブイレ",
-        "7-11",
-        "セブンイレブン"
+        "セブンイレブン",
+        "7-Eleven"
       ],
       "conditions": {
-        "payment_method": "クレジットカード決済、カードタッチ決済、Apple Pay（QUICPay）",
-        "mobile_order": "対象外（スマホレジ対象外）",
+        "payment_method": "クレジットカード決済、タッチ決済、Apple Pay（QUICPay）",
+        "mobile_order": "対象外（スマホレジは対象外）",
         "delivery": "対象外",
-        "note": "商業施設内の店舗は対象外の場合あり。セブン自販機・オンラインは対象外。Amexは条件が異なる可能性があるため公式サイトを確認推奨"
+        "note": "商業施設内の店舗は対象外の場合あり。セブン自販機・オンラインショッピング・デリバリーサービスは対象外。Amexは条件が異なる可能性があるため公式サイトを確認推奨"
       },
       "official_list_url": null,
       "card_type": "MUFG",
@@ -483,18 +483,19 @@
     },
     {
       "name": "ローソン",
-      "group": "ローソン",
+      "group": null,
       "aliases": [
         "ろーそん",
-        "ローソンストア100",
+        "ローソン",
         "ナチュラルローソン",
-        "LAWSON"
+        "ローソンストア100",
+        "Lawson"
       ],
       "conditions": {
-        "payment_method": "クレジットカード決済、カードタッチ決済、Apple Pay（QUICPay）",
-        "mobile_order": "対象外（スマホレジ対象外）",
+        "payment_method": "クレジットカード決済、タッチ決済、Apple Pay（QUICPay）",
+        "mobile_order": "対象外（スマホレジは対象外）",
         "delivery": "対象外",
-        "note": "商業施設内の店舗は対象外の場合あり。駅ビル内・ガソリンスタンド併設店舗・オンラインは対象外の場合あり。ナチュラルローソン・ローソンストア100も対象。Amexは条件が異なる可能性があるため公式サイトを確認推奨"
+        "note": "商業施設内の店舗は対象外の場合あり。ナチュラルローソン・ローソンストア100も対象。駅ビル内、ガソリンスタンド併設店舗、オンライン、デリバリーは対象外の場合あり。Amexは条件が異なる可能性があるため公式サイトを確認推奨"
       },
       "official_list_url": null,
       "card_type": "MUFG",
@@ -504,17 +505,18 @@
       "name": "コカ・コーラ自販機",
       "group": "日本コカ・コーラ",
       "aliases": [
-        "こかこーら",
+        "こかこーらじはんき",
         "コカコーラ",
+        "コカ・コーラ",
         "Coke ON",
         "コークオン",
         "自販機"
       ],
       "conditions": {
-        "payment_method": "自販機上のタッチ決済（カード/QUICPay）、Coke ON Pay、Coke ON Pass（カード直接登録のみ、Apple Pay決済は対象外）",
-        "mobile_order": "Coke ONアプリでの決済対象",
+        "payment_method": "タッチ決済、QUICPay、Coke ON Pay/Pass（対象カード登録）",
+        "mobile_order": "Coke ON Pay/Pass利用のみ対象（Apple Pay利用分は対象外）",
         "delivery": "対象外",
-        "note": "Coke ON Pay/PassでのApple Pay利用分は対象外。Amexは条件が異なる可能性があるため公式サイトを確認推奨"
+        "note": "自販機上のタッチ決済またはCoke ONアプリに対象カードを登録した決済が対象。Apple Pay経由のCoke ONは対象外。Amexは条件が異なる可能性があるため公式サイトを確認推奨"
       },
       "official_list_url": null,
       "card_type": "MUFG",
@@ -524,16 +526,16 @@
       "name": "上島珈琲店",
       "group": "UCCグループ",
       "aliases": [
-        "うえしまこーひー",
-        "うえしま珈琲",
+        "うえしまこーひーてん",
+        "上島珈琲",
         "UCC Cafe Plaza",
         "ユーシーシー"
       ],
       "conditions": {
-        "payment_method": "クレジットカード決済、カードタッチ決済、Apple Pay（QUICPay）",
+        "payment_method": "クレジットカード決済、タッチ決済、Apple Pay（QUICPay）",
         "mobile_order": "対象外",
         "delivery": "対象外",
-        "note": "商業施設内の店舗は対象外の場合あり。UCC Cafe Plazaも対象。Amexは条件が異なる可能性があるため公式サイトを確認推奨"
+        "note": "商業施設内の店舗は対象外の場合あり。「UCC Cafe Plaza」各店も対象。Amexは条件が異なる可能性があるため公式サイトを確認推奨"
       },
       "official_list_url": null,
       "card_type": "MUFG",
@@ -544,14 +546,15 @@
       "group": "C-United",
       "aliases": [
         "かふぇどくりえ",
+        "カフェドクリエ",
         "クリエ",
-        "CAFÉ de CRIÉ"
+        "Cafe de Crie"
       ],
       "conditions": {
-        "payment_method": "クレジットカード決済、カードタッチ決済、Apple Pay（QUICPay）",
+        "payment_method": "クレジットカード決済、タッチ決済、Apple Pay（QUICPay）",
         "mobile_order": "対象外",
         "delivery": "対象外",
-        "note": "商業施設内の店舗は対象外の場合あり。モバイルオーダー・クリエカードチャージは対象外。Amexは条件が異なる可能性があるため公式サイトを確認推奨"
+        "note": "商業施設内の店舗は対象外の場合あり。モバイルオーダー、クリエカードチャージは対象外。Amexは条件が異なる可能性があるため公式サイトを確認推奨"
       },
       "official_list_url": null,
       "card_type": "MUFG",
@@ -559,17 +562,18 @@
     },
     {
       "name": "スターバックス",
-      "group": "スターバックス",
+      "group": null,
       "aliases": [
         "すたーばっくす",
         "スタバ",
+        "スターバックスコーヒー",
         "Starbucks"
       ],
       "conditions": {
         "payment_method": "スターバックス カードへのオンライン入金のみ",
-        "mobile_order": "スターバックス カードオンライン入金経由のみ対象",
+        "mobile_order": "対象外",
         "delivery": "対象外",
-        "note": "店頭での決済・入金およびApple Pay経由の入金は対象外。Amexは条件が異なる可能性があるため公式サイトを確認推奨"
+        "note": "スターバックス カードへのオンライン入金のみ対象。店頭でのご入金・ご利用やApple Payでのチャージは対象外。Amexは条件が異なる可能性があるため公式サイトを確認推奨"
       },
       "official_list_url": null,
       "card_type": "MUFG",
@@ -580,14 +584,14 @@
       "group": "くら寿司",
       "aliases": [
         "くらずし",
-        "無添くら寿司",
-        "くら"
+        "くら寿司",
+        "無添くら寿司"
       ],
       "conditions": {
-        "payment_method": "クレジットカード決済、カードタッチ決済、Apple Pay（QUICPay）",
-        "mobile_order": "対象外（スマホでお持ち帰り・どこでもくら寿司等の事前決済対象外）",
+        "payment_method": "クレジットカード決済、タッチ決済、Apple Pay（QUICPay）",
+        "mobile_order": "対象外",
         "delivery": "対象外",
-        "note": "商業施設内の店舗は対象外の場合あり（ららぽーとTOKYO-BAY店など）。通販等のオンライン事前決済は対象外。Amexは条件が異なる可能性があるため公式サイトを確認推奨"
+        "note": "商業施設内の店舗は対象外の場合あり（ららぽーとTOKYO-BAY店など）。スマホでお持ち帰り、どこでもくら寿司、通販などのオンライン事前決済は対象外。Amexは条件が異なる可能性があるため公式サイトを確認推奨"
       },
       "official_list_url": null,
       "card_type": "MUFG",
@@ -598,13 +602,14 @@
       "group": "FOOD & LIFE COMPANIES",
       "aliases": [
         "すしろー",
+        "スシロー",
         "あきんどスシロー"
       ],
       "conditions": {
-        "payment_method": "クレジットカード決済、カードタッチ決済、Apple Pay（QUICPay）",
-        "mobile_order": "対象外（オンライン決済対象外）",
+        "payment_method": "クレジットカード決済、タッチ決済、Apple Pay（QUICPay）",
+        "mobile_order": "対象外",
         "delivery": "対象外",
-        "note": "商業施設内の店舗は対象外の場合あり。京樽スシロー・スシローToGo・オンライン決済は対象外。Amexは条件が異なる可能性があるため公式サイトを確認推奨"
+        "note": "商業施設内の店舗は対象外の場合あり。オンライン決済、「京樽スシロー」「スシローToGo」は対象外。Amexは条件が異なる可能性があるため公式サイトを確認推奨"
       },
       "official_list_url": null,
       "card_type": "MUFG",
@@ -616,67 +621,40 @@
       "aliases": [
         "ぴざはっと",
         "ピザハット",
+        "ピザハットオンライン",
         "Pizza Hut"
       ],
       "conditions": {
-        "payment_method": "公式サイトおよび公式アプリでのオンラインクレジットカード決済",
-        "mobile_order": "公式サイト・公式アプリでの注文対象",
-        "delivery": "公式オンライン注文時は対象",
-        "note": "店頭決済ではなくオンラインクレジットカード決済が対象。Amexは条件が異なる可能性があるため公式サイトを確認推奨"
+        "payment_method": "公式サイトおよび公式アプリでのオンラインクレジットカード決済のみ",
+        "mobile_order": "公式アプリ注文は対象",
+        "delivery": "公式オンライン注文デリバリーは対象",
+        "note": "ピザハット公式サイトおよび公式アプリでのオンライン注文時のクレジットカード決済が対象（店頭決済は対象外）。Amexは条件が異なる可能性があるため公式サイトを確認推奨"
       },
       "official_list_url": null,
       "card_type": "MUFG",
       "source_url": "https://www.cr.mufg.jp/mufgcard/point/global/save/convenience_store/index.html"
     },
     {
-      "name": "松屋",
+      "name": "松屋・松のや・マイカリー食堂",
       "group": "松屋フーズ",
       "aliases": [
         "まつや",
+        "松屋",
+        "まつのや",
+        "松のや",
+        "まいかりーしょくどう",
+        "マイカリー食堂",
         "松弁ネット",
         "松屋モバイルオーダー",
-        "松弁デリバリー"
+        "松弁デリバリー",
+        "ステーキ屋松",
+        "すし松"
       ],
       "conditions": {
-        "payment_method": "店舗券売機・セルフレジでのクレジットカード決済、Apple Pay（QUICPay）、松弁ネット・松屋モバイルオーダー・松弁デリバリーのクレジット決済",
-        "mobile_order": "松屋モバイルオーダー・松弁ネット対象",
-        "delivery": "松弁デリバリー対象（公式オンラインショップは対象外）",
-        "note": "商業施設内の店舗は対象外の場合あり（高速道路SA・PA内店舗など）。Amexは条件が異なる可能性があるため公式サイトを確認推奨"
-      },
-      "official_list_url": null,
-      "card_type": "MUFG",
-      "source_url": "https://www.cr.mufg.jp/mufgcard/point/global/save/convenience_store/index.html"
-    },
-    {
-      "name": "松のや",
-      "group": "松屋フーズ",
-      "aliases": [
-        "まつのや",
-        "松乃家",
-        "まつのいえ"
-      ],
-      "conditions": {
-        "payment_method": "店舗券売機・セルフレジでのクレジットカード決済、Apple Pay（QUICPay）、松弁ネット・松屋モバイルオーダー・松弁デリバリーのクレジット決済",
-        "mobile_order": "松屋モバイルオーダー・松弁ネット対象",
-        "delivery": "松弁デリバリー対象",
-        "note": "高速道路SA・PA内店舗など一部対象外あり。Amexは条件が異なる可能性があるため公式サイトを確認推奨"
-      },
-      "official_list_url": null,
-      "card_type": "MUFG",
-      "source_url": "https://www.cr.mufg.jp/mufgcard/point/global/save/convenience_store/index.html"
-    },
-    {
-      "name": "マイカリー食堂",
-      "group": "松屋フーズ",
-      "aliases": [
-        "まいかりーしょくどう",
-        "マイカリー"
-      ],
-      "conditions": {
-        "payment_method": "店舗券売機・セルフレジでのクレジットカード決済、Apple Pay（QUICPay）、松弁ネット・松屋モバイルオーダー・松弁デリバリーのクレジット決済",
-        "mobile_order": "松屋モバイルオーダー・松弁ネット対象",
-        "delivery": "松弁デリバリー対象",
-        "note": "高速道路SA・PA内店舗など一部対象外あり。Amexは条件が異なる可能性があるため公式サイトを確認推奨"
+        "payment_method": "店頭券売機・セルフレジでのクレカ/Apple Pay（QUICPay）、またはネット注文でのクレカ決済",
+        "mobile_order": "松弁ネット・松屋モバイルオーダーは対象",
+        "delivery": "松弁デリバリーは対象",
+        "note": "商業施設内の店舗は対象外の場合あり（高速道路SA・PA内店舗など）。松弁ネット・モバイルオーダー・松弁デリバリー対応ブランドも対象。松屋公式オンラインショップは対象外。Amexは条件が異なる可能性があるため公式サイトを確認推奨"
       },
       "official_list_url": null,
       "card_type": "MUFG",
@@ -684,17 +662,17 @@
     },
     {
       "name": "ゼッテリア",
-      "group": "ゼンショーホールディングス",
+      "group": "ロッテリア",
       "aliases": [
         "ぜってりあ",
-        "ZETTERIA",
-        "ロッテリア"
+        "ゼッテリア",
+        "ZETTERIA"
       ],
       "conditions": {
-        "payment_method": "店頭でのクレジットカード決済、公式アプリモバイルオーダーのクレジット決済",
-        "mobile_order": "公式アプリでのモバイルオーダー対象",
+        "payment_method": "店頭クレジットカード決済、タッチ決済、Apple Pay（QUICPay）、公式アプリモバイルオーダー",
+        "mobile_order": "公式アプリでのクレジット決済のみ対象",
         "delivery": "対象外",
-        "note": "商業施設内の店舗は対象外の場合あり。Amexは条件が異なる可能性があるため公式サイトを確認推奨"
+        "note": "商業施設内の店舗は対象外の場合あり。店頭決済および公式アプリでのモバイルオーダーが対象。Amexは条件が異なる可能性があるため公式サイトを確認推奨"
       },
       "official_list_url": null,
       "card_type": "MUFG",
@@ -705,14 +683,14 @@
       "group": "セブン&アイ・ホールディングス",
       "aliases": [
         "あかちゃんほんぽ",
-        "赤ちゃん本舗",
-        "アカホン"
+        "アカチャンホンポ",
+        "赤ちゃん本舗"
       ],
       "conditions": {
-        "payment_method": "クレジットカード決済（店頭はMastercard/JCB/Visaのみ、QUICPay対象外）、アカチャンホンポ Online Shop",
-        "mobile_order": "オンラインショップ対象",
-        "delivery": "オンラインショップ対象",
-        "note": "商業施設内の店舗は対象外の場合あり。店頭でのQUICPay利用は対象外。フランチャイズ店舗対象外の場合あり。Amexは条件が異なる可能性があるため公式サイトを確認推奨"
+        "payment_method": "クレジットカード決済（店頭はMastercard/Visa/JCBのみ、QUICPay対象外）、オンラインショップ",
+        "mobile_order": "対象外",
+        "delivery": "公式オンラインショップは対象",
+        "note": "商業施設内の店舗は対象外の場合あり。フランチャイズ店舗、QUICPay利用は対象外。店頭ではMastercard/Visa/JCBのみ対象。Amexは条件が異なる可能性があるため公式サイトを確認推奨"
       },
       "official_list_url": null,
       "card_type": "MUFG",
@@ -723,13 +701,14 @@
       "group": "カーブスホールディングス",
       "aliases": [
         "かーぶす",
+        "カーブス",
         "Curves"
       ],
       "conditions": {
-        "payment_method": "クレジットカード決済（入会金・月会費）",
+        "payment_method": "クレジットカード決済",
         "mobile_order": "対象外",
         "delivery": "対象外",
-        "note": "入会金および月会費のご利用が対象。Amexは条件が異なる可能性があるため公式サイトを確認推奨"
+        "note": "入会金、月会費のご利用が対象。Amexは条件が異なる可能性があるため公式サイトを確認推奨"
       },
       "official_list_url": null,
       "card_type": "MUFG",
@@ -739,13 +718,14 @@
       "name": "アオキスーパー",
       "group": null,
       "aliases": [
-        "あおきすーぱー"
+        "あおきすーぱー",
+        "アオキスーパー"
       ],
       "conditions": {
-        "payment_method": "クレジットカード決済、カードタッチ決済、Apple Pay（QUICPay）",
+        "payment_method": "クレジットカード決済、タッチ決済、Apple Pay（QUICPay）",
         "mobile_order": "対象外",
-        "delivery": "対象外",
-        "note": "商業施設内の店舗は対象外の場合あり（ショッピングセンターアズパーク内専門店等対象外）。クイックコマース・インターネット・別レジ精算は対象外。Amexは条件が異なる可能性があるため公式サイトを確認推奨"
+        "delivery": "対象外（クイックコマース対象外）",
+        "note": "商業施設内の店舗は対象外の場合あり（アズパーク内専門店等対象外）。食品スーパー以外、ネット利用、クイックコマースは対象外。Amexは条件が異なる可能性があるため公式サイトを確認推奨"
       },
       "official_list_url": null,
       "card_type": "MUFG",
@@ -756,13 +736,14 @@
       "group": "あおき",
       "aliases": [
         "ふーどすとああおき",
+        "フードストアあおき",
         "あおき"
       ],
       "conditions": {
-        "payment_method": "クレジットカード決済、カードタッチ決済、Apple Pay（QUICPay）",
+        "payment_method": "クレジットカード決済、タッチ決済、Apple Pay（QUICPay）",
         "mobile_order": "対象外",
-        "delivery": "対象外",
-        "note": "食品スーパー以外およびネットスーパーは対象外。Amexは条件が異なる可能性があるため公式サイトを確認推奨"
+        "delivery": "対象外（ネットスーパー対象外）",
+        "note": "食品スーパー以外のご利用、ネットスーパーは対象外。Amexは条件が異なる可能性があるため公式サイトを確認推奨"
       },
       "official_list_url": null,
       "card_type": "MUFG",
@@ -773,14 +754,15 @@
       "group": "オーケー",
       "aliases": [
         "おーけー",
+        "オーケー",
         "OKストア",
         "オーケーストア"
       ],
       "conditions": {
-        "payment_method": "クレジットカード決済、カードタッチ決済、Apple Pay（QUICPay）",
+        "payment_method": "クレジットカード決済、タッチ決済、Apple Pay（QUICPay）",
         "mobile_order": "対象外",
-        "delivery": "対象外",
-        "note": "食品スーパー以外およびネットスーパーは対象外。Amexは条件が異なる可能性があるため公式サイトを確認推奨"
+        "delivery": "対象外（ネットスーパー対象外）",
+        "note": "食品スーパー以外のご利用、ネットスーパーは対象外。Amexは条件が異なる可能性があるため公式サイトを確認推奨"
       },
       "official_list_url": null,
       "card_type": "MUFG",
@@ -788,16 +770,16 @@
     },
     {
       "name": "オオゼキ",
-      "group": null,
+      "group": "オオゼキ",
       "aliases": [
         "おおぜき",
-        "大関"
+        "オオゼキ"
       ],
       "conditions": {
-        "payment_method": "クレジットカード決済、カードタッチ決済、Apple Pay（QUICPay）",
+        "payment_method": "クレジットカード決済、タッチ決済、Apple Pay（QUICPay）",
         "mobile_order": "対象外",
-        "delivery": "対象外",
-        "note": "オンラインストア・ネットスーパー・食品スーパー以外は対象外。Amexは条件が異なる可能性があるため公式サイトを確認推奨"
+        "delivery": "対象外（ネットスーパー・オンラインストア対象外）",
+        "note": "食品スーパー以外のご利用、オンラインストア、ネットスーパーは対象外。Amexは条件が異なる可能性があるため公式サイトを確認推奨"
       },
       "official_list_url": null,
       "card_type": "MUFG",
@@ -808,37 +790,38 @@
       "group": "サンリブグループ",
       "aliases": [
         "さんりぶ",
+        "サンリブ",
+        "まるしょく",
         "マルショク",
         "リブホール",
         "サンク",
-        "サンリブBUONO",
-        "まるしょく"
+        "サンリブBUONO"
       ],
       "conditions": {
-        "payment_method": "クレジットカード決済、カードタッチ決済、Apple Pay（QUICPay）",
+        "payment_method": "クレジットカード決済、タッチ決済、Apple Pay（QUICPay）",
         "mobile_order": "対象外",
-        "delivery": "対象外",
-        "note": "マルショク・リブホール・サンク・サンリブBUONO各店も対象。テナント・ネットスーパー・食品スーパー以外は対象外。Amexは条件が異なる可能性があるため公式サイトを確認推奨"
+        "delivery": "対象外（ネットスーパー対象外）",
+        "note": "「マルショク」「リブホール」「サンク」「サンリブBUONO」も対象。テナント、ネットスーパー、食品スーパー以外のご利用は対象外。Amexは条件が異なる可能性があるため公式サイトを確認推奨"
       },
       "official_list_url": null,
       "card_type": "MUFG",
       "source_url": "https://www.cr.mufg.jp/mufgcard/point/global/save/convenience_store/index.html"
     },
     {
-      "name": "三和",
+      "name": "三和・フードワン",
       "group": "三和",
       "aliases": [
         "さんわ",
-        "フードワン",
+        "三和",
         "ふーどわん",
-        "SANWA",
-        "FOOD ONE"
+        "フードワン",
+        "スーパー三和"
       ],
       "conditions": {
-        "payment_method": "クレジットカード決済、カードタッチ決済、Apple Pay（QUICPay）",
+        "payment_method": "クレジットカード決済、タッチ決済、Apple Pay（QUICPay）",
         "mobile_order": "対象外",
         "delivery": "対象外",
-        "note": "フードワン各店も対象。食品スーパー以外のご利用は対象外。Amexは条件が異なる可能性があるため公式サイトを確認推奨"
+        "note": "食品スーパー以外のご利用は対象外。Amexは条件が異なる可能性があるため公式サイトを確認推奨"
       },
       "official_list_url": null,
       "card_type": "MUFG",
@@ -849,15 +832,17 @@
       "group": "魚長",
       "aliases": [
         "すーぱーうおちょう",
+        "スーパー魚長",
         "うおちょう",
+        "魚長",
         "生鮮乃木市場",
         "生鮮げんき市場"
       ],
       "conditions": {
-        "payment_method": "クレジットカード決済、カードタッチ決済、Apple Pay（QUICPay）",
+        "payment_method": "クレジットカード決済、タッチ決済、Apple Pay（QUICPay）",
         "mobile_order": "対象外",
         "delivery": "対象外",
-        "note": "生鮮乃木市場・生鮮げんき市場も対象。食品スーパー以外のご利用は対象外。Amexは条件が異なる可能性があるため公式サイトを確認推奨"
+        "note": "「生鮮乃木市場」「生鮮げんき市場」も対象。食品スーパー以外のご利用は対象外。Amexは条件が異なる可能性があるため公式サイトを確認推奨"
       },
       "official_list_url": null,
       "card_type": "MUFG",
@@ -868,16 +853,17 @@
       "group": "近鉄グループ",
       "aliases": [
         "きんしょうすとあ",
+        "近商ストア",
+        "はーべす",
         "ハーベス",
         "Pochette",
-        "はーべす",
         "ポシェット"
       ],
       "conditions": {
-        "payment_method": "クレジットカード決済、カードタッチ決済、Apple Pay（QUICPay）",
+        "payment_method": "クレジットカード決済、タッチ決済、Apple Pay（QUICPay）",
         "mobile_order": "対象外",
-        "delivery": "対象外",
-        "note": "ハーベス・Pochetteも対象。ネットスーパー・食品スーパー以外は対象外。Amexは条件が異なる可能性があるため公式サイトを確認推奨"
+        "delivery": "対象外（ネットスーパー対象外）",
+        "note": "「ハーベス」「Pochette」も対象。ネットスーパー、食品スーパー以外のご利用は対象外。Amexは条件が異なる可能性があるため公式サイトを確認推奨"
       },
       "official_list_url": null,
       "card_type": "MUFG",
@@ -888,15 +874,16 @@
       "group": "東急グループ",
       "aliases": [
         "とうきゅうすとあ",
+        "東急ストア",
+        "ぷれっせ",
         "プレッセ",
-        "フードステーション",
-        "TOKYU STORE"
+        "フードステーション"
       ],
       "conditions": {
-        "payment_method": "クレジットカード決済、カードタッチ決済、Apple Pay（QUICPay）",
+        "payment_method": "クレジットカード決済、タッチ決済、Apple Pay（QUICPay）",
         "mobile_order": "対象外",
-        "delivery": "対象外",
-        "note": "プレッセ・フードステーションも対象。テナント・ネットスーパー・食品スーパー以外は対象外。Amexは条件が異なる可能性があるため公式サイトを確認推奨"
+        "delivery": "対象外（ネットスーパー対象外）",
+        "note": "「プレッセ」「フードステーション」も対象。テナント、ネットスーパー、食品スーパー以外のご利用は対象外。Amexは条件が異なる可能性があるため公式サイトを確認推奨"
       },
       "official_list_url": null,
       "card_type": "MUFG",
@@ -907,13 +894,13 @@
       "group": "東武グループ",
       "aliases": [
         "とうぶすとあ",
-        "TOBU STORE"
+        "東武ストア"
       ],
       "conditions": {
-        "payment_method": "クレジットカード決済、カードタッチ決済、Apple Pay（QUICPay）",
+        "payment_method": "クレジットカード決済、タッチ決済、Apple Pay（QUICPay）",
         "mobile_order": "対象外",
-        "delivery": "対象外",
-        "note": "ネットショップ・手ぶら決済・専門店売り場・食品スーパー以外は対象外。Amexは条件が異なる可能性があるため公式サイトを確認推奨"
+        "delivery": "対象外（ネットショップ対象外）",
+        "note": "ネットショップ、手ぶら決済、専門店売り場、食品スーパー以外のご利用は対象外。Amexは条件が異なる可能性があるため公式サイトを確認推奨"
       },
       "official_list_url": null,
       "card_type": "MUFG",
@@ -921,13 +908,14 @@
     },
     {
       "name": "ドミー",
-      "group": null,
+      "group": "ドミー",
       "aliases": [
         "どみー",
+        "ドミー",
         "DOMY"
       ],
       "conditions": {
-        "payment_method": "クレジットカード決済、カードタッチ決済、Apple Pay（QUICPay）",
+        "payment_method": "クレジットカード決済、タッチ決済、Apple Pay（QUICPay）",
         "mobile_order": "対象外",
         "delivery": "対象外",
         "note": "食品スーパー以外のご利用は対象外。Amexは条件が異なる可能性があるため公式サイトを確認推奨"
@@ -938,17 +926,18 @@
     },
     {
       "name": "肉のハナマサ",
-      "group": "花正",
+      "group": "JMホールディングス",
       "aliases": [
         "にくのはなまさ",
+        "肉のハナマサ",
         "はなまさ",
         "ハナマサ"
       ],
       "conditions": {
-        "payment_method": "クレジットカード決済、カードタッチ決済、Apple Pay（QUICPay）",
+        "payment_method": "クレジットカード決済、タッチ決済、Apple Pay（QUICPay）",
         "mobile_order": "対象外",
         "delivery": "対象外",
-        "note": "フランチャイズ店・食品スーパー以外のご利用は対象外。Amexは条件が異なる可能性があるため公式サイトを確認推奨"
+        "note": "フランチャイズ店、食品スーパー以外のご利用は対象外。Amexは条件が異なる可能性があるため公式サイトを確認推奨"
       },
       "official_list_url": null,
       "card_type": "MUFG",
@@ -959,15 +948,16 @@
       "group": "JMホールディングス",
       "aliases": [
         "じゃぱんみーと",
+        "ジャパンミート",
         "MEATMeet",
-        "パワーマート",
-        "ミートミート"
+        "ミートミート",
+        "パワーマート"
       ],
       "conditions": {
-        "payment_method": "クレジットカード決済、カードタッチ決済、Apple Pay（QUICPay）",
+        "payment_method": "クレジットカード決済、タッチ決済、Apple Pay（QUICPay）",
         "mobile_order": "対象外",
         "delivery": "対象外",
-        "note": "MEATMeet・パワーマートも対象。食品スーパー以外のご利用は対象外。Amexは条件が異なる可能性があるため公式サイトを確認推奨"
+        "note": "「MEATMeet」「パワーマート」も対象。食品スーパー以外のご利用は対象外。Amexは条件が異なる可能性があるため公式サイトを確認推奨"
       },
       "official_list_url": null,
       "card_type": "MUFG",
@@ -978,13 +968,14 @@
       "group": "フィールコーポレーション",
       "aliases": [
         "ふぃーる",
+        "フィール",
         "FEEL"
       ],
       "conditions": {
-        "payment_method": "クレジットカード決済、カードタッチ決済、Apple Pay（QUICPay）",
+        "payment_method": "クレジットカード決済、タッチ決済、Apple Pay（QUICPay）",
         "mobile_order": "対象外",
         "delivery": "対象外",
-        "note": "テナント・インターネット・食品スーパー以外のご利用は対象外。Amexは条件が異なる可能性があるため公式サイトを確認推奨"
+        "note": "テナント、インターネット、食品スーパー以外のご利用は対象外。Amexは条件が異なる可能性があるため公式サイトを確認推奨"
       },
       "official_list_url": null,
       "card_type": "MUFG",
@@ -995,15 +986,16 @@
       "group": "ヤマナカ",
       "aliases": [
         "やまなか",
+        "ヤマナカ",
+        "ふらんて",
         "フランテ",
-        "フランテロゼ",
-        "ふらんて"
+        "フランテロゼ"
       ],
       "conditions": {
-        "payment_method": "クレジットカード決済、カードタッチ決済、Apple Pay（QUICPay）",
+        "payment_method": "クレジットカード決済、タッチ決済、Apple Pay（QUICPay）",
         "mobile_order": "対象外",
-        "delivery": "対象外",
-        "note": "フランテ・フランテロゼも対象。ネットスーパー・食品スーパー以外のご利用は対象外。Amexは条件が異なる可能性があるため公式サイトを確認推奨"
+        "delivery": "対象外（ネットスーパー対象外）",
+        "note": "「フランテ」「フランテロゼ」も対象。ネットスーパー、食品スーパー以外のご利用は対象外。Amexは条件が異なる可能性があるため公式サイトを確認推奨"
       },
       "official_list_url": null,
       "card_type": "MUFG",
